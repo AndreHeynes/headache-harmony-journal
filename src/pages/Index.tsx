@@ -2,50 +2,56 @@
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PlusCircle, Activity } from "lucide-react";
+import { Activity, ChartLine, Search } from "lucide-react";
 
 export default function Index() {
   return (
-    <AppLayout>
-      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-        {/* Welcome Section */}
-        <section className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-charcoal">
-            Headache Experience Journal
-          </h1>
-          <p className="text-lg text-charcoal/70 max-w-2xl mx-auto">
-            Track your headache experiences, identify patterns, and gain valuable insights
-            for better health management.
+    <div className="min-h-screen bg-gradient-to-br from-secondary-dark via-charcoal to-primary-dark">
+      <div className="max-w-md mx-auto p-6 space-y-8 animate-fade-in">
+        {/* Logo and Welcome Section */}
+        <div className="text-center space-y-6">
+          <div className="w-24 h-24 mx-auto bg-white/10 rounded-full flex items-center justify-center">
+            <Activity className="w-12 h-12 text-primary" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-white">
+              Welcome
+            </h1>
+            <h2 className="text-xl text-white/80">
+              My Headache Experience Journal!
+            </h2>
+          </div>
+          <p className="text-white/60">
+            Let's start the journey of developing a better understanding of your headache experience.
           </p>
-        </section>
+        </div>
 
-        {/* Quick Actions */}
-        <Card className="glass p-6 animate-slide-in">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-charcoal">Ready to log your experience?</h2>
-              <p className="text-charcoal/70">Record your headache details for better tracking.</p>
+        {/* Feature Icons */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { icon: Activity, label: "Participate" },
+            { icon: Search, label: "Understand" },
+            { icon: ChartLine, label: "Recognize" }
+          ].map((item, index) => (
+            <div key={index} className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
+                <item.icon className="w-8 h-8 text-primary" />
+              </div>
+              <span className="text-white/80 text-sm">{item.label}</span>
             </div>
-            <Button className="bg-primary hover:bg-primary-dark text-charcoal" size="lg">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              New Entry
-            </Button>
-          </div>
-        </Card>
+          ))}
+        </div>
 
-        {/* Recent Activity */}
-        <Card className="glass p-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-charcoal">
-              <Activity className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Recent Activity</h2>
-            </div>
-            <div className="text-center py-8 text-charcoal/60">
-              <p>No entries yet. Start by adding your first headache experience.</p>
-            </div>
-          </div>
-        </Card>
+        {/* Action Buttons */}
+        <div className="space-y-4 pt-4">
+          <Button className="w-full bg-primary hover:bg-primary-dark text-charcoal font-semibold h-12">
+            Let's Start
+          </Button>
+          <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10 h-12">
+            My Account
+          </Button>
+        </div>
       </div>
-    </AppLayout>
+    </div>
   );
 }
