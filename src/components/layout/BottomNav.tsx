@@ -12,7 +12,7 @@ const navItems = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 w-full bg-charcoal/80 backdrop-blur-lg border-t border-white/10">
+    <nav className="fixed bottom-0 w-full bg-charcoal/80 backdrop-blur-sm border-t border-white/5">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item) => (
           <Link

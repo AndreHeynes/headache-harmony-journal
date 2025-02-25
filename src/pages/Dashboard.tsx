@@ -7,8 +7,8 @@ import BottomNav from "@/components/layout/BottomNav";
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-dark via-charcoal to-primary-dark pb-20">
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-charcoal/80 backdrop-blur-lg border-b border-white/10 z-50">
+      {/* Header - Updated border opacity */}
+      <header className="fixed top-0 w-full bg-charcoal/80 backdrop-blur-sm border-b border-white/5 z-50">
         <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center space-x-2">
             <Activity className="h-6 w-6 text-primary" />
