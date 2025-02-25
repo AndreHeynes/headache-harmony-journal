@@ -1,7 +1,7 @@
-
 import { Activity, ArrowRight, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function Dashboard() {
@@ -33,9 +33,11 @@ export default function Dashboard() {
                 <span className="text-primary font-bold">7/10</span>
               </div>
             </div>
-            <Button className="w-full bg-primary hover:bg-primary-dark text-charcoal h-12">
-              Log New Headache
-            </Button>
+            <Link to="/log">
+              <Button className="w-full bg-primary hover:bg-primary-dark text-charcoal h-12">
+                Log New Headache
+              </Button>
+            </Link>
           </div>
         </Card>
 
