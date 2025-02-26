@@ -1,72 +1,116 @@
+
 import { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 export default function LogSymptoms() {
-  const [neckPainChecked, setNeckPainChecked] = useState(false);
-  const [neckPainTiming, setNeckPainTiming] = useState<string>("");
-
-  const commonSymptoms = [
-    "Nausea",
-    "Vomiting",
-    "Sensitivity to Light",
-    "Sensitivity to Sound",
-    "Visual Disturbances",
-    "Dizziness",
-    "Fatigue"
-  ];
+  const navigate = useNavigate();
+  const [selectedSide, setSelectedSide] = useState<string>("");
+  const [customSymptom, setCustomSymptom] = useState("");
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-white/5 border-white/10">
-        <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Associated Symptoms</h2>
-          <div className="space-y-3">
-            {commonSymptoms.map((symptom) => (
-              <Label key={symptom} className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5">
-                <Checkbox className="border-primary data-[state=checked]:bg-primary" />
-                <span className="ml-3 text-white">{symptom}</span>
-              </Label>
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4">
+      <header className="flex items-center justify-between mb-6">
+        <button className="text-gray-400" onClick={() => navigate(-1)}>
+          <i className="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+        <h1 className="text-xl font-semibold">Associated Symptoms</h1>
+        <button className="text-gray-400">
+          <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
+        </button>
+      </header>
+
+      <main className="space-y-6">
+        <section id="common-symptoms" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Common Symptoms</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {['Nausea', 'Vomiting', 'Dizziness', 'Pins & Needles'].map((symptom) => (
+              <label key={symptom} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                <input type="checkbox" className="form-checkbox rounded bg-gray-600 border-gray-500 text-primary" />
+                <span>{symptom}</span>
+              </label>
             ))}
+          </div>
+        </section>
 
-            {/* Neck Pain Section */}
-            <div className="space-y-3">
-              <Label className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5">
-                <Checkbox 
-                  className="border-primary data-[state=checked]:bg-primary"
-                  checked={neckPainChecked}
-                  onCheckedChange={(checked: boolean) => setNeckPainChecked(checked)}
+        <section id="functional-difficulties" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Functional Difficulties</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {['Speech Difficulty', 'Swallowing Difficulty'].map((difficulty) => (
+              <label key={difficulty} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                <input type="checkbox" className="form-checkbox rounded bg-gray-600 border-gray-500 text-primary" />
+                <span>{difficulty}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section id="visual-disturbances" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Visual Disturbances</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {['Seeing Stars', 'Dark Spots', 'Line Patterns'].map((disturbance) => (
+              <label key={disturbance} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                <input type="checkbox" className="form-checkbox rounded bg-gray-600 border-gray-500 text-primary" />
+                <span>{disturbance}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section id="sensory-sensitivity" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Sensory Sensitivity</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {['Sound Sensitivity', 'Light Sensitivity'].map((sensitivity) => (
+              <label key={sensitivity} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                <input type="checkbox" className="form-checkbox rounded bg-gray-600 border-gray-500 text-primary" />
+                <span>{sensitivity}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section id="body-weakness" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Body Weakness</h2>
+          <div className="space-y-3">
+            {['Right Side', 'Left Side', 'Both Sides'].map((side) => (
+              <label key={side} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                <input 
+                  type="radio" 
+                  name="side" 
+                  value={side}
+                  checked={selectedSide === side}
+                  onChange={(e) => setSelectedSide(e.target.value)}
+                  className="form-radio bg-gray-600 border-gray-500 text-primary"
                 />
-                <span className="ml-3 text-white">Neck Pain</span>
-              </Label>
+                <span>{side}</span>
+              </label>
+            ))}
+          </div>
+        </section>
 
-              {neckPainChecked && (
-                <div className="ml-6 p-3 rounded-lg border border-white/10 bg-white/5">
-                  <p className="text-sm text-white/60 mb-3">When did the neck pain start?</p>
-                  <RadioGroup value={neckPainTiming} onValueChange={setNeckPainTiming}>
-                    <div className="space-y-2">
-                      <Label className="flex items-center p-2 rounded-lg hover:bg-white/5">
-                        <RadioGroupItem value="before" className="text-primary" />
-                        <span className="ml-3 text-white">Before headache started</span>
-                      </Label>
-                      <Label className="flex items-center p-2 rounded-lg hover:bg-white/5">
-                        <RadioGroupItem value="during" className="text-primary" />
-                        <span className="ml-3 text-white">During headache</span>
-                      </Label>
-                      <Label className="flex items-center p-2 rounded-lg hover:bg-white/5">
-                        <RadioGroupItem value="after" className="text-primary" />
-                        <span className="ml-3 text-white">After headache started</span>
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              )}
+        <section id="custom-symptom" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Custom Symptom</h2>
+          <div className="relative">
+            <input 
+              type="text" 
+              value={customSymptom}
+              onChange={(e) => setCustomSymptom(e.target.value)}
+              maxLength={50} 
+              placeholder="Enter custom symptom" 
+              className="w-full bg-gray-700/30 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white placeholder-gray-400"
+            />
+            <div className="absolute right-3 top-3 text-gray-400">
+              <i className="fa-solid fa-plus"></i>
             </div>
           </div>
-        </div>
-      </Card>
+        </section>
+      </main>
+
+      <footer className="mt-6 flex justify-center">
+        <Button className="w-full bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-lg shadow-lg">
+          Save Symptoms
+        </Button>
+      </footer>
     </div>
   );
 }
