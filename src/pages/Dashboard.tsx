@@ -1,10 +1,14 @@
-import { Activity, ArrowRight, Clock } from "lucide-react";
+
+import { Activity, ArrowRight, Clock, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function Dashboard() {
+  // This would come from your auth/subscription system
+  const isPremium = false;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-dark via-charcoal to-primary-dark pb-20">
       {/* Header - Updated border opacity */}
@@ -102,6 +106,7 @@ export default function Dashboard() {
           <div className="p-4 space-y-4">
             <h2 className="text-lg font-bold text-white">Quick Insights</h2>
             <div className="space-y-4">
+              {/* Free Features */}
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-white/60">Most Common Trigger</div>
@@ -116,6 +121,28 @@ export default function Dashboard() {
                 </div>
                 <Clock className="h-5 w-5 text-primary" />
               </div>
+
+              {/* Premium Features (Locked) */}
+              {!isPremium && (
+                <>
+                  <div className="flex items-center justify-between opacity-50">
+                    <div>
+                      <div className="text-sm text-white/60">Pattern Analysis</div>
+                      <div className="text-white">Most Common Times</div>
+                    </div>
+                    <Lock className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex items-center justify-between opacity-50">
+                    <div>
+                      <div className="text-sm text-white/60">Trigger Correlation</div>
+                      <div className="text-white">Impact Analysis</div>
+                    </div>
+                    <Lock className="h-5 w-5 text-primary" />
+                  </div>
+                </>
+              )}
+
+              {/* Upgrade Button */}
               <div className="bg-primary/10 rounded-lg p-3 cursor-pointer">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white">Upgrade for Full Insights</span>
