@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,9 +51,9 @@ export default function LogVariables() {
           humidity: 45
         };
       } catch (error) {
-        toast({
-          title: "Weather data unavailable",
-          description: "Using manual weather input instead",
+        // Fixed toast usage to match sonner's API
+        toast("Weather data unavailable", {
+          description: "Using manual weather input instead"
         });
         throw error;
       }
@@ -61,8 +61,8 @@ export default function LogVariables() {
     enabled: true, // Enable the query by default
   });
 
-  // Update weather condition when weather data changes
-  useState(() => {
+  // Fixed: Changed useState to useEffect for handling weather data updates
+  useEffect(() => {
     if (weatherData?.condition) {
       setWeatherCondition(weatherData.condition);
     }
