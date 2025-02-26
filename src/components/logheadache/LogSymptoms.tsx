@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,8 @@ export default function LogSymptoms() {
   const navigate = useNavigate();
   const [selectedSide, setSelectedSide] = useState<string>("");
   const [customSymptom, setCustomSymptom] = useState("");
+  const [hasNeckPain, setHasNeckPain] = useState(false);
+  const [neckPainTiming, setNeckPainTiming] = useState("");
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-4">
@@ -30,6 +31,40 @@ export default function LogSymptoms() {
                 <span>{symptom}</span>
               </label>
             ))}
+          </div>
+        </section>
+
+        <section id="neck-pain" className="bg-gray-800/50 rounded-xl p-4 shadow-lg border border-gray-700">
+          <h2 className="text-lg font-medium mb-4 text-primary">Neck Pain</h2>
+          <div className="space-y-4">
+            <label className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+              <input 
+                type="checkbox" 
+                checked={hasNeckPain}
+                onChange={(e) => setHasNeckPain(e.target.checked)}
+                className="form-checkbox rounded bg-gray-600 border-gray-500 text-primary" 
+              />
+              <span>Experiencing Neck Pain</span>
+            </label>
+
+            {hasNeckPain && (
+              <div className="space-y-3 ml-4">
+                <div className="text-sm text-gray-400 mb-2">When did the neck pain start?</div>
+                {['Before headache started', 'During headache', 'After headache started'].map((timing) => (
+                  <label key={timing} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/30 border border-gray-600">
+                    <input 
+                      type="radio"
+                      name="neckPainTiming"
+                      value={timing}
+                      checked={neckPainTiming === timing}
+                      onChange={(e) => setNeckPainTiming(e.target.value)}
+                      className="form-radio bg-gray-600 border-gray-500 text-primary"
+                    />
+                    <span>{timing}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
