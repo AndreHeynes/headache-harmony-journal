@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import LogPainLocation from "@/components/logheadache/LogPainLocation";
 import LogPainIntensity from "@/components/logheadache/LogPainIntensity";
 import LogPainDuration from "@/components/logheadache/LogPainDuration";
-import LogPainFrequency from "@/components/logheadache/LogPainFrequency";
 import LogSymptoms from "@/components/logheadache/LogSymptoms";
 import LogTriggers from "@/components/logheadache/LogTriggers";
 import LogVariables from "@/components/logheadache/LogVariables";
@@ -16,7 +15,6 @@ const steps = [
   { id: 'location', title: 'Pain Location', component: LogPainLocation },
   { id: 'intensity', title: 'Pain Intensity', component: LogPainIntensity },
   { id: 'duration', title: 'Pain Duration', component: LogPainDuration },
-  { id: 'frequency', title: 'Pain Frequency', component: LogPainFrequency },
   { id: 'symptoms', title: 'Associated Symptoms', component: LogSymptoms },
   { id: 'triggers', title: 'Triggers', component: LogTriggers },
   { id: 'variables', title: 'Self-Determined Variables', component: LogVariables },
