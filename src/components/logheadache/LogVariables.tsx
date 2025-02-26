@@ -1,9 +1,12 @@
 
+import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { useQuery } from '@tanstack/react-query';
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -12,7 +15,83 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface WeatherData {
+  condition: string;
+  temperature: number;
+  humidity: number;
+}
+
 export default function LogVariables() {
+  // Basic Variables State
+  const [stressLevel, setStressLevel] = useState<number>(5);
+  const [sleepQuality, setSleepQuality] = useState<string>("");
+  const [sleepHours, setSleepHours] = useState<number>(8);
+  const [waterIntake, setWaterIntake] = useState<number>(0);
+
+  // Environmental Conditions State
+  const [lightSensitivity, setLightSensitivity] = useState<string>("");
+  const [noiseLevel, setNoiseLevel] = useState<string>("");
+  const [weatherCondition, setWeatherCondition] = useState<string>("");
+
+  // Menstrual Cycle State
+  const [cycleTrackingEnabled, setCycleTrackingEnabled] = useState<boolean>(false);
+  const [cyclePhase, setCyclePhase] = useState<string>("");
+  const [cycleDay, setCycleDay] = useState<number>(1);
+
+  // Weather API Integration
+  const { data: weatherData } = useQuery({
+    queryKey: ['weather'],
+    queryFn: async (): Promise<WeatherData> => {
+      try {
+        // Note: In a real app, you'd want to handle location permission and use a real weather API
+        // This is just a mock implementation
+        return {
+          condition: 'sunny',
+          temperature: 22,
+          humidity: 45
+        };
+      } catch (error) {
+        toast({
+          title: "Weather data unavailable",
+          description: "Using manual weather input instead",
+        });
+        throw error;
+      }
+    },
+    enabled: true, // Enable the query by default
+  });
+
+  // Update weather condition when weather data changes
+  useState(() => {
+    if (weatherData?.condition) {
+      setWeatherCondition(weatherData.condition);
+    }
+  }, [weatherData]);
+
+  // Handle form submission
+  const handleSubmit = () => {
+    const data = {
+      basicVariables: {
+        stressLevel,
+        sleepQuality,
+        sleepHours,
+        waterIntake,
+      },
+      environmentalConditions: {
+        lightSensitivity,
+        noiseLevel,
+        weatherCondition,
+      },
+      menstrualCycle: cycleTrackingEnabled ? {
+        phase: cyclePhase,
+        day: cycleDay,
+      } : null,
+    };
+
+    // This data would be saved to your backend
+    console.log('Submitting variables:', data);
+  };
+
   return (
     <div className="space-y-6">
       <Card className="bg-white/5 border-white/10">
@@ -23,12 +102,18 @@ export default function LogVariables() {
           <div className="space-y-6">
             <div>
               <Label className="text-white/60">Stress Level</Label>
-              <Slider defaultValue={[5]} max={10} step={1} className="mt-2" />
+              <Slider 
+                defaultValue={[stressLevel]} 
+                max={10} 
+                step={1} 
+                className="mt-2"
+                onValueChange={(value) => setStressLevel(value[0])} 
+              />
             </div>
             
             <div>
               <Label className="text-white/60">Sleep Quality</Label>
-              <Select>
+              <Select value={sleepQuality} onValueChange={setSleepQuality}>
                 <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select sleep quality" />
                 </SelectTrigger>
@@ -43,12 +128,25 @@ export default function LogVariables() {
 
             <div>
               <Label className="text-white/60">Hours of Sleep</Label>
-              <Input type="number" min="0" max="24" className="mt-1 bg-white/5 border-white/10 text-white" />
+              <Input 
+                type="number" 
+                min="0" 
+                max="24" 
+                value={sleepHours}
+                onChange={(e) => setSleepHours(Number(e.target.value))}
+                className="mt-1 bg-white/5 border-white/10 text-white" 
+              />
             </div>
 
             <div>
               <Label className="text-white/60">Water Intake (glasses)</Label>
-              <Input type="number" min="0" className="mt-1 bg-white/5 border-white/10 text-white" />
+              <Input 
+                type="number" 
+                min="0" 
+                value={waterIntake}
+                onChange={(e) => setWaterIntake(Number(e.target.value))}
+                className="mt-1 bg-white/5 border-white/10 text-white" 
+              />
             </div>
           </div>
 
@@ -58,7 +156,7 @@ export default function LogVariables() {
             
             <div>
               <Label className="text-white/60">Light Sensitivity</Label>
-              <Select>
+              <Select value={lightSensitivity} onValueChange={setLightSensitivity}>
                 <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select light condition" />
                 </SelectTrigger>
@@ -73,7 +171,7 @@ export default function LogVariables() {
 
             <div>
               <Label className="text-white/60">Noise Level</Label>
-              <Select>
+              <Select value={noiseLevel} onValueChange={setNoiseLevel}>
                 <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select noise level" />
                 </SelectTrigger>
@@ -88,7 +186,7 @@ export default function LogVariables() {
 
             <div>
               <Label className="text-white/60">Weather Conditions</Label>
-              <Select>
+              <Select value={weatherCondition} onValueChange={setWeatherCondition}>
                 <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
                   <SelectValue placeholder="Select weather condition" />
                 </SelectTrigger>
@@ -108,34 +206,43 @@ export default function LogVariables() {
           <div className="space-y-4 pt-4 border-t border-white/10">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-medium text-white">Menstrual Cycle</h3>
-              <Switch />
-            </div>
-
-            <div>
-              <Label className="text-white/60">Cycle Phase</Label>
-              <Select>
-                <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
-                  <SelectValue placeholder="Select cycle phase" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="menstrual">Menstrual Phase</SelectItem>
-                  <SelectItem value="follicular">Follicular Phase</SelectItem>
-                  <SelectItem value="ovulation">Ovulation Phase</SelectItem>
-                  <SelectItem value="luteal">Luteal Phase</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-white/60">Day of Cycle</Label>
-              <Input 
-                type="number" 
-                min="1" 
-                max="31" 
-                className="mt-1 bg-white/5 border-white/10 text-white" 
-                placeholder="Enter day of cycle"
+              <Switch 
+                checked={cycleTrackingEnabled}
+                onCheckedChange={setCycleTrackingEnabled}
               />
             </div>
+
+            {cycleTrackingEnabled && (
+              <>
+                <div>
+                  <Label className="text-white/60">Cycle Phase</Label>
+                  <Select value={cyclePhase} onValueChange={setCyclePhase}>
+                    <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+                      <SelectValue placeholder="Select cycle phase" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="menstrual">Menstrual Phase</SelectItem>
+                      <SelectItem value="follicular">Follicular Phase</SelectItem>
+                      <SelectItem value="ovulation">Ovulation Phase</SelectItem>
+                      <SelectItem value="luteal">Luteal Phase</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label className="text-white/60">Day of Cycle</Label>
+                  <Input 
+                    type="number" 
+                    min="1" 
+                    max="31" 
+                    value={cycleDay}
+                    onChange={(e) => setCycleDay(Number(e.target.value))}
+                    className="mt-1 bg-white/5 border-white/10 text-white" 
+                    placeholder="Enter day of cycle"
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Card>
