@@ -81,7 +81,7 @@ const SupportServices = () => {
       <div className="container mx-auto p-4 md:p-6 space-y-6">
         {/* Header with Title and Admin Notice */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary">Support Center</h1>
+          <h1 className="text-3xl font-bold text-[#2DD4BF]">Support Center</h1>
           
           {!isContentComplete && (
             <Alert variant="destructive" className="w-auto inline-flex ml-4 p-2 h-10">
@@ -92,7 +92,7 @@ const SupportServices = () => {
         </div>
         
         {/* Country-specific Alert */}
-        <Alert className="bg-primary/10 border-primary text-primary">
+        <Alert className="bg-[#2DD4BF]/10 border-[#2DD4BF] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             The information shown below is specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
@@ -115,7 +115,7 @@ const SupportServices = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col items-center text-center">
-              <CircleHelp className="h-8 w-8 text-primary mb-3" />
+              <CircleHelp className="h-8 w-8 text-[#2DD4BF] mb-3" />
               <h3 className="font-semibold">FAQs</h3>
               <p className="text-sm text-muted-foreground">Common questions</p>
             </CardContent>
@@ -123,7 +123,7 @@ const SupportServices = () => {
           
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col items-center text-center">
-              <Book className="h-8 w-8 text-secondary mb-3" />
+              <Book className="h-8 w-8 text-[#2DD4BF] mb-3" />
               <h3 className="font-semibold">User Guide</h3>
               <p className="text-sm text-muted-foreground">How-to guides</p>
             </CardContent>
@@ -131,7 +131,7 @@ const SupportServices = () => {
           
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col items-center text-center">
-              <Headphones className="h-8 w-8 text-accent mb-3" />
+              <Headphones className="h-8 w-8 text-[#2DD4BF] mb-3" />
               <h3 className="font-semibold">Contact</h3>
               <p className="text-sm text-muted-foreground">Get help</p>
             </CardContent>
@@ -139,7 +139,7 @@ const SupportServices = () => {
           
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col items-center text-center">
-              <Flag className="h-8 w-8 text-primary-dark mb-3" />
+              <Flag className="h-8 w-8 text-[#2DD4BF] mb-3" />
               <h3 className="font-semibold">Report</h3>
               <p className="text-sm text-muted-foreground">Report an issue</p>
             </CardContent>
@@ -168,7 +168,7 @@ const SupportServices = () => {
                     <div key={index} className="p-4 border rounded-lg bg-card/30">
                       <h3 className="text-lg font-medium">{resource.name}</h3>
                       <a href={resource.url} target="_blank" rel="noopener noreferrer" 
-                        className="text-primary hover:underline mt-2 block">
+                        className="text-[#2DD4BF] hover:underline mt-2 block">
                         {resource.url}
                       </a>
                     </div>
@@ -191,7 +191,7 @@ const SupportServices = () => {
                   {content.hotlines.map((hotline, index) => (
                     <div key={index} className="p-4 border rounded-lg bg-card/30">
                       <h3 className="text-lg font-medium">{hotline.name}</h3>
-                      <p className="text-xl font-bold text-primary mt-2">{hotline.number}</p>
+                      <p className="text-xl font-bold text-[#2DD4BF] mt-2">{hotline.number}</p>
                     </div>
                   ))}
                 </div>
@@ -254,7 +254,7 @@ const SupportServices = () => {
                 <Textarea id="description" rows={4} />
               </div>
               
-              <Button type="submit" className="w-full">Submit</Button>
+              <Button type="submit" className="w-full bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white">Submit</Button>
             </form>
           </CardContent>
         </Card>
@@ -267,7 +267,7 @@ const SupportServices = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center p-4 border rounded-lg">
-                <Mail className="h-6 w-6 text-primary mr-3" />
+                <Mail className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
                   <h3 className="font-medium">Email Support</h3>
                   <p className="text-sm text-muted-foreground">support@example.com</p>
@@ -275,7 +275,7 @@ const SupportServices = () => {
               </div>
               
               <div className="flex items-center p-4 border rounded-lg">
-                <Users className="h-6 w-6 text-secondary mr-3" />
+                <Users className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
                   <h3 className="font-medium">Community Forum</h3>
                   <p className="text-sm text-muted-foreground">Join the discussion</p>

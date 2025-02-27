@@ -162,7 +162,7 @@ const Policy = () => {
             <Button variant="ghost" size="icon" onClick={handleGoBack}>
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-2xl font-bold text-primary">Legal Policies</h1>
+            <h1 className="text-2xl font-bold text-[#2DD4BF]">Legal Policies</h1>
           </div>
           
           {!isContentComplete && (
@@ -174,7 +174,7 @@ const Policy = () => {
         </div>
         
         {/* Country-specific Alert */}
-        <Alert className="mb-6 bg-primary/10 border-primary text-primary">
+        <Alert className="mb-6 bg-[#2DD4BF]/10 border-[#2DD4BF] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             The policies shown below are specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
