@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,14 +15,35 @@ import { Slider } from "@/components/ui/slider";
 import BottomNav from "@/components/layout/BottomNav";
 import { ChevronLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const [userCountry, setUserCountry] = useState(() => 
+    localStorage.getItem('userCountry') || 'US'
+  );
+
+  const handleCountryChange = (value: string) => {
+    setUserCountry(value);
+    localStorage.setItem('userCountry', value);
+    toast.success(`Country preference updated to ${value}`);
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  const handleViewPolicies = () => {
+    navigate("/policy");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-dark to-charcoal pb-20">
       {/* Header */}
       <header className="fixed top-0 w-full bg-charcoal/80 backdrop-blur-sm border-b border-white/5 z-50">
         <div className="flex items-center px-4 h-16">
-          <ChevronLeft className="h-6 w-6 text-white/60" />
+          <ChevronLeft className="h-6 w-6 text-white/60 cursor-pointer" onClick={handleGoBack} />
           <span className="ml-2 font-semibold text-white">Settings</span>
         </div>
       </header>
@@ -89,6 +111,32 @@ export default function Profile() {
                     <SelectItem value="fr">French</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label className="text-white/60">Country</Label>
+                <Select value={userCountry} onValueChange={handleCountryChange}>
+                  <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="US">United States</SelectItem>
+                    <SelectItem value="UK">United Kingdom</SelectItem>
+                    <SelectItem value="CA">Canada</SelectItem>
+                    <SelectItem value="AU">Australia</SelectItem>
+                    <SelectItem value="DE">Germany</SelectItem>
+                    <SelectItem value="FR">France</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-sm text-white/60">
+                  Your country selection affects which privacy policies and regulations apply to your account
+                  <button 
+                    className="ml-1 text-sm underline text-white/80 hover:text-white" 
+                    onClick={handleViewPolicies}
+                  >
+                    View policies
+                  </button>
+                </p>
               </div>
 
               <div>
