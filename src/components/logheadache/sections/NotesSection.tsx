@@ -23,13 +23,14 @@ export function NotesSection() {
 
   return (
     <div>
-      <Label className="text-white/60">Notes</Label>
+      <Label className="text-white/60">Additional Notes</Label>
       <Textarea 
         ref={textareaRef}
         value={notes}
         onChange={handleChange}
         className="mt-2 bg-white/5 border-white/10 text-white min-h-[100px]" 
-        placeholder="Add any additional notes about treatment effectiveness..."
+        placeholder="Enter your notes here..."
+        maxLength={MAX_LENGTH}
       />
       <div className="flex justify-end mt-1">
         <span className={`text-xs ${charCount > MAX_LENGTH * 0.9 ? 'text-red-400' : 'text-white/60'}`}>

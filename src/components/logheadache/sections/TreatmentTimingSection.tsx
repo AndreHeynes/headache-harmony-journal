@@ -9,8 +9,7 @@ export function TreatmentTimingSection() {
   const timingOptions = [
     { value: "immediately", label: "Immediately" },
     { value: "10-20mins", label: "10-20 mins after onset" },
-    { value: "30-60mins", label: "30-60 mins after onset" },
-    { value: "hours", label: "Hours after onset" },
+    { value: "30-40mins", label: "30-40 mins after onset" },
     { value: "unsure", label: "Not sure" }
   ];
 
