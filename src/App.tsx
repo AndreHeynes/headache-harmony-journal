@@ -10,6 +10,8 @@ import LogHeadache from "./pages/LogHeadache";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Analysis from "./pages/Analysis";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/log" element={<LogHeadache />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/analysis" element={<Analysis />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
