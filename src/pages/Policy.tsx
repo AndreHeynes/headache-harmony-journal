@@ -176,12 +176,12 @@ const Policy = () => {
         {/* Country-specific Alert */}
         <Alert className="mb-6 border-[#2DD4BF] bg-[#E6FAF8] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-gray-800 font-medium">
             The policies shown below are specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
           </AlertDescription>
         </Alert>
 
-        <div className="mb-4 text-sm text-gray-600">
+        <div className="mb-4 text-sm text-gray-700 font-medium">
           Last updated: {new Date().toLocaleDateString()}
         </div>
 
@@ -194,28 +194,28 @@ const Policy = () => {
           </TabsList>
           
           <TabsContent value="terms">
-            <Card>
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Terms of Service</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900">Terms of Service</CardTitle>
+                <CardDescription className="text-gray-700">
                   Please read these terms carefully before using our service
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">1. Introduction</h2>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900">1. Introduction</h2>
+                  <p className="text-gray-800 leading-relaxed">
                     Welcome to our platform. These Terms of Service govern your use of our website, mobile applications, and services.
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">2. User Agreements</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">2. User Agreements</h2>
                   <Accordion type="single" collapsible className="w-full">
                     {policy.terms.map((section, index) => (
                       <AccordionItem key={index} value={`terms-${index}`}>
-                        <AccordionTrigger>{section.title}</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground">
+                        <AccordionTrigger className="text-gray-900">{section.title}</AccordionTrigger>
+                        <AccordionContent className="text-gray-800">
                           {section.content}
                         </AccordionContent>
                       </AccordionItem>
@@ -224,8 +224,8 @@ const Policy = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">3. Privacy & Data</h2>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900">3. Privacy & Data</h2>
+                  <p className="text-gray-800 leading-relaxed">
                     We take your privacy seriously. Learn about how we collect, use, and protect your personal information.
                   </p>
                 </div>
@@ -243,10 +243,10 @@ const Policy = () => {
           </TabsContent>
           
           <TabsContent value="privacy">
-            <Card>
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Privacy Policy</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900">Privacy Policy</CardTitle>
+                <CardDescription className="text-gray-700">
                   How we collect, use, and protect your personal information
                 </CardDescription>
               </CardHeader>
@@ -255,8 +255,8 @@ const Policy = () => {
                   <Accordion type="single" collapsible className="w-full">
                     {policy.privacy.map((section, index) => (
                       <AccordionItem key={index} value={`privacy-${index}`}>
-                        <AccordionTrigger>{section.title}</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground">
+                        <AccordionTrigger className="text-gray-900">{section.title}</AccordionTrigger>
+                        <AccordionContent className="text-gray-800">
                           {section.content}
                         </AccordionContent>
                       </AccordionItem>
@@ -277,10 +277,10 @@ const Policy = () => {
           </TabsContent>
           
           <TabsContent value="data">
-            <Card>
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Data Usage & Storage</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900">Data Usage & Storage</CardTitle>
+                <CardDescription className="text-gray-700">
                   How we store, process, and protect your data
                 </CardDescription>
               </CardHeader>
@@ -289,8 +289,8 @@ const Policy = () => {
                   <Accordion type="single" collapsible className="w-full">
                     {policy.dataHandling.map((section, index) => (
                       <AccordionItem key={index} value={`data-${index}`}>
-                        <AccordionTrigger>{section.title}</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground">
+                        <AccordionTrigger className="text-gray-900">{section.title}</AccordionTrigger>
+                        <AccordionContent className="text-gray-800">
                           {section.content}
                         </AccordionContent>
                       </AccordionItem>
@@ -298,8 +298,8 @@ const Policy = () => {
                   </Accordion>
                   
                   <div className="p-4 border rounded-lg mt-4">
-                    <h3 className="text-lg font-medium mb-2">Country-Specific Regulatory Compliance</h3>
-                    <p className="text-muted-foreground">{policy.countrySpecificRules}</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Country-Specific Regulatory Compliance</h3>
+                    <p className="text-gray-800">{policy.countrySpecificRules}</p>
                   </div>
                 </div>
               </CardContent>
@@ -316,22 +316,22 @@ const Policy = () => {
           </TabsContent>
           
           <TabsContent value="cookies">
-            <Card>
+            <Card className="bg-white">
               <CardHeader>
-                <CardTitle>Cookie Policy</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-gray-900">Cookie Policy</CardTitle>
+                <CardDescription className="text-gray-700">
                   How we use cookies and similar technologies
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">What are cookies?</h2>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <h2 className="text-xl font-semibold text-gray-900">What are cookies?</h2>
+                  <p className="text-gray-800 leading-relaxed">
                     Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences, analyzing how you use our site, and personalizing content.
                   </p>
                   
-                  <h2 className="text-xl font-semibold">How we use cookies</h2>
-                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                  <h2 className="text-xl font-semibold text-gray-900">How we use cookies</h2>
+                  <ul className="list-disc pl-5 space-y-2 text-gray-800">
                     <li>Essential cookies: Required for the website to function properly</li>
                     <li>Functional cookies: Help us remember your preferences and settings</li>
                     <li>Analytics cookies: Help us understand how visitors interact with our website</li>

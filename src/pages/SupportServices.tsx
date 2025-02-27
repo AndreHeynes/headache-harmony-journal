@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { AlertCircle, Search, CircleHelp, Book, Headphones, Flag, Mail, Users, ThumbsUp, ThumbsDown } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
@@ -91,7 +92,7 @@ const SupportServices = () => {
         {/* Country-specific Alert */}
         <Alert className="border-[#2DD4BF] bg-[#E6FAF8] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-gray-800 font-medium">
             The information shown below is specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
           </AlertDescription>
         </Alert>
@@ -108,25 +109,7 @@ const SupportServices = () => {
           />
         </div>
 
-        {/* Category Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { icon: CircleHelp, title: "FAQs", description: "Common questions" },
-            { icon: Book, title: "User Guide", description: "How-to guides" },
-            { icon: Headphones, title: "Contact", description: "Get help" },
-            { icon: Flag, title: "Report", description: "Report an issue" }
-          ].map((item, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow bg-white">
-              <CardContent className="p-4 flex flex-col items-center text-center">
-                <item.icon className="h-8 w-8 text-[#2DD4BF] mb-3" />
-                <h3 className="font-semibold">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Main Content Tabs */}
+        {/* Main Content Tabs - We removed the Category Cards block */}
         <Tabs defaultValue="resources" className="w-full">
           <TabsList className="grid grid-cols-3 mb-6 bg-white">
             <TabsTrigger value="resources" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Resources</TabsTrigger>
@@ -138,8 +121,8 @@ const SupportServices = () => {
             <TabsContent key={tab} value={tab}>
               <Card className="bg-white">
                 <CardHeader>
-                  <CardTitle>{tab === "resources" ? "Online Resources" : tab === "hotlines" ? "Emergency & Support Hotlines" : "Specialized Clinics"}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-gray-900">{tab === "resources" ? "Online Resources" : tab === "hotlines" ? "Emergency & Support Hotlines" : "Specialized Clinics"}</CardTitle>
+                  <CardDescription className="text-gray-700">
                     {tab === "resources" 
                       ? "These organizations provide valuable information and resources for headache sufferers."
                       : tab === "hotlines"
@@ -151,7 +134,7 @@ const SupportServices = () => {
                   <div className="space-y-4">
                     {tab === "resources" && content.resources.map((resource, index) => (
                       <div key={index} className="p-4 border rounded-lg bg-white">
-                        <h3 className="text-lg font-medium">{resource.name}</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{resource.name}</h3>
                         <a href={resource.url} target="_blank" rel="noopener noreferrer" 
                           className="text-[#2DD4BF] hover:underline mt-2 block">
                           {resource.url}
@@ -160,13 +143,13 @@ const SupportServices = () => {
                     ))}
                     {tab === "hotlines" && content.hotlines.map((hotline, index) => (
                       <div key={index} className="p-4 border rounded-lg bg-white">
-                        <h3 className="text-lg font-medium">{hotline.name}</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{hotline.name}</h3>
                         <p className="text-xl font-bold text-[#2DD4BF] mt-2">{hotline.number}</p>
                       </div>
                     ))}
                     {tab === "clinics" && (
                       <div className="p-4 border rounded-lg bg-white">
-                        <p>{content.clinics}</p>
+                        <p className="text-gray-800">{content.clinics}</p>
                       </div>
                     )}
                   </div>
@@ -179,24 +162,24 @@ const SupportServices = () => {
         {/* Contact Form */}
         <Card className="bg-white">
           <CardHeader>
-            <CardTitle>Contact Support</CardTitle>
-            <CardDescription>Fill out this form and we'll get back to you as soon as possible.</CardDescription>
+            <CardTitle className="text-gray-900">Contact Support</CardTitle>
+            <CardDescription className="text-gray-700">Fill out this form and we'll get back to you as soon as possible.</CardDescription>
           </CardHeader>
           <CardContent>
             <form className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name" className="text-gray-800">Name</Label>
                   <Input id="name" type="text" className="bg-white border-[#2DD4BF]" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-gray-800">Email</Label>
                   <Input id="email" type="email" className="bg-white border-[#2DD4BF]" />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
+                <Label htmlFor="subject" className="text-gray-800">Subject</Label>
                 <Select>
                   <SelectTrigger id="subject" className="bg-white border-[#2DD4BF]">
                     <SelectValue placeholder="Select subject" />
@@ -210,7 +193,7 @@ const SupportServices = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-gray-800">Description</Label>
                 <Textarea id="description" rows={4} className="bg-white border-[#2DD4BF]" />
               </div>
               
@@ -222,23 +205,23 @@ const SupportServices = () => {
         {/* Alternative Contact Methods */}
         <Card className="bg-white">
           <CardHeader>
-            <CardTitle>Other Ways to Connect</CardTitle>
+            <CardTitle className="text-gray-900">Other Ways to Connect</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center p-4 border rounded-lg border-[#2DD4BF]">
                 <Mail className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
-                  <h3 className="font-medium">Email Support</h3>
-                  <p className="text-sm text-gray-600">support@example.com</p>
+                  <h3 className="font-medium text-gray-900">Email Support</h3>
+                  <p className="text-sm text-gray-700">support@example.com</p>
                 </div>
               </div>
               
               <div className="flex items-center p-4 border rounded-lg border-[#2DD4BF]">
                 <Users className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
-                  <h3 className="font-medium">Community Forum</h3>
-                  <p className="text-sm text-gray-600">Join the discussion</p>
+                  <h3 className="font-medium text-gray-900">Community Forum</h3>
+                  <p className="text-sm text-gray-700">Join the discussion</p>
                 </div>
               </div>
             </div>
@@ -246,7 +229,7 @@ const SupportServices = () => {
           <CardFooter className="flex flex-col">
             <Separator className="mb-4" />
             <div className="text-center w-full">
-              <p className="font-medium mb-2">Was this helpful?</p>
+              <p className="font-medium text-gray-800 mb-2">Was this helpful?</p>
               <div className="flex justify-center space-x-4">
                 <Button variant="outline" size="sm" className="border-[#2DD4BF] hover:bg-[#2DD4BF] hover:text-white">
                   <ThumbsUp className="h-4 w-4 mr-2" />
