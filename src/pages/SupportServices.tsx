@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Search, ThumbsUp, ThumbsDown, Mail, Users } from "lucide-react";
+import { Search, ThumbsUp, ThumbsDown, Mail, Users, HelpCircle, BookOpen, Headphones, Flag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -40,28 +40,28 @@ const SupportServices = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 mb-3">
-              <i className="fa-solid fa-circle-question text-xl text-blue-700"></i>
+              <HelpCircle className="h-6 w-6 text-blue-700" />
             </div>
             <h3 className="font-semibold text-gray-900">FAQs</h3>
             <p className="text-sm text-gray-700 mt-1">Common questions</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 mb-3">
-              <i className="fa-solid fa-book text-xl text-green-700"></i>
+              <BookOpen className="h-6 w-6 text-green-700" />
             </div>
             <h3 className="font-semibold text-gray-900">User Guide</h3>
             <p className="text-sm text-gray-700 mt-1">How-to guides</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 mb-3">
-              <i className="fa-solid fa-headset text-xl text-purple-700"></i>
+              <Headphones className="h-6 w-6 text-purple-700" />
             </div>
             <h3 className="font-semibold text-gray-900">Contact</h3>
             <p className="text-sm text-gray-700 mt-1">Get help</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 mb-3">
-              <i className="fa-solid fa-flag text-xl text-red-700"></i>
+              <Flag className="h-6 w-6 text-red-700" />
             </div>
             <h3 className="font-semibold text-gray-900">Report</h3>
             <p className="text-sm text-gray-700 mt-1">Report an issue</p>
