@@ -154,12 +154,12 @@ const Policy = () => {
   };
 
   return (
-    <AppLayout>
+    <div className="min-h-screen bg-[#E6FAF8]"> {/* Light turquoise background */}
       <div className="max-w-4xl mx-auto p-4">
-        {/* Header with Admin Notice */}
-        <div className="sticky top-0 z-10 flex items-center justify-between mb-6 bg-background/80 backdrop-blur-sm py-3">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between mb-6 bg-[#E6FAF8] py-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={handleGoBack}>
+            <Button variant="ghost" size="icon" onClick={handleGoBack} className="text-[#2DD4BF] hover:bg-[#2DD4BF]/10">
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-2xl font-bold text-[#2DD4BF]">Legal Policies</h1>
@@ -174,23 +174,23 @@ const Policy = () => {
         </div>
         
         {/* Country-specific Alert */}
-        <Alert className="mb-6 bg-[#2DD4BF]/10 border-[#2DD4BF] text-[#2DD4BF]">
+        <Alert className="mb-6 border-[#2DD4BF] bg-[#E6FAF8] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             The policies shown below are specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
           </AlertDescription>
         </Alert>
 
-        <div className="mb-4 text-sm text-muted-foreground">
+        <div className="mb-4 text-sm text-gray-600">
           Last updated: {new Date().toLocaleDateString()}
         </div>
 
         <Tabs defaultValue="terms" className="w-full">
-          <TabsList className="w-full mb-6 overflow-x-auto whitespace-nowrap">
-            <TabsTrigger value="terms">Terms of Service</TabsTrigger>
-            <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
-            <TabsTrigger value="data">Data Usage</TabsTrigger>
-            <TabsTrigger value="cookies">Cookie Policy</TabsTrigger>
+          <TabsList className="w-full mb-6 bg-white">
+            <TabsTrigger value="terms" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Terms of Service</TabsTrigger>
+            <TabsTrigger value="privacy" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Privacy Policy</TabsTrigger>
+            <TabsTrigger value="data" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Data Usage</TabsTrigger>
+            <TabsTrigger value="cookies" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Cookie Policy</TabsTrigger>
           </TabsList>
           
           <TabsContent value="terms">
@@ -350,7 +350,7 @@ const Policy = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    </div>
   );
 };
 

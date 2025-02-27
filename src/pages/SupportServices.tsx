@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { AlertCircle, Search, CircleHelp, Book, Headphones, Flag, Mail, Users, ThumbsUp, ThumbsDown } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
@@ -69,15 +68,13 @@ const SupportServices = () => {
   useEffect(() => {
     const country = getUserCountry();
     setUserCountry(countrySpecificContent[country] ? country : 'default');
-    
-    // In a real app, you would check if the content is complete
     setIsContentComplete(false);
   }, []);
 
   const content = countrySpecificContent[userCountry] || countrySpecificContent['default'];
 
   return (
-    <AppLayout>
+    <div className="min-h-screen bg-[#E6FAF8]"> {/* Light turquoise background */}
       <div className="container mx-auto p-4 md:p-6 space-y-6">
         {/* Header with Title and Admin Notice */}
         <div className="flex items-center justify-between">
@@ -92,7 +89,7 @@ const SupportServices = () => {
         </div>
         
         {/* Country-specific Alert */}
-        <Alert className="bg-[#2DD4BF]/10 border-[#2DD4BF] text-[#2DD4BF]">
+        <Alert className="border-[#2DD4BF] bg-[#E6FAF8] text-[#2DD4BF]">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             The information shown below is specific to {userCountry === 'default' ? 'general international guidelines' : userCountry}. You can change your country in your profile settings.
@@ -101,11 +98,11 @@ const SupportServices = () => {
 
         {/* Search Section */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#2DD4BF] h-4 w-4" />
           <Input 
             type="text" 
             placeholder="Search for help..." 
-            className="pl-10 bg-background border-input"
+            className="pl-10 bg-white border-[#2DD4BF]"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -113,111 +110,74 @@ const SupportServices = () => {
 
         {/* Category Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <CircleHelp className="h-8 w-8 text-[#2DD4BF] mb-3" />
-              <h3 className="font-semibold">FAQs</h3>
-              <p className="text-sm text-muted-foreground">Common questions</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <Book className="h-8 w-8 text-[#2DD4BF] mb-3" />
-              <h3 className="font-semibold">User Guide</h3>
-              <p className="text-sm text-muted-foreground">How-to guides</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <Headphones className="h-8 w-8 text-[#2DD4BF] mb-3" />
-              <h3 className="font-semibold">Contact</h3>
-              <p className="text-sm text-muted-foreground">Get help</p>
-            </CardContent>
-          </Card>
-          
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <Flag className="h-8 w-8 text-[#2DD4BF] mb-3" />
-              <h3 className="font-semibold">Report</h3>
-              <p className="text-sm text-muted-foreground">Report an issue</p>
-            </CardContent>
-          </Card>
+          {[
+            { icon: CircleHelp, title: "FAQs", description: "Common questions" },
+            { icon: Book, title: "User Guide", description: "How-to guides" },
+            { icon: Headphones, title: "Contact", description: "Get help" },
+            { icon: Flag, title: "Report", description: "Report an issue" }
+          ].map((item, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow bg-white">
+              <CardContent className="p-4 flex flex-col items-center text-center">
+                <item.icon className="h-8 w-8 text-[#2DD4BF] mb-3" />
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="text-sm text-gray-600">{item.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="resources" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="resources">Resources</TabsTrigger>
-            <TabsTrigger value="hotlines">Emergency Hotlines</TabsTrigger>
-            <TabsTrigger value="clinics">Specialized Clinics</TabsTrigger>
+          <TabsList className="grid grid-cols-3 mb-6 bg-white">
+            <TabsTrigger value="resources" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Resources</TabsTrigger>
+            <TabsTrigger value="hotlines" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Emergency Hotlines</TabsTrigger>
+            <TabsTrigger value="clinics" className="data-[state=active]:bg-[#2DD4BF] data-[state=active]:text-white">Specialized Clinics</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="resources">
-            <Card>
-              <CardHeader>
-                <CardTitle>Online Resources</CardTitle>
-                <CardDescription>
-                  These organizations provide valuable information and resources for headache sufferers.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {content.resources.map((resource, index) => (
-                    <div key={index} className="p-4 border rounded-lg bg-card/30">
-                      <h3 className="text-lg font-medium">{resource.name}</h3>
-                      <a href={resource.url} target="_blank" rel="noopener noreferrer" 
-                        className="text-[#2DD4BF] hover:underline mt-2 block">
-                        {resource.url}
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="hotlines">
-            <Card>
-              <CardHeader>
-                <CardTitle>Emergency & Support Hotlines</CardTitle>
-                <CardDescription>
-                  These hotlines can provide immediate assistance and information.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {content.hotlines.map((hotline, index) => (
-                    <div key={index} className="p-4 border rounded-lg bg-card/30">
-                      <h3 className="text-lg font-medium">{hotline.name}</h3>
-                      <p className="text-xl font-bold text-[#2DD4BF] mt-2">{hotline.number}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="clinics">
-            <Card>
-              <CardHeader>
-                <CardTitle>Specialized Headache Clinics</CardTitle>
-                <CardDescription>
-                  Finding specialized care for chronic or severe headaches.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 border rounded-lg bg-card/30">
-                  <p>{content.clinics}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {["resources", "hotlines", "clinics"].map((tab) => (
+            <TabsContent key={tab} value={tab}>
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle>{tab === "resources" ? "Online Resources" : tab === "hotlines" ? "Emergency & Support Hotlines" : "Specialized Clinics"}</CardTitle>
+                  <CardDescription>
+                    {tab === "resources" 
+                      ? "These organizations provide valuable information and resources for headache sufferers."
+                      : tab === "hotlines"
+                      ? "These hotlines can provide immediate assistance and information."
+                      : "Finding specialized care for chronic or severe headaches."}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {tab === "resources" && content.resources.map((resource, index) => (
+                      <div key={index} className="p-4 border rounded-lg bg-white">
+                        <h3 className="text-lg font-medium">{resource.name}</h3>
+                        <a href={resource.url} target="_blank" rel="noopener noreferrer" 
+                          className="text-[#2DD4BF] hover:underline mt-2 block">
+                          {resource.url}
+                        </a>
+                      </div>
+                    ))}
+                    {tab === "hotlines" && content.hotlines.map((hotline, index) => (
+                      <div key={index} className="p-4 border rounded-lg bg-white">
+                        <h3 className="text-lg font-medium">{hotline.name}</h3>
+                        <p className="text-xl font-bold text-[#2DD4BF] mt-2">{hotline.number}</p>
+                      </div>
+                    ))}
+                    {tab === "clinics" && (
+                      <div className="p-4 border rounded-lg bg-white">
+                        <p>{content.clinics}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
         </Tabs>
 
         {/* Contact Form */}
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>Contact Support</CardTitle>
             <CardDescription>Fill out this form and we'll get back to you as soon as possible.</CardDescription>
@@ -227,18 +187,18 @@ const SupportServices = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" type="text" />
+                  <Input id="name" type="text" className="bg-white border-[#2DD4BF]" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" />
+                  <Input id="email" type="email" className="bg-white border-[#2DD4BF]" />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
                 <Select>
-                  <SelectTrigger id="subject">
+                  <SelectTrigger id="subject" className="bg-white border-[#2DD4BF]">
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
@@ -251,7 +211,7 @@ const SupportServices = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" rows={4} />
+                <Textarea id="description" rows={4} className="bg-white border-[#2DD4BF]" />
               </div>
               
               <Button type="submit" className="w-full bg-[#2DD4BF] hover:bg-[#2DD4BF]/90 text-white">Submit</Button>
@@ -260,25 +220,25 @@ const SupportServices = () => {
         </Card>
 
         {/* Alternative Contact Methods */}
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>Other Ways to Connect</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center p-4 border rounded-lg">
+              <div className="flex items-center p-4 border rounded-lg border-[#2DD4BF]">
                 <Mail className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
                   <h3 className="font-medium">Email Support</h3>
-                  <p className="text-sm text-muted-foreground">support@example.com</p>
+                  <p className="text-sm text-gray-600">support@example.com</p>
                 </div>
               </div>
               
-              <div className="flex items-center p-4 border rounded-lg">
+              <div className="flex items-center p-4 border rounded-lg border-[#2DD4BF]">
                 <Users className="h-6 w-6 text-[#2DD4BF] mr-3" />
                 <div>
                   <h3 className="font-medium">Community Forum</h3>
-                  <p className="text-sm text-muted-foreground">Join the discussion</p>
+                  <p className="text-sm text-gray-600">Join the discussion</p>
                 </div>
               </div>
             </div>
@@ -288,11 +248,11 @@ const SupportServices = () => {
             <div className="text-center w-full">
               <p className="font-medium mb-2">Was this helpful?</p>
               <div className="flex justify-center space-x-4">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="border-[#2DD4BF] hover:bg-[#2DD4BF] hover:text-white">
                   <ThumbsUp className="h-4 w-4 mr-2" />
                   Yes
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="border-[#2DD4BF] hover:bg-[#2DD4BF] hover:text-white">
                   <ThumbsDown className="h-4 w-4 mr-2" />
                   No
                 </Button>
@@ -301,7 +261,7 @@ const SupportServices = () => {
           </CardFooter>
         </Card>
       </div>
-    </AppLayout>
+    </div>
   );
 };
 
