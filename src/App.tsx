@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import LogHeadache from "./pages/LogHeadache";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Analysis from "./pages/Analysis";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/log" element={<LogHeadache />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/analysis" element={<Analysis />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
