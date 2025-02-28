@@ -11,10 +11,12 @@ import { OverviewStats } from "@/components/analysis/OverviewStats";
 import { PremiumInsights } from "@/components/analysis/PremiumInsights";
 import { CorrelationAnalysis } from "@/components/analysis/CorrelationAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
+import { DetailedInsight } from "@/components/analysis/DetailedInsight";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
   const isPremium = false; // This would come from your authentication/user context
   const navigate = useNavigate();
 
@@ -32,8 +34,13 @@ export default function Analysis() {
       return;
     }
     
-    // In a real app, you would show detailed analytics for the selected insight type
+    // Set the selected insight to show the detailed view
+    setSelectedInsight(cardType);
     console.log("Showing detailed analytics for:", cardType);
+  };
+
+  const handleCloseDetailedInsight = () => {
+    setSelectedInsight(null);
   };
 
   const handleGoBack = () => {
@@ -62,21 +69,30 @@ export default function Analysis() {
       
       <DateRangeSelector onRangeChange={handleDateRangeChange} />
       
-      <OverviewStats 
-        episodes={12} 
-        avgDuration="2.5h" 
-        dailyFrequency={1.7} 
-        topTriggers={4} 
-      />
-      
-      <PremiumInsights 
-        isPremium={isPremium} 
-        onCardClick={handleInsightCardClick} 
-      />
-      
-      <CorrelationAnalysis />
-      
-      <NeckPainInsights />
+      {selectedInsight ? (
+        <DetailedInsight 
+          type={selectedInsight} 
+          onClose={handleCloseDetailedInsight} 
+        />
+      ) : (
+        <>
+          <OverviewStats 
+            episodes={12} 
+            avgDuration="2.5h" 
+            dailyFrequency={1.7} 
+            topTriggers={4} 
+          />
+          
+          <PremiumInsights 
+            isPremium={isPremium} 
+            onCardClick={handleInsightCardClick} 
+          />
+          
+          <CorrelationAnalysis />
+          
+          <NeckPainInsights />
+        </>
+      )}
       
       <div className="fixed bottom-20 right-6">
         <Button 
