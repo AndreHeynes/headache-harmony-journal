@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
 import { DateRange } from "react-day-picker";
-import { BarChart2, Plus } from "lucide-react";
+import { BarChart2, Plus, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 import { DateRangeSelector } from "@/components/analysis/DateRangeSelector";
 import { OverviewStats } from "@/components/analysis/OverviewStats";
@@ -14,6 +15,7 @@ import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const isPremium = false; // This would come from your authentication/user context
+  const navigate = useNavigate();
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
@@ -33,10 +35,22 @@ export default function Analysis() {
     console.log("Showing detailed analytics for:", cardType);
   };
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="bg-gray-900 text-white p-4 pb-20">
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleGoBack}
+            className="text-gray-400 hover:text-white hover:bg-gray-800"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
           <BarChart2 className="h-6 w-6 text-indigo-400" />
           <h1 className="text-xl font-semibold">Analysis Dashboard</h1>
         </div>
