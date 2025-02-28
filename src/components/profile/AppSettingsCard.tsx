@@ -17,18 +17,18 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
   };
 
   return (
-    <Card className="bg-white/5 border-white/10">
+    <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
       <div className="p-4 space-y-4">
         <h3 className="text-lg font-semibold text-white">App Settings</h3>
         
         <div className="space-y-3">
           <div>
-            <Label className="text-white/60">Language</Label>
+            <Label className="text-gray-300">Language</Label>
             <Select>
-              <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+              <SelectTrigger className="mt-1 bg-gray-900/50 border-gray-700 text-white">
                 <SelectValue placeholder="Select language" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-700">
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="es">Spanish</SelectItem>
                 <SelectItem value="fr">French</SelectItem>
@@ -37,12 +37,12 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
           </div>
 
           <div>
-            <Label className="text-white/60">Country</Label>
+            <Label className="text-gray-300">Country</Label>
             <Select value={userCountry} onValueChange={handleCountryChange}>
-              <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+              <SelectTrigger className="mt-1 bg-gray-900/50 border-gray-700 text-white">
                 <SelectValue placeholder="Select country" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-700">
                 <SelectItem value="US">United States</SelectItem>
                 <SelectItem value="UK">United Kingdom</SelectItem>
                 <SelectItem value="CA">Canada</SelectItem>
@@ -51,10 +51,10 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
                 <SelectItem value="FR">France</SelectItem>
               </SelectContent>
             </Select>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-gray-400">
               Your country selection affects which privacy policies and regulations apply to your account
               <button 
-                className="ml-1 text-sm underline text-white/80 hover:text-white" 
+                className="ml-1 text-sm underline text-primary hover:text-primary-dark" 
                 onClick={onViewPolicies}
               >
                 View policies
@@ -63,12 +63,12 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
           </div>
 
           <div>
-            <Label className="text-white/60">Time Zone</Label>
+            <Label className="text-gray-300">Time Zone</Label>
             <Select>
-              <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+              <SelectTrigger className="mt-1 bg-gray-900/50 border-gray-700 text-white">
                 <SelectValue placeholder="Select timezone" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-700">
                 <SelectItem value="utc">UTC-05:00 Eastern Time</SelectItem>
                 <SelectItem value="pst">UTC-08:00 Pacific Time</SelectItem>
               </SelectContent>
@@ -76,12 +76,12 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
           </div>
 
           <div>
-            <Label className="text-white/60">Date Format</Label>
+            <Label className="text-gray-300">Date Format</Label>
             <Select>
-              <SelectTrigger className="mt-1 bg-white/5 border-white/10 text-white">
+              <SelectTrigger className="mt-1 bg-gray-900/50 border-gray-700 text-white">
                 <SelectValue placeholder="Select date format" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-700">
                 <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
                 <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
               </SelectContent>

@@ -27,7 +27,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-dark to-charcoal pb-20">
+    <div className="min-h-screen bg-charcoal text-gray-100 pb-20">
       <ProfileHeader onBack={handleGoBack} />
 
       <main className="pt-20 px-4 space-y-6">
