@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { TreatmentSelectionSection, TreatmentType } from "./sections/TreatmentSelectionSection";
@@ -15,15 +14,14 @@ import { TreatmentTimingSection } from "./sections/TreatmentTimingSection";
 import { EffectivenessSection } from "./sections/EffectivenessSection";
 import { ClassificationSection } from "./sections/ClassificationSection";
 import { NotesSection } from "./sections/NotesSection";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function LogTreatment() {
-  const navigate = useNavigate();
   const [treatmentType, setTreatmentType] = useState<TreatmentType>("");
 
   const handleSave = () => {
     // Here you would save the treatment log data
     toast.success("Treatment log saved successfully");
-    navigate("/dashboard");
   };
 
   // Render the appropriate details section based on treatment type
@@ -43,8 +41,8 @@ export default function LogTreatment() {
         // For custom, you might want to provide a text input
         return (
           <div className="pt-2">
-            <textarea 
-              className="w-full bg-white/5 border-white/10 text-white rounded-lg p-3" 
+            <Textarea 
+              className="w-full bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500 rounded-lg p-3" 
               placeholder="Describe your custom treatment..."
               rows={3}
             />
@@ -57,7 +55,7 @@ export default function LogTreatment() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-6">
           <h2 className="text-lg font-medium text-white">Treatment Log</h2>
           
@@ -70,7 +68,7 @@ export default function LogTreatment() {
           {/* Treatment Details - conditional rendering based on treatment type */}
           {treatmentType && (
             <>
-              <Separator className="my-6 bg-white/10" />
+              <Separator className="my-6 bg-gray-700" />
               <div>
                 <h3 className="text-md font-medium text-white mb-4">Treatment Details</h3>
                 {renderDetailsSection()}
@@ -78,7 +76,7 @@ export default function LogTreatment() {
             </>
           )}
           
-          <Separator className="my-6 bg-white/10" />
+          <Separator className="my-6 bg-gray-700" />
           
           {/* Treatment Timing */}
           <div>
@@ -86,7 +84,7 @@ export default function LogTreatment() {
             <TreatmentTimingSection />
           </div>
           
-          <Separator className="my-6 bg-white/10" />
+          <Separator className="my-6 bg-gray-700" />
           
           {/* Effectiveness */}
           <div>
@@ -94,7 +92,7 @@ export default function LogTreatment() {
             <EffectivenessSection />
           </div>
           
-          <Separator className="my-6 bg-white/10" />
+          <Separator className="my-6 bg-gray-700" />
           
           {/* Classification */}
           <div>
@@ -102,7 +100,7 @@ export default function LogTreatment() {
             <ClassificationSection />
           </div>
           
-          <Separator className="my-6 bg-white/10" />
+          <Separator className="my-6 bg-gray-700" />
           
           {/* Notes */}
           <div>
@@ -111,7 +109,7 @@ export default function LogTreatment() {
           </div>
           
           <Button 
-            className="w-full mt-6 bg-gradient-to-r from-primary to-primary-dark text-white font-medium"
+            className="w-full mt-6 bg-primary hover:bg-primary-dark text-charcoal font-medium"
             onClick={handleSave}
           >
             Save Treatment Log

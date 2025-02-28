@@ -45,8 +45,8 @@ export default function LogHeadache() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-dark via-charcoal to-primary-dark pb-24">
-      <header className="fixed top-0 w-full bg-charcoal/80 backdrop-blur-sm border-b border-white/5 z-50">
+    <div className="min-h-screen bg-charcoal pb-24">
+      <header className="fixed top-0 w-full bg-gray-800/80 backdrop-blur-sm border-b border-gray-700 z-50">
         <div className="flex items-center px-4 h-16">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ChevronLeft className="h-6 w-6 text-white/60" />
@@ -62,9 +62,9 @@ export default function LogHeadache() {
         <CurrentStepComponent />
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-charcoal/80 backdrop-blur-sm border-t border-white/5">
+      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700">
         <Button 
-          className="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-medium"
+          className="w-full bg-primary hover:bg-primary-dark text-charcoal font-medium"
           onClick={handleNext}
         >
           {currentStep === steps.length - 1 ? 'Complete' : 'Continue'}

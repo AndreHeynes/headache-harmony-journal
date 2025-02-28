@@ -8,7 +8,7 @@ export function ClassificationSection() {
 
   return (
     <div>
-      <Label className="text-white/60 mb-2 block">Treatment Classification</Label>
+      <Label className="text-gray-400 mb-2 block">Treatment Classification</Label>
       <ToggleGroup 
         type="multiple" 
         value={classifications}
@@ -17,25 +17,25 @@ export function ClassificationSection() {
       >
         <ToggleGroupItem 
           value="prevention-plan" 
-          className="h-auto py-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
+          className="h-auto py-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
         >
           Prevention Plan
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="treatment-plan" 
-          className="h-auto py-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
+          className="h-auto py-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
         >
           Treatment Plan
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="non-structured" 
-          className="h-auto py-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
+          className="h-auto py-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
         >
           Non-structured plan
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="side-effects" 
-          className="h-auto py-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
+          className="h-auto py-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 data-[state=on]:bg-primary/20 data-[state=on]:border-primary/30"
         >
           Side-Effects Noticed
         </ToggleGroupItem>

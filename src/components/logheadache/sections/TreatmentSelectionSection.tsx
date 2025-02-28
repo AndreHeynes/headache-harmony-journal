@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,15 +21,15 @@ export function TreatmentSelectionSection({
 }: TreatmentSelectionSectionProps) {
   return (
     <div>
-      <Label className="text-white/60 mb-2 block">Treatment Type</Label>
+      <Label className="text-gray-400 mb-2 block">Treatment Type</Label>
       <Select 
         value={selectedTreatment} 
         onValueChange={(value) => onTreatmentChange(value as TreatmentType)}
       >
-        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+        <SelectTrigger className="bg-gray-700/40 border-gray-700 text-white">
           <SelectValue placeholder="Select Treatment Type" />
         </SelectTrigger>
-        <SelectContent className="bg-gray-800 border-white/10 text-white">
+        <SelectContent className="bg-gray-800 border-gray-700 text-white">
           <SelectItem value="medication">Medication</SelectItem>
           <SelectItem value="meditation">Meditation</SelectItem>
           <SelectItem value="massage">Massage</SelectItem>

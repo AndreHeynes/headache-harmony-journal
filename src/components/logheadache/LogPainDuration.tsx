@@ -21,12 +21,12 @@ export default function LogPainDuration() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white/5 border-white/10">
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-medium text-white">Pain Duration</h2>
             <div className="flex items-center gap-2">
-              <Label htmlFor="ongoing" className="text-white/60">Still Ongoing</Label>
+              <Label htmlFor="ongoing" className="text-gray-400">Still Ongoing</Label>
               <Switch
                 id="ongoing"
                 checked={isOngoing}
@@ -37,19 +37,19 @@ export default function LogPainDuration() {
 
           <div className="space-y-4">
             <div>
-              <Label className="text-white/60">Start Time</Label>
+              <Label className="text-gray-400">Start Time</Label>
               <Input 
                 type="datetime-local"
-                className="mt-1 bg-white/5 border-white/10 text-white"
+                className="mt-1 bg-gray-700/40 border-gray-700 text-white"
               />
             </div>
 
             {!isOngoing && (
               <div>
-                <Label className="text-white/60">End Time</Label>
+                <Label className="text-gray-400">End Time</Label>
                 <Input 
                   type="datetime-local"
-                  className="mt-1 bg-white/5 border-white/10 text-white"
+                  className="mt-1 bg-gray-700/40 border-gray-700 text-white"
                 />
               </div>
             )}
@@ -57,20 +57,20 @@ export default function LogPainDuration() {
             {!isOngoing && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-white/60">Duration (Hours)</Label>
+                  <Label className="text-gray-400">Duration (Hours)</Label>
                   <Input 
                     type="number" 
                     min="0"
-                    className="mt-1 bg-white/5 border-white/10 text-white" 
+                    className="mt-1 bg-gray-700/40 border-gray-700 text-white" 
                   />
                 </div>
                 <div>
-                  <Label className="text-white/60">Minutes</Label>
+                  <Label className="text-gray-400">Minutes</Label>
                   <Input 
                     type="number" 
                     min="0" 
                     max="59"
-                    className="mt-1 bg-white/5 border-white/10 text-white" 
+                    className="mt-1 bg-gray-700/40 border-gray-700 text-white" 
                   />
                 </div>
               </div>
@@ -80,7 +80,7 @@ export default function LogPainDuration() {
       </Card>
 
       {isOngoing && (
-        <Card className="bg-white/5 border-white/10">
+        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
           <div className="p-4 space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-white">Reminder Settings</h2>
@@ -93,7 +93,7 @@ export default function LogPainDuration() {
 
             {enableReminders && (
               <div className="space-y-4">
-                <Label className="text-white/60">Reminder Frequency (minutes)</Label>
+                <Label className="text-gray-400">Reminder Frequency (minutes)</Label>
                 <Slider
                   value={reminderInterval}
                   onValueChange={setReminderInterval}
@@ -102,7 +102,7 @@ export default function LogPainDuration() {
                   step={15}
                   className="py-4"
                 />
-                <div className="flex justify-between text-sm text-white/60">
+                <div className="flex justify-between text-sm text-gray-400">
                   <span>15m</span>
                   <span className="text-primary">Every {reminderInterval[0]} minutes</span>
                   <span>120m</span>

@@ -11,23 +11,23 @@ export function ExerciseDetailsSection() {
   return (
     <div className="space-y-6">
       <div>
-        <Label className="text-white/60 mb-2 block">Exercise Type</Label>
+        <Label className="text-gray-400 mb-2 block">Exercise Type</Label>
         <RadioGroup value={exerciseType} onValueChange={setExerciseType}>
           <div className="space-y-3">
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="stretching" className="text-primary" />
               <span className="ml-3 text-white">Stretching</span>
             </Label>
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="strengthening" className="text-primary" />
               <span className="ml-3 text-white">Strengthening/Resistance</span>
             </Label>
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="mobility" className="text-primary" />
               <span className="ml-3 text-white">Mobility</span>
@@ -37,17 +37,17 @@ export function ExerciseDetailsSection() {
       </div>
 
       <div>
-        <Label className="text-white/60 mb-2 block">Exercise Structure</Label>
+        <Label className="text-gray-400 mb-2 block">Exercise Structure</Label>
         <RadioGroup value={exerciseStructure} onValueChange={setExerciseStructure}>
           <div className="space-y-3">
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="structured" className="text-primary" />
               <span className="ml-3 text-white">Structured</span>
             </Label>
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="unstructured" className="text-primary" />
               <span className="ml-3 text-white">Unstructured</span>
@@ -57,17 +57,17 @@ export function ExerciseDetailsSection() {
       </div>
 
       <div>
-        <Label className="text-white/60 mb-2 block">Exercise Location</Label>
+        <Label className="text-gray-400 mb-2 block">Exercise Location</Label>
         <RadioGroup value={exerciseLocation} onValueChange={setExerciseLocation}>
           <div className="space-y-3">
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="home" className="text-primary" />
               <span className="ml-3 text-white">Home/Private</span>
             </Label>
             <Label 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value="professional" className="text-primary" />
               <span className="ml-3 text-white">Professional</span>

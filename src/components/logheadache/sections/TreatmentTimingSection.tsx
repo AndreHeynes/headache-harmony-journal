@@ -15,13 +15,13 @@ export function TreatmentTimingSection() {
 
   return (
     <div>
-      <Label className="text-white/60 mb-2 block">When did you take treatment?</Label>
+      <Label className="text-gray-400 mb-2 block">When did you take treatment?</Label>
       <RadioGroup value={timing} onValueChange={setTiming}>
         <div className="space-y-3">
           {timingOptions.map(option => (
             <Label 
               key={option.value} 
-              className="flex items-center p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+              className="flex items-center p-3 rounded-lg border border-gray-700 bg-gray-700/40 hover:bg-gray-700/60 transition-colors cursor-pointer"
             >
               <RadioGroupItem value={option.value} className="text-primary" />
               <span className="ml-3 text-white">{option.label}</span>
