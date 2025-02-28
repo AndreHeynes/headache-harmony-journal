@@ -11,6 +11,7 @@ import { OverviewStats } from "@/components/analysis/OverviewStats";
 import { PremiumInsights } from "@/components/analysis/PremiumInsights";
 import { CorrelationAnalysis } from "@/components/analysis/CorrelationAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
+import BottomNav from "@/components/layout/BottomNav";
 
 export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -40,7 +41,7 @@ export default function Analysis() {
   };
 
   return (
-    <div className="bg-gray-900 text-white p-4 pb-20">
+    <div className="bg-charcoal text-white p-4 pb-20">
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <Button 
@@ -85,6 +86,8 @@ export default function Analysis() {
           <Plus className="h-6 w-6" />
         </Button>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
