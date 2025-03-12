@@ -26,7 +26,7 @@ export const faqData = [
       },
       {
         question: "How can I delete my data?",
-        answer: "You can delete your data by going to Profile > App Settings > Data Management, where you'll find options to export or delete your data."
+        answer: "You can delete your data by going to Profile > App Settings > Data Management, where you'll find options to export or delete your data. We'll send a confirmation email before permanently deleting your information."
       }
     ]
   },
@@ -43,7 +43,7 @@ export const faqData = [
       },
       {
         question: "How can I export my data?",
-        answer: "You can export your data in CSV format by going to Profile > App Settings > Data Management > Export Data."
+        answer: "You can export your data in CSV or JSON format by going to Profile > App Settings > Data Management > Export My Data. This allows you to save or share your headache history with healthcare providers."
       }
     ]
   },
@@ -60,7 +60,11 @@ export const faqData = [
       },
       {
         question: "Is my payment information secure?",
-        answer: "Yes, we use industry-standard encryption and never store your full credit card details on our servers. All payments are processed through secure payment providers."
+        answer: "Yes, we use industry-standard encryption and never store your full credit card details on our servers. All payments are processed through secure payment providers like Stripe to maximize security."
+      },
+      {
+        question: "What payment methods do you accept?",
+        answer: "We accept all major credit cards, PayPal, and Apple Pay/Google Pay where available. All transactions are securely processed by our payment provider."
       }
     ]
   }

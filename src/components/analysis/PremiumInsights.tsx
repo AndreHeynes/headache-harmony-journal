@@ -2,10 +2,11 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { InsightCard } from "./InsightCard";
 import { 
-  Brain, Gauge, Clock, Stethoscope, Zap, Pill, Sliders, Skull, Crown
+  Brain, Gauge, Clock, Stethoscope, Zap, Pill, Sliders, Skull, Crown, CreditCard
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface PremiumInsightsProps {
   isPremium: boolean;
@@ -13,6 +14,13 @@ interface PremiumInsightsProps {
 }
 
 export function PremiumInsights({ isPremium, onCardClick }: PremiumInsightsProps) {
+  const handleUpgradeClick = () => {
+    toast.info("Secure payment processing", {
+      description: "You'll be redirected to our secure payment processor"
+    });
+    // In a real app, this would redirect to a payment page
+  };
+
   const insights = [
     { 
       type: 'pain-area', 
@@ -114,13 +122,20 @@ export function PremiumInsights({ isPremium, onCardClick }: PremiumInsightsProps
       {!isPremium && (
         <div className="mt-3 bg-gray-800/80 border border-gray-700 rounded-lg p-3">
           <div className="flex flex-col sm:flex-row items-center justify-between">
-            <div className="flex items-center mb-3 sm:mb-0">
-              <Crown className="h-5 w-5 text-yellow-500 mr-2" />
-              <p className="text-sm text-gray-300">
-                Unlock detailed insights with Premium
-              </p>
+            <div className="flex flex-col sm:items-start">
+              <div className="flex items-center mb-1">
+                <Crown className="h-5 w-5 text-yellow-500 mr-2" />
+                <p className="text-sm text-gray-300">
+                  Unlock detailed insights with Premium
+                </p>
+              </div>
+              <p className="text-xs text-gray-400 ml-7 sm:ml-7">$4.99/month or $49.99/year • Secure payment • Cancel anytime</p>
             </div>
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-medium">
+            <Button 
+              className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-medium mt-3 sm:mt-0"
+              onClick={handleUpgradeClick}
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
               Upgrade Now
             </Button>
           </div>

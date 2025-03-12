@@ -2,6 +2,8 @@
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface AppSettingsCardProps {
@@ -14,6 +16,20 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
   const handleCountryChange = (value: string) => {
     onCountryChange(value);
     toast.success(`Country preference updated to ${value}`);
+  };
+
+  const handleDataExport = () => {
+    // In a real app, this would trigger the data export process
+    toast.success("Your data is being prepared for download", {
+      description: "You'll receive a notification when it's ready"
+    });
+  };
+
+  const handleDataDelete = () => {
+    // In a real app, this would show a confirmation dialog first
+    toast.info("Data deletion", { 
+      description: "Please confirm this action in the email we've sent you" 
+    });
   };
 
   return (
@@ -86,6 +102,33 @@ export function AppSettingsCard({ userCountry, onCountryChange, onViewPolicies }
                 <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="pt-2 border-t border-gray-700">
+            <h4 className="text-white font-medium mb-3">Data Management</h4>
+            <div className="flex flex-col gap-2">
+              <Button 
+                variant="outline" 
+                className="justify-start bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
+                onClick={handleDataExport}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export My Data
+                <span className="text-xs text-gray-400 ml-auto">CSV, JSON</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="justify-start bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700"
+                onClick={handleDataDelete}
+              >
+                <Trash2 className="mr-2 h-4 w-4 text-red-400" />
+                Delete All My Data
+                <span className="text-xs text-gray-400 ml-auto">Permanent</span>
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-gray-400">
+              You can export your data anytime or permanently delete all your information from our servers
+            </p>
           </div>
         </div>
       </div>
