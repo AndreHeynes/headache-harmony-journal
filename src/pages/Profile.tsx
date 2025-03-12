@@ -11,10 +11,12 @@ import { AppSettingsCard } from "@/components/profile/AppSettingsCard";
 import { TestModeToggle } from "@/components/profile/TestModeToggle";
 import { DataManagementCard } from "@/components/profile/DataManagementCard";
 import BottomNav from "@/components/layout/BottomNav";
+import { toast } from "sonner";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [isTestMode, setIsTestMode] = useState(false);
+  const [userCountry, setUserCountry] = useState("US");
   
   // This state would be lifted to a global context in a real app
   // so that premium status can be accessed throughout the app
@@ -33,6 +35,16 @@ export default function Profile() {
     navigate(-1);
   };
 
+  const handleCountryChange = (country: string) => {
+    setUserCountry(country);
+    console.log("Country changed to:", country);
+  };
+
+  const handleViewPolicies = () => {
+    navigate("/policy");
+    console.log("Viewing policies");
+  };
+
   return (
     <div className="bg-charcoal text-white p-4 pb-20">
       <Button 
@@ -44,7 +56,7 @@ export default function Profile() {
         <ChevronLeft className="h-5 w-5" />
       </Button>
       
-      <ProfileHeader />
+      <ProfileHeader onBack={handleGoBack} />
       
       <div className="space-y-4 mt-6">
         {process.env.NODE_ENV === 'development' && (
@@ -57,7 +69,11 @@ export default function Profile() {
         <PersonalInfoCard />
         <NotificationsCard />
         <DataManagementCard />
-        <AppSettingsCard isPremium={isPremiumOverride} />
+        <AppSettingsCard 
+          userCountry={userCountry}
+          onCountryChange={handleCountryChange}
+          onViewPolicies={handleViewPolicies}
+        />
       </div>
       
       <BottomNav />
