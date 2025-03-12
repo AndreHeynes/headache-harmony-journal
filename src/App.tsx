@@ -16,6 +16,7 @@ import SupportServices from "./pages/SupportServices";
 import Policy from "./pages/Policy";
 import { TestProvider } from "./contexts/TestContext";
 import TestDashboard from "./pages/TestDashboard";
+import { TestGuideModal } from "./components/testing/TestGuideModal";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <TestGuideModal />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { BeakerIcon, Crown } from "lucide-react";
+import { useTestContext } from "@/contexts/TestContext";
 
 interface TestModeToggleProps {
   isTestMode: boolean;
@@ -11,6 +13,8 @@ interface TestModeToggleProps {
 }
 
 export function TestModeToggle({ isTestMode, onToggleTestMode }: TestModeToggleProps) {
+  const { setShowTestGuide } = useTestContext();
+  
   // Initialize from localStorage on component mount
   useEffect(() => {
     const storedTestMode = localStorage.getItem('testMode') === 'true';
@@ -25,6 +29,12 @@ export function TestModeToggle({ isTestMode, onToggleTestMode }: TestModeToggleP
     onToggleTestMode(checked);
     
     if (checked) {
+      // Show the test guide if this is the first time enabling test mode
+      const hasSeenGuide = localStorage.getItem('testGuideShown') === 'true';
+      if (!hasSeenGuide) {
+        setShowTestGuide(true);
+      }
+      
       toast.success("Test mode enabled", {
         description: "All premium features are now accessible for testing purposes"
       });

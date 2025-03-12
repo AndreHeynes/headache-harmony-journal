@@ -9,6 +9,8 @@ interface TestContextType {
   testEvents: TestEvent[];
   logTestEvent: (event: Omit<TestEvent, "timestamp">) => void;
   clearTestEvents: () => void;
+  showTestGuide: boolean;
+  setShowTestGuide: (value: boolean) => void;
 }
 
 export interface TestEvent {
@@ -25,6 +27,7 @@ export function TestProvider({ children }: { children: ReactNode }) {
   const [isTestMode, setIsTestMode] = useState<boolean>(false);
   const [isPremiumOverride, setIsPremiumOverride] = useState<boolean>(false);
   const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
+  const [showTestGuide, setShowTestGuide] = useState<boolean>(false);
 
   // Load test mode settings from localStorage on mount
   useEffect(() => {
@@ -39,6 +42,12 @@ export function TestProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('testMode', isTestMode.toString());
     localStorage.setItem('premiumOverride', isPremiumOverride.toString());
+    
+    // Check if this is the first time enabling test mode
+    if (isTestMode && localStorage.getItem('testGuideShown') !== 'true') {
+      setShowTestGuide(true);
+      localStorage.setItem('testGuideShown', 'true');
+    }
   }, [isTestMode, isPremiumOverride]);
 
   const logTestEvent = (event: Omit<TestEvent, "timestamp">) => {
@@ -67,7 +76,9 @@ export function TestProvider({ children }: { children: ReactNode }) {
       setIsPremiumOverride,
       testEvents,
       logTestEvent,
-      clearTestEvents
+      clearTestEvents,
+      showTestGuide,
+      setShowTestGuide
     }}>
       {children}
     </TestContext.Provider>
