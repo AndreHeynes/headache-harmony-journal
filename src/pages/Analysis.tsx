@@ -13,25 +13,36 @@ import { CorrelationAnalysis } from "@/components/analysis/CorrelationAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
 import BottomNav from "@/components/layout/BottomNav";
+import { useTestContext } from "@/contexts/TestContext";
 
 export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
   
-  // In a real app, this would come from a global state/context
-  // For now, this just checks localStorage which would be set by the test mode toggle
-  const isPremium = localStorage.getItem('testMode') === 'true' || false;
+  const { isPremiumOverride, logTestEvent } = useTestContext();
   
   const navigate = useNavigate();
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
     // In a real app, you would fetch new data based on the date range
+    logTestEvent({
+      type: "action",
+      details: "Date range changed",
+      component: "DateRangeSelector",
+      metadata: { range }
+    });
     console.log("Fetching data for range:", range);
   };
 
   const handleInsightCardClick = (cardType: string) => {
-    if (!isPremium) {
+    logTestEvent({
+      type: "feature_usage",
+      details: `Insight card clicked: ${cardType}`,
+      component: "PremiumInsights"
+    });
+    
+    if (!isPremiumOverride) {
       toast.info("Premium Feature", {
         description: "Upgrade to premium to access detailed insights"
       });
@@ -45,9 +56,18 @@ export default function Analysis() {
 
   const handleCloseDetailedInsight = () => {
     setSelectedInsight(null);
+    logTestEvent({
+      type: "action",
+      details: "Detailed insight closed",
+      component: "DetailedInsight"
+    });
   };
 
   const handleGoBack = () => {
+    logTestEvent({
+      type: "navigation",
+      details: "Navigated back from Analysis"
+    });
     navigate(-1);
   };
 
@@ -88,7 +108,7 @@ export default function Analysis() {
           />
           
           <PremiumInsights 
-            isPremium={isPremium} 
+            isPremium={isPremiumOverride} 
             onCardClick={handleInsightCardClick} 
           />
           
@@ -102,7 +122,13 @@ export default function Analysis() {
         <Button 
           size="icon" 
           className="h-12 w-12 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg"
-          onClick={() => navigate("/log")}
+          onClick={() => {
+            logTestEvent({
+              type: "navigation",
+              details: "Navigate to log headache"
+            });
+            navigate("/log");
+          }}
         >
           <Plus className="h-6 w-6" />
         </Button>

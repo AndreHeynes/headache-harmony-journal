@@ -10,24 +10,25 @@ import { NotificationsCard } from "@/components/profile/NotificationsCard";
 import { AppSettingsCard } from "@/components/profile/AppSettingsCard";
 import { TestModeToggle } from "@/components/profile/TestModeToggle";
 import { DataManagementCard } from "@/components/profile/DataManagementCard";
-import BottomNav from "@/components/layout/BottomNav";
+import BottomNavWithTest from "@/components/layout/BottomNavWithTest";
 import { toast } from "sonner";
+import { useTestContext } from "@/contexts/TestContext";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [isTestMode, setIsTestMode] = useState(false);
   const [userCountry, setUserCountry] = useState("US");
-  
-  // This state would be lifted to a global context in a real app
-  // so that premium status can be accessed throughout the app
-  const [isPremiumOverride, setIsPremiumOverride] = useState(false);
+  const { isTestMode, setIsTestMode, isPremiumOverride, setIsPremiumOverride, logTestEvent } = useTestContext();
   
   const handleToggleTestMode = (enabled: boolean) => {
     setIsTestMode(enabled);
     setIsPremiumOverride(enabled);
     
-    // In a real app, you would update a global state or context
-    // to make premium features available throughout the app
+    logTestEvent({
+      type: "action",
+      details: `Test mode ${enabled ? "enabled" : "disabled"}`,
+      component: "TestModeToggle"
+    });
+    
     console.log("Test mode toggled:", enabled);
   };
   
@@ -45,6 +46,9 @@ export default function Profile() {
     console.log("Viewing policies");
   };
 
+  const isTestingEnabled = process.env.NODE_ENV === 'development' || 
+                          localStorage.getItem('enableTesting') === 'true';
+
   return (
     <div className="bg-charcoal text-white p-4 pb-20">
       <Button 
@@ -59,7 +63,7 @@ export default function Profile() {
       <ProfileHeader onBack={handleGoBack} />
       
       <div className="space-y-4 mt-6">
-        {process.env.NODE_ENV === 'development' && (
+        {isTestingEnabled && (
           <TestModeToggle 
             isTestMode={isTestMode} 
             onToggleTestMode={handleToggleTestMode} 
@@ -76,7 +80,7 @@ export default function Profile() {
         />
       </div>
       
-      <BottomNav />
+      <BottomNavWithTest />
     </div>
   );
 }

@@ -14,29 +14,34 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import SupportServices from "./pages/SupportServices";
 import Policy from "./pages/Policy";
+import { TestProvider } from "./contexts/TestContext";
+import TestDashboard from "./pages/TestDashboard";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/log" element={<LogHeadache />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/analysis" element={<Analysis />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/support" element={<SupportServices />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <TestProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/log" element={<LogHeadache />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/analysis" element={<Analysis />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/support" element={<SupportServices />} />
+            <Route path="/policy" element={<Policy />} />
+            <Route path="/test-dashboard" element={<TestDashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </TestProvider>
   </QueryClientProvider>
 );
 
