@@ -38,8 +38,8 @@ export default function Policy() {
                 onClick={() => setActivePolicy(policy)}
                 className={`flex-1 px-3 py-4 text-sm font-medium transition-colors focus:outline-none
                   ${activePolicy === policy 
-                    ? "bg-primary text-charcoal" 
-                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                    ? "bg-primary text-charcoal font-semibold shadow-lg" 
+                    : "text-gray-300 hover:text-white hover:bg-gray-700"
                   }`}
               >
                 {policy.charAt(0).toUpperCase() + policy.slice(1)}
