@@ -98,6 +98,7 @@ export default function Analysis() {
         <Button 
           size="icon" 
           className="h-12 w-12 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg"
+          onClick={() => navigate("/log")}
         >
           <Plus className="h-6 w-6" />
         </Button>

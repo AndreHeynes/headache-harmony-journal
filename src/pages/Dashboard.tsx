@@ -2,12 +2,21 @@
 import { Activity, ArrowRight, Clock, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
 
 export default function Dashboard() {
   // This would come from your auth/subscription system
   const isPremium = false;
+  const navigate = useNavigate();
+
+  const handleViewAllEntries = () => {
+    navigate("/analysis");
+  };
+
+  const handleUpgradeForInsights = () => {
+    navigate("/analysis");
+  };
 
   return (
     <div className="min-h-screen bg-charcoal pb-20">
@@ -77,7 +86,12 @@ export default function Dashboard() {
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-white">Recent Entries</h2>
-            <span className="text-primary text-sm cursor-pointer">View All</span>
+            <span 
+              className="text-primary text-sm cursor-pointer"
+              onClick={handleViewAllEntries}
+            >
+              View All
+            </span>
           </div>
           {[
             { day: "Today", trigger: "Stress-induced", duration: "2h 30m", intensity: "8/10" },
@@ -143,7 +157,10 @@ export default function Dashboard() {
               )}
 
               {/* Upgrade Button */}
-              <div className="bg-gray-700/30 rounded-lg p-3 border border-gray-600 cursor-pointer">
+              <div 
+                className="bg-gray-700/30 rounded-lg p-3 border border-gray-600 cursor-pointer"
+                onClick={handleUpgradeForInsights}
+              >
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white">Upgrade for Full Insights</span>
                   <ArrowRight className="h-4 w-4 text-primary" />

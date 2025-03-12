@@ -8,7 +8,7 @@ export default function Index() {
   const navigate = useNavigate();
   
   const handleStart = () => {
-    navigate("/dashboard");
+    navigate("/signup");
   };
   
   const handleAccount = () => {

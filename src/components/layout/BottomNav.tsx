@@ -1,16 +1,18 @@
 
 import { Home, PlusCircle, BookOpen, BarChart2, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { icon: Home, label: "Home", href: "/", active: true },
+  { icon: Home, label: "Home", href: "/dashboard" },
   { icon: PlusCircle, label: "Log", href: "/log" },
   { icon: BookOpen, label: "Journal", href: "/journal" },
-  { icon: BarChart2, label: "Reports", href: "/reports" },
+  { icon: BarChart2, label: "Reports", href: "/analysis" },
   { icon: User, label: "Profile", href: "/profile" },
 ];
 
 export default function BottomNav() {
+  const location = useLocation();
+
   return (
     <nav className="fixed bottom-0 w-full bg-charcoal/80 backdrop-blur-sm border-t border-white/5">
       <div className="flex justify-around items-center h-16 px-2">
@@ -19,7 +21,7 @@ export default function BottomNav() {
             key={item.label}
             to={item.href}
             className={`flex flex-col items-center justify-center flex-1 py-1 text-xs ${
-              item.active ? "text-primary" : "text-white/60 hover:text-white/80"
+              location.pathname === item.href ? "text-primary" : "text-white/60 hover:text-white/80"
             }`}
           >
             <item.icon className="h-5 w-5 mb-1" />
