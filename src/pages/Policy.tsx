@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
@@ -52,15 +51,17 @@ export default function Policy() {
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-white">Privacy Policy</h2>
                 <p className="text-gray-300">
-                  This Privacy Policy describes how your personal information is collected, used, and shared when you use our application.
+                  [Placeholder] This Privacy Policy outlines how we collect, use, and protect your personal information when you use our application.
                 </p>
-                <h3 className="text-md font-semibold text-white mt-4">Information We Collect</h3>
+                <h3 className="text-md font-semibold text-white mt-4">Information Collection</h3>
                 <p className="text-gray-300">
-                  We collect information you provide directly to us, such as your name, email address, and any other information you choose to provide.
+                  [Placeholder] We collect information you provide directly to us, including but not limited to:
                 </p>
-                <p className="text-gray-300">
-                  We also automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device.
-                </p>
+                <ul className="list-disc pl-6 text-gray-300 space-y-2">
+                  <li>Account information (name, email, etc.)</li>
+                  <li>Health-related data you choose to provide</li>
+                  <li>Usage data and analytics</li>
+                </ul>
               </div>
             )}
             
@@ -94,11 +95,16 @@ export default function Policy() {
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-white">Data Protection</h2>
                 <p className="text-gray-300">
-                  We implement a variety of security measures to maintain the safety of your personal information.
+                  [Placeholder] Our commitment to protecting your data includes:
                 </p>
-                <h3 className="text-md font-semibold text-white mt-4">Your Data Rights</h3>
-                <p className="text-gray-300">
-                  If you are a European resident, you have the right to access personal information we hold about you and to ask that your personal information be corrected, updated, or deleted. If you would like to exercise this right, please contact us.
+                <ul className="list-disc pl-6 text-gray-300 space-y-2">
+                  <li>Industry-standard encryption</li>
+                  <li>Regular security audits</li>
+                  <li>Strict access controls</li>
+                  <li>Data retention policies</li>
+                </ul>
+                <p className="text-gray-300 mt-4">
+                  [Placeholder] For detailed information about our data protection practices, please contact our privacy team.
                 </p>
               </div>
             )}

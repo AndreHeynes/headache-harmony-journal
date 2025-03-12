@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ThumbsUp, ThumbsDown, Mail, Users, HelpCircle, BookOpen, Headphones, Flag, ChevronLeft } from "lucide-react";
@@ -11,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Card } from "@/components/ui/card";
 import BottomNav from "@/components/layout/BottomNav";
 import { toast } from "sonner";
+import UserGuideContent from "@/components/support/UserGuideContent";
 
 const faqData = [
   {
@@ -56,7 +56,7 @@ const faqData = [
 
 const SupportServices = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -90,6 +90,10 @@ const SupportServices = () => {
       subject: '',
       description: ''
     });
+  };
+
+  const handleSectionClick = (section: string) => {
+    setActiveSection(activeSection === section ? null : section);
   };
 
   const filteredFaqs = faqData.map(category => ({
@@ -133,28 +137,48 @@ const SupportServices = () => {
 
       <section className="px-4 py-6">
         <div className="grid grid-cols-2 gap-4">
-          <Card className="bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors">
+          <Card 
+            className={`bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors ${
+              activeSection === 'faqs' ? 'ring-2 ring-primary' : ''
+            }`}
+            onClick={() => handleSectionClick('faqs')}
+          >
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-500/20 mb-3">
               <HelpCircle className="h-6 w-6 text-blue-400" />
             </div>
             <h3 className="font-semibold text-white">FAQs</h3>
             <p className="text-sm text-gray-400 mt-1">Common questions</p>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors">
+          <Card 
+            className={`bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors ${
+              activeSection === 'guide' ? 'ring-2 ring-primary' : ''
+            }`}
+            onClick={() => handleSectionClick('guide')}
+          >
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500/20 mb-3">
               <BookOpen className="h-6 w-6 text-green-400" />
             </div>
             <h3 className="font-semibold text-white">User Guide</h3>
             <p className="text-sm text-gray-400 mt-1">How-to guides</p>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors">
+          <Card 
+            className={`bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors ${
+              activeSection === 'contact' ? 'ring-2 ring-primary' : ''
+            }`}
+            onClick={() => handleSectionClick('contact')}
+          >
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-500/20 mb-3">
               <Headphones className="h-6 w-6 text-purple-400" />
             </div>
             <h3 className="font-semibold text-white">Contact</h3>
             <p className="text-sm text-gray-400 mt-1">Get help</p>
           </Card>
-          <Card className="bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors">
+          <Card 
+            className={`bg-gray-800/50 border-gray-700 p-4 cursor-pointer hover:bg-gray-800 transition-colors ${
+              activeSection === 'report' ? 'ring-2 ring-primary' : ''
+            }`}
+            onClick={() => handleSectionClick('report')}
+          >
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/20 mb-3">
               <Flag className="h-6 w-6 text-red-400" />
             </div>
@@ -164,118 +188,160 @@ const SupportServices = () => {
         </div>
       </section>
 
-      <section className="px-4 py-6 bg-gray-800/30">
-        <h2 className="text-lg font-semibold text-white mb-4">Frequently Asked Questions</h2>
-        <div className="space-y-3">
-          <Accordion type="single" collapsible className="space-y-2">
-            {filteredFaqs.map((category) => (
-              <AccordionItem
-                key={category.category}
-                value={category.category}
-                className="border rounded-lg border-gray-700 bg-gray-800/50 overflow-hidden"
-              >
-                <AccordionTrigger className="px-4 py-3 text-white hover:bg-gray-700/50">
-                  {category.category}
-                </AccordionTrigger>
-                <AccordionContent className="px-4 pb-3">
-                  <div className="space-y-3 mt-2">
-                    {category.items.map((item, index) => (
-                      <div key={index} className="bg-gray-900/30 rounded-lg p-3">
-                        <h4 className="font-medium text-white mb-1">{item.question}</h4>
-                        <p className="text-sm text-gray-400">{item.answer}</p>
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
-
-      <section className="px-4 py-6 bg-gray-800/50">
-        <h2 className="text-lg font-semibold text-white mb-4">Contact Support</h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <Label htmlFor="name" className="text-gray-300 mb-2">Name</Label>
-            <Input 
-              id="name" 
-              type="text" 
-              className="border-gray-700 bg-gray-900/50 text-white"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="email" className="text-gray-300 mb-2">Email</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              className="border-gray-700 bg-gray-900/50 text-white"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="subject" className="text-gray-300 mb-2">Subject</Label>
-            <Select onValueChange={handleSelectChange} value={formData.subject}>
-              <SelectTrigger id="subject" className="border-gray-700 bg-gray-900/50 text-white">
-                <SelectValue placeholder="Select subject" />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-900 border-gray-700">
-                <SelectItem value="technical">Technical Support</SelectItem>
-                <SelectItem value="account">Account Issues</SelectItem>
-                <SelectItem value="billing">Billing Questions</SelectItem>
-                <SelectItem value="feedback">Feedback</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="description" className="text-gray-300 mb-2">Description</Label>
-            <Textarea 
-              id="description" 
-              rows={4} 
-              className="border-gray-700 bg-gray-900/50 text-white"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full bg-primary hover:bg-primary-dark text-charcoal font-medium">
-            Submit
-          </Button>
-        </form>
-      </section>
-
-      <section className="px-4 py-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Other Ways to Connect</h2>
-        <div className="grid grid-cols-1 gap-4">
-          <Card className="bg-gray-800/50 border-gray-700 p-4">
-            <div className="flex items-center">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20 mr-3">
-                <Mail className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-white">Email Support</h3>
-                <p className="text-sm text-gray-400">support@headachejournal.com</p>
+      {activeSection && (
+        <section className="px-4 py-6 bg-gray-800/30">
+          {activeSection === 'guide' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-white mb-4">User Guide</h2>
+              <UserGuideContent />
+            </div>
+          )}
+          {activeSection === 'faqs' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-white mb-4">Frequently Asked Questions</h2>
+              <div className="space-y-3">
+                <Accordion type="single" collapsible className="space-y-2">
+                  {filteredFaqs.map((category) => (
+                    <AccordionItem
+                      key={category.category}
+                      value={category.category}
+                      className="border rounded-lg border-gray-700 bg-gray-800/50 overflow-hidden"
+                    >
+                      <AccordionTrigger className="px-4 py-3 text-white hover:bg-gray-700/50">
+                        {category.category}
+                      </AccordionTrigger>
+                      <AccordionContent className="px-4 pb-3">
+                        <div className="space-y-3 mt-2">
+                          {category.items.map((item, index) => (
+                            <div key={index} className="bg-gray-900/30 rounded-lg p-3">
+                              <h4 className="font-medium text-white mb-1">{item.question}</h4>
+                              <p className="text-sm text-gray-400">{item.answer}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             </div>
-          </Card>
-          <Card className="bg-gray-800/50 border-gray-700 p-4">
-            <div className="flex items-center">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20 mr-3">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-medium text-white">Community Forum</h3>
-                <p className="text-sm text-gray-400">Join the discussion</p>
-              </div>
+          )}
+          {activeSection === 'contact' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-white mb-4">Contact Support</h2>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <Label htmlFor="name" className="text-gray-300 mb-2">Name</Label>
+                  <Input 
+                    id="name" 
+                    type="text" 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-gray-300 mb-2">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="subject" className="text-gray-300 mb-2">Subject</Label>
+                  <Select onValueChange={handleSelectChange} value={formData.subject}>
+                    <SelectTrigger id="subject" className="border-gray-700 bg-gray-900/50 text-white">
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="technical">Technical Support</SelectItem>
+                      <SelectItem value="account">Account Issues</SelectItem>
+                      <SelectItem value="billing">Billing Questions</SelectItem>
+                      <SelectItem value="feedback">Feedback</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-gray-300 mb-2">Description</Label>
+                  <Textarea 
+                    id="description" 
+                    rows={4} 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary-dark text-charcoal font-medium">
+                  Submit
+                </Button>
+              </form>
             </div>
-          </Card>
-        </div>
-      </section>
+          )}
+          {activeSection === 'report' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-white mb-4">Report an Issue</h2>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <Label htmlFor="name" className="text-gray-300 mb-2">Name</Label>
+                  <Input 
+                    id="name" 
+                    type="text" 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-gray-300 mb-2">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="subject" className="text-gray-300 mb-2">Subject</Label>
+                  <Select onValueChange={handleSelectChange} value={formData.subject}>
+                    <SelectTrigger id="subject" className="border-gray-700 bg-gray-900/50 text-white">
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="technical">Technical Support</SelectItem>
+                      <SelectItem value="account">Account Issues</SelectItem>
+                      <SelectItem value="billing">Billing Questions</SelectItem>
+                      <SelectItem value="feedback">Feedback</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-gray-300 mb-2">Description</Label>
+                  <Textarea 
+                    id="description" 
+                    rows={4} 
+                    className="border-gray-700 bg-gray-900/50 text-white"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary-dark text-charcoal font-medium">
+                  Submit
+                </Button>
+              </form>
+            </div>
+          )}
+        </section>
+      )}
 
       <footer className="bg-gray-800/80 border-t border-gray-700 px-4 py-6">
         <div className="text-center">
