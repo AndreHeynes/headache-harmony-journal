@@ -17,7 +17,11 @@ import BottomNav from "@/components/layout/BottomNav";
 export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
-  const isPremium = false; // This would come from your authentication/user context
+  
+  // In a real app, this would come from a global state/context
+  // For now, this just checks localStorage which would be set by the test mode toggle
+  const isPremium = localStorage.getItem('testMode') === 'true' || false;
+  
   const navigate = useNavigate();
 
   const handleDateRangeChange = (range: DateRange | undefined) => {

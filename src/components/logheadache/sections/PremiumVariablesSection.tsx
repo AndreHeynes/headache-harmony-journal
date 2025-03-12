@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Crown, Sun, Moon, CloudRain, Coffee, CreditCard } from "lucide-react";
+import { Crown, Sun, Moon, CloudRain, Coffee, CreditCard, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 interface PremiumVariablesSectionProps {
@@ -12,7 +12,7 @@ export function PremiumVariablesSection({ isPremium }: PremiumVariablesSectionPr
     toast.info("Secure payment processing", {
       description: "You'll be redirected to our secure payment processor"
     });
-    // In a real app, this would redirect to a payment page
+    // In a real app, this would redirect to a payment page through a secure third-party processor
   };
 
   return (
@@ -51,12 +51,32 @@ export function PremiumVariablesSection({ isPremium }: PremiumVariablesSectionPr
           
           <div className="mt-4 text-xs text-gray-500">
             <p>$4.99/month or $49.99/year</p>
-            <p className="mt-1">Secure payment processing • Cancel anytime</p>
+            <div className="mt-1 flex justify-center items-center">
+              <Shield className="h-3 w-3 mr-1 text-teal-500" />
+              <p>Secure third-party payment processing • Cancel anytime</p>
+            </div>
           </div>
         </div>
       ) : (
         <div className="space-y-4">
           {/* Premium variable inputs would go here */}
+          <p className="text-gray-400 text-sm">You have access to all premium variables. Track additional factors that may influence your headaches.</p>
+          
+          {/* Example premium variable inputs */}
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" className="justify-start border-gray-700 hover:bg-gray-700/50">
+              <Moon className="h-4 w-4 mr-2 text-blue-400" /> Sleep Quality
+            </Button>
+            <Button variant="outline" className="justify-start border-gray-700 hover:bg-gray-700/50">
+              <Sun className="h-4 w-4 mr-2 text-yellow-400" /> Weather
+            </Button>
+            <Button variant="outline" className="justify-start border-gray-700 hover:bg-gray-700/50">
+              <CloudRain className="h-4 w-4 mr-2 text-cyan-400" /> Humidity
+            </Button>
+            <Button variant="outline" className="justify-start border-gray-700 hover:bg-gray-700/50">
+              <Coffee className="h-4 w-4 mr-2 text-amber-400" /> Caffeine
+            </Button>
+          </div>
         </div>
       )}
     </section>

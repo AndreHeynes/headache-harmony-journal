@@ -1,45 +1,65 @@
 
 import { useState } from "react";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "@/components/layout/BottomNav";
+
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { PersonalInfoCard } from "@/components/profile/PersonalInfoCard";
-import { AppSettingsCard } from "@/components/profile/AppSettingsCard";
 import { NotificationsCard } from "@/components/profile/NotificationsCard";
+import { AppSettingsCard } from "@/components/profile/AppSettingsCard";
+import { TestModeToggle } from "@/components/profile/TestModeToggle";
+import { DataManagementCard } from "@/components/profile/DataManagementCard";
+import BottomNav from "@/components/layout/BottomNav";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const [userCountry, setUserCountry] = useState(() => 
-    localStorage.getItem('userCountry') || 'US'
-  );
-
-  const handleCountryChange = (value: string) => {
-    setUserCountry(value);
-    localStorage.setItem('userCountry', value);
+  const [isTestMode, setIsTestMode] = useState(false);
+  
+  // This state would be lifted to a global context in a real app
+  // so that premium status can be accessed throughout the app
+  const [isPremiumOverride, setIsPremiumOverride] = useState(false);
+  
+  const handleToggleTestMode = (enabled: boolean) => {
+    setIsTestMode(enabled);
+    setIsPremiumOverride(enabled);
+    
+    // In a real app, you would update a global state or context
+    // to make premium features available throughout the app
+    console.log("Test mode toggled:", enabled);
   };
-
+  
   const handleGoBack = () => {
     navigate(-1);
   };
 
-  const handleViewPolicies = () => {
-    navigate("/policy");
-  };
-
   return (
-    <div className="min-h-screen bg-charcoal text-gray-100 pb-20">
-      <ProfileHeader onBack={handleGoBack} />
-
-      <main className="pt-20 px-4 space-y-6">
+    <div className="bg-charcoal text-white p-4 pb-20">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleGoBack}
+        className="text-gray-400 hover:text-white hover:bg-gray-800 mb-4"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </Button>
+      
+      <ProfileHeader />
+      
+      <div className="space-y-4 mt-6">
+        {process.env.NODE_ENV === 'development' && (
+          <TestModeToggle 
+            isTestMode={isTestMode} 
+            onToggleTestMode={handleToggleTestMode} 
+          />
+        )}
+        
         <PersonalInfoCard />
-        <AppSettingsCard 
-          userCountry={userCountry} 
-          onCountryChange={handleCountryChange} 
-          onViewPolicies={handleViewPolicies} 
-        />
         <NotificationsCard />
-      </main>
-
+        <DataManagementCard />
+        <AppSettingsCard isPremium={isPremiumOverride} />
+      </div>
+      
       <BottomNav />
     </div>
   );
