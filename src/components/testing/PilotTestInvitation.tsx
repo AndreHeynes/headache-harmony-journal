@@ -24,19 +24,19 @@ export function PilotTestInvitation({
     const letterContent = `
 Dear ${recipientName},
 
-I'm excited to invite you to participate in the pilot testing phase of Headache Experience Journal, a new application designed to help users better understand and manage their headache experiences.
+I'm excited to invite you to participate in the pilot testing phase of Headache Experience Journal, a new application designed to help users better understand and gather any relationships or pattern identification of your headache experience. This you can share with your doctor in order to better understand your headache disorder.
 
 Purpose of Testing:
 The main objective of this pilot testing is to gather valuable feedback on the usability, functionality, and effectiveness of our application before its official launch. Your insights will directly influence the final product and help us ensure it genuinely addresses the needs of people who experience headaches.
 
 Duration of Testing:
-The pilot testing period will run for two weeks, from ${startDate} to ${endDate}. During this time, we ask that you use the application as you normally would to track your headache experiences, explore the analysis features, and test various functionalities.
+The pilot testing period will run for six weeks, from ${startDate} to ${endDate}. During this time, we ask that you use the application as you normally would to track your headache experiences, explore the analysis features, and test various functionalities.
 
 What's Involved:
 - Use the app to log your headache experiences and related factors
 - Explore the analysis dashboard to view patterns and insights
 - Test both basic and premium features (all premium features will be available during testing)
-- Provide feedback through the in-app feedback form or during our scheduled check-ins
+- Provide feedback through the in-app feedback form
 
 How to Provide Feedback:
 Our application includes a dedicated test dashboard accessible through the "Test" tab in the navigation menu. This dashboard allows you to:
@@ -44,8 +44,6 @@ Our application includes a dedicated test dashboard accessible through the "Test
 - Report any bugs or issues you encounter
 - Suggest improvements or new features
 - View your testing activity and analytics
-
-We will also schedule a brief 15-minute check-in call midway through the testing period and a final 30-minute feedback session at the conclusion.
 
 Getting Started:
 1. Download the application using the link provided in your email
@@ -88,7 +86,8 @@ The Headache Experience Journal Team
         
         <p className="text-gray-800">
           I'm excited to invite you to participate in the pilot testing phase of <strong>Headache Experience Journal</strong>,
-          a new application designed to help users better understand and manage their headache experiences.
+          a new application designed to help users better understand and gather any relationships or pattern identification 
+          of your headache experience. This you can share with your doctor in order to better understand your headache disorder.
         </p>
         
         <div className="space-y-2">
@@ -104,7 +103,7 @@ The Headache Experience Journal Team
         <div className="space-y-2">
           <h3 className="text-lg font-medium text-indigo-700">Duration of Testing:</h3>
           <p className="text-gray-800">
-            The pilot testing period will run for two weeks, from {startDate} to {endDate}. 
+            The pilot testing period will run for six weeks, from {startDate} to {endDate}. 
             During this time, we ask that you use the application as you normally would to track your 
             headache experiences, explore the analysis features, and test various functionalities.
           </p>
@@ -116,7 +115,7 @@ The Headache Experience Journal Team
             <li>Use the app to log your headache experiences and related factors</li>
             <li>Explore the analysis dashboard to view patterns and insights</li>
             <li>Test both basic and premium features (all premium features will be available during testing)</li>
-            <li>Provide feedback through the in-app feedback form or during our scheduled check-ins</li>
+            <li>Provide feedback through the in-app feedback form</li>
           </ul>
         </div>
         
@@ -132,10 +131,6 @@ The Headache Experience Journal Team
             <li>Suggest improvements or new features</li>
             <li>View your testing activity and analytics</li>
           </ul>
-          <p className="text-gray-800 mt-2">
-            We will also schedule a brief 15-minute check-in call midway through the testing period
-            and a final 30-minute feedback session at the conclusion.
-          </p>
         </div>
         
         <div className="space-y-2">
