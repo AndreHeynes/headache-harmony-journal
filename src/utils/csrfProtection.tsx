@@ -6,6 +6,8 @@
  * Note: Will need to be updated when actual backend is implemented.
  */
 
+import React from 'react';
+
 /**
  * Generate a CSRF token
  */
