@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Mail, Lock, User, UserPlus } from "lucide-react";
+import { Mail, Lock, User, UserPlus, AlertCircle } from "lucide-react";
 import { AgeVerificationModal } from "./privacy/AgeVerificationModal";
+import { isValidEmail, isStrongPassword, getPasswordStrength, sanitizeInput } from "@/utils/validation";
+import { secureSetItem } from "@/utils/secureStorage";
+import { getCSRFToken } from "@/utils/csrfProtection";
 
 export function SignUpForm() {
   const navigate = useNavigate();
@@ -23,8 +26,24 @@ export function SignUpForm() {
   const [showAgeVerification, setShowAgeVerification] = useState(false);
   const [isOver16, setIsOver16] = useState<boolean | null>(null);
   const [hasParentalConsent, setHasParentalConsent] = useState(false);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
+  const [passwordStrength, setPasswordStrength] = useState<{
+    score: number;
+    feedback: string;
+  }>({ score: 0, feedback: "" });
+
+  // CSRF token for form security
+  const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
+    // Generate CSRF token
+    setCsrfToken(getCSRFToken());
+    
     // Check if we need to show age verification
     const ageVerified = localStorage.getItem('age-verified');
     if (!ageVerified) {
@@ -34,32 +53,88 @@ export function SignUpForm() {
       }, 500);
       return () => clearTimeout(timer);
     } else {
-      // Load stored age verification status
-      const ageData = JSON.parse(ageVerified);
-      setIsOver16(ageData.isOver16);
-      setHasParentalConsent(ageData.hasParentalConsent);
+      try {
+        // Load stored age verification status
+        const ageData = JSON.parse(ageVerified);
+        setIsOver16(ageData.isOver16);
+        setHasParentalConsent(ageData.hasParentalConsent);
+      } catch (error) {
+        console.error("Error parsing age verification data:", error);
+        // If parsing fails, show age verification again
+        setShowAgeVerification(true);
+      }
     }
   }, []);
+
+  // Password strength validation
+  useEffect(() => {
+    if (password) {
+      setPasswordStrength(getPasswordStrength(password));
+    } else {
+      setPasswordStrength({ score: 0, feedback: "" });
+    }
+  }, [password]);
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+    let isValid = true;
+
+    // Validate name
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+      isValid = false;
+    } else if (name.length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+      isValid = false;
+    }
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!isValidEmail(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Validate password
+    if (!password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (!isStrongPassword(password)) {
+      newErrors.password = "Password must be at least 8 characters with uppercase, lowercase, and numbers";
+      isValid = false;
+    }
+
+    // Validate confirm password
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleAgeVerification = (isOver16: boolean, hasParentalConsent: boolean) => {
     setIsOver16(isOver16);
     setHasParentalConsent(hasParentalConsent);
     setShowAgeVerification(false);
     
-    // Store age verification status
-    localStorage.setItem('age-verified', JSON.stringify({
+    // Store age verification status securely
+    secureSetItem('age-verified', {
       isOver16,
       hasParentalConsent,
       verifiedAt: new Date().toISOString()
-    }));
+    });
   };
 
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+    if (!validateForm()) {
+      toast.error("Please correct the errors in the form");
       return;
     }
     
@@ -75,7 +150,11 @@ export function SignUpForm() {
     
     setIsLoading(true);
     
-    // Store consent data
+    // Sanitize inputs before storing
+    const sanitizedName = sanitizeInput(name);
+    const sanitizedEmail = sanitizeInput(email);
+    
+    // Store consent data securely
     const consentData = {
       termsAccepted: agreedToTerms,
       privacyAccepted: agreedToPrivacy,
@@ -84,11 +163,11 @@ export function SignUpForm() {
       consentDate: new Date().toISOString()
     };
     
-    localStorage.setItem('user-consent', JSON.stringify(consentData));
-    localStorage.setItem('user-name', name);
-    localStorage.setItem('user-email', email);
+    secureSetItem('user-consent', consentData);
+    secureSetItem('user-name', sanitizedName);
+    secureSetItem('user-email', sanitizedEmail);
 
-    // Simulate registration
+    // Simulate registration (will be replaced with actual API call)
     setTimeout(() => {
       toast.success("Account created successfully");
       setIsLoading(false);
@@ -99,6 +178,13 @@ export function SignUpForm() {
   return (
     <>
       <form onSubmit={handleSignUp} className="space-y-4">
+        {/* Hidden CSRF token for form security */}
+        <input 
+          type="hidden" 
+          name="csrf_token" 
+          value={csrfToken}
+        />
+
         <div className="space-y-2">
           <Label htmlFor="name" className="text-gray-300">Full Name</Label>
           <div className="relative">
@@ -109,10 +195,13 @@ export function SignUpForm() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+              className={`pl-10 bg-gray-900/50 border-${errors.name ? 'red-500' : 'gray-700'} text-white placeholder:text-gray-500`}
             />
             <User className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
           </div>
+          {errors.name && (
+            <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+          )}
         </div>
         
         <div className="space-y-2">
@@ -125,10 +214,13 @@ export function SignUpForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+              className={`pl-10 bg-gray-900/50 border-${errors.email ? 'red-500' : 'gray-700'} text-white placeholder:text-gray-500`}
             />
             <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
           </div>
+          {errors.email && (
+            <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+          )}
         </div>
         
         <div className="space-y-2">
@@ -141,10 +233,35 @@ export function SignUpForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+              className={`pl-10 bg-gray-900/50 border-${errors.password ? 'red-500' : 'gray-700'} text-white placeholder:text-gray-500`}
             />
             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
           </div>
+          {password && (
+            <div className="mt-1">
+              <div className="h-1 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-300 ${
+                    passwordStrength.score === 0 ? 'bg-red-500 w-1/5' :
+                    passwordStrength.score === 1 ? 'bg-red-500 w-2/5' :
+                    passwordStrength.score === 2 ? 'bg-yellow-500 w-3/5' :
+                    passwordStrength.score === 3 ? 'bg-yellow-500 w-4/5' :
+                    'bg-green-500 w-full'
+                  }`}
+                />
+              </div>
+              <p className={`text-xs mt-1 ${
+                passwordStrength.score < 3 ? 'text-red-400' : 
+                passwordStrength.score < 4 ? 'text-yellow-400' : 
+                'text-green-400'
+              }`}>
+                {passwordStrength.feedback}
+              </p>
+            </div>
+          )}
+          {errors.password && (
+            <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+          )}
         </div>
         
         <div className="space-y-2">
@@ -157,10 +274,13 @@ export function SignUpForm() {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+              className={`pl-10 bg-gray-900/50 border-${errors.confirmPassword ? 'red-500' : 'gray-700'} text-white placeholder:text-gray-500`}
             />
             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
           </div>
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-500 mt-1">{errors.confirmPassword}</p>
+          )}
         </div>
         
         <div className="space-y-3 border border-gray-700 rounded-md p-3 bg-gray-800/50">

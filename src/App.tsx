@@ -19,8 +19,26 @@ import { TestProvider } from "./contexts/TestContext";
 import TestDashboard from "./pages/TestDashboard";
 import { TestGuideModal } from "./components/testing/TestGuideModal";
 import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
+import { SecurityHeaders } from "./components/security/SecurityHeaders";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  // Adding security-focused default options
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: 1,
+      onError: (error) => {
+        console.error("Mutation error:", error);
+      },
+    },
+  },
+});
 
 const App = () => {
   // Check if the privacy policy has been updated and show a notification if needed
@@ -44,6 +62,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TestProvider>
+        <SecurityHeaders />
         <TooltipProvider>
           <Toaster />
           <Sonner />
