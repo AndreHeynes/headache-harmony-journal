@@ -17,6 +17,7 @@ import SupportServices from "./pages/SupportServices";
 import Policy from "./pages/Policy";
 import { TestProvider } from "./contexts/TestContext";
 import TestDashboard from "./pages/TestDashboard";
+import PilotTestingPrep from "./pages/PilotTestingPrep";
 import { TestGuideModal } from "./components/testing/TestGuideModal";
 import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
 import { SecurityHeaders } from "./components/security/SecurityHeaders";
@@ -93,6 +94,7 @@ const App = () => {
               <Route path="/support" element={<SupportServices />} />
               <Route path="/policy" element={<Policy />} />
               <Route path="/test-dashboard" element={<TestDashboard />} />
+              <Route path="/pilot-testing-prep" element={<PilotTestingPrep />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
