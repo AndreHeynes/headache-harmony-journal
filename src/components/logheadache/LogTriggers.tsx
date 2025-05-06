@@ -14,7 +14,6 @@ export default function LogTriggers() {
   const [foodItems, setFoodItems] = useState([{ food: "", hours: "" }]);
   const [beverages, setBeverages] = useState([{ beverage: "", hours: "" }]);
   const [activities, setActivities] = useState([{ type: "", duration: "" }]);
-  const isPremium = false; // This would come from your user context/state
 
   const addNewItem = (list: any[], setList: (items: any[]) => void) => {
     setList([...list, { food: "", hours: "", beverage: "", type: "", duration: "" }]);
@@ -117,7 +116,7 @@ export default function LogTriggers() {
         </div>
       </Card>
       
-      <PremiumVariablesSection isPremium={isPremium} />
+      <PremiumVariablesSection />
     </div>
   );
 }
