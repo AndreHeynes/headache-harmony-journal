@@ -1,8 +1,8 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 // Test Event Types
-export type TestEventType = "error" | "warning" | "action" | "feature_usage" | "navigation";
+export type TestEventType = "error" | "warning" | "action" | "feature_usage" | "navigation" | "feedback";
 
 export interface TestEvent {
   timestamp: number;
@@ -10,6 +10,7 @@ export interface TestEvent {
   details: string;
   component?: string;
   metadata?: any;
+  severity?: string; // Add severity property for error events
 }
 
 // Premium Features Interface
@@ -20,6 +21,14 @@ export interface PremiumFeatures {
   export: boolean;
   menstrual_tracking: boolean;
   weather_tracking: boolean;
+}
+
+// Session information interface
+export interface SessionInfo {
+  sessionId: string;
+  startTime: number;
+  totalEvents: number;
+  errorCount: number;
 }
 
 // Test Context Type
@@ -33,6 +42,11 @@ interface TestContextType {
   clearTestEvents: () => void;
   premiumFeatures: PremiumFeatures;
   updatePremiumFeature: (feature: keyof PremiumFeatures, value: boolean) => void;
+  // Add missing properties
+  trackError: (error: unknown, component?: string, severity?: string, action?: string) => void;
+  sessionInfo: SessionInfo;
+  showTestGuide: boolean;
+  setShowTestGuide: (show: boolean) => void;
 }
 
 // Default values for premium features
@@ -45,6 +59,11 @@ const defaultPremiumFeatures: PremiumFeatures = {
   weather_tracking: false
 };
 
+// Generate a unique session ID
+const generateSessionId = (): string => {
+  return `test-${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 5)}`;
+};
+
 // Create the context
 const TestContext = createContext<TestContextType>({
   isTestMode: false,
@@ -55,7 +74,16 @@ const TestContext = createContext<TestContextType>({
   logTestEvent: () => {},
   clearTestEvents: () => {},
   premiumFeatures: defaultPremiumFeatures,
-  updatePremiumFeature: () => {}
+  updatePremiumFeature: () => {},
+  trackError: () => {},
+  sessionInfo: {
+    sessionId: generateSessionId(),
+    startTime: Date.now(),
+    totalEvents: 0,
+    errorCount: 0
+  },
+  showTestGuide: false,
+  setShowTestGuide: () => {}
 });
 
 // Provider component
@@ -64,6 +92,15 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
   const [isPremiumOverride, setIsPremiumOverride] = useState(false);
   const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
   const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatures>(defaultPremiumFeatures);
+  const [showTestGuide, setShowTestGuide] = useState(false);
+  
+  // Initialize session info
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo>({
+    sessionId: generateSessionId(),
+    startTime: Date.now(),
+    totalEvents: 0,
+    errorCount: 0
+  });
 
   const logTestEvent = (event: Omit<TestEvent, "timestamp">) => {
     const newEvent: TestEvent = {
@@ -72,11 +109,25 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
     };
     
     setTestEvents(prev => [newEvent, ...prev]);
+    
+    // Update session info
+    setSessionInfo(prev => ({
+      ...prev,
+      totalEvents: prev.totalEvents + 1,
+      errorCount: event.type === "error" ? prev.errorCount + 1 : prev.errorCount
+    }));
+    
     console.log("Test event logged:", newEvent);
   };
 
   const clearTestEvents = () => {
     setTestEvents([]);
+    // Reset error count but maintain session info
+    setSessionInfo(prev => ({
+      ...prev,
+      errorCount: 0,
+      totalEvents: 0
+    }));
   };
 
   const updatePremiumFeature = (feature: keyof PremiumFeatures, value: boolean) => {
@@ -84,6 +135,24 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
       ...prev,
       [feature]: value
     }));
+  };
+  
+  // Helper function for tracking errors
+  const trackError = (error: unknown, component?: string, severity?: string, action?: string) => {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    logTestEvent({
+      type: "error",
+      details: errorMessage,
+      component,
+      severity,
+      metadata: {
+        stack: errorStack,
+        action,
+        timestamp: new Date().toISOString()
+      }
+    });
   };
 
   // This effect runs when isPremiumOverride changes
@@ -114,7 +183,11 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
       logTestEvent,
       clearTestEvents,
       premiumFeatures,
-      updatePremiumFeature
+      updatePremiumFeature,
+      trackError,
+      sessionInfo,
+      showTestGuide,
+      setShowTestGuide
     }}>
       {children}
     </TestContext.Provider>
@@ -122,4 +195,10 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
 };
 
 // Custom hook to use the test context
-export const useTestContext = () => useContext(TestContext);
+export const useTestContext = () => {
+  const context = useContext(TestContext);
+  if (context === undefined) {
+    throw new Error("useTestContext must be used within a TestProvider");
+  }
+  return context;
+};

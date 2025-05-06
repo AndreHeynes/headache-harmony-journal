@@ -44,6 +44,7 @@ export function ErrorReports({ events }: ErrorReportsProps) {
   // Apply severity filter
   const filteredErrors = useMemo(() => {
     if (filter === "all") return errorEvents;
+    // Use optional chaining since severity might be undefined
     return errorEvents.filter(event => event.severity === filter);
   }, [errorEvents, filter]);
   

@@ -22,9 +22,9 @@ export function TestFeedbackForm() {
       return;
     }
 
-    // Log the feedback as a test event
+    // Log the feedback as a test event - using the correct event type
     logTestEvent({
-      type: "feedback",
+      type: "feedback", // Now this is a valid TestEventType
       details: `Feedback submitted: ${feedbackType}`,
       component: "TestFeedbackForm",
       metadata: {
