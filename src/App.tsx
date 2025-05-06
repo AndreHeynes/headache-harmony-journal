@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +22,9 @@ import { TestGuideModal } from "./components/testing/TestGuideModal";
 import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
 import { SecurityHeaders } from "./components/security/SecurityHeaders";
 import DataExport from "./pages/DataExport";
+import ErrorBoundaryWithContext from "./components/testing/ErrorBoundary";
 
+// Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
   // Adding security-focused default options
   defaultOptions: {
@@ -31,12 +34,18 @@ const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
+      onError: (error) => {
+        // Global error handler for query errors
+        console.error("Query error:", error);
+        // The TestContext will pick this up in the global error handler
+      }
     },
     mutations: {
       retry: 1,
       onError: (error) => {
         console.error("Mutation error:", error);
-      },
+        // The TestContext will pick this up in the global error handler
+      }
     },
   },
 });
@@ -82,23 +91,38 @@ const App = () => {
               </div>
             </div>
           )}
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/log" element={<LogHeadache />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/analysis" element={<Analysis />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/support" element={<SupportServices />} />
-              <Route path="/policy" element={<Policy />} />
-              <Route path="/test-dashboard" element={<TestDashboard />} />
-              <Route path="/pilot-testing-prep" element={<PilotTestingPrep />} />
-              <Route path="/data-export" element={<DataExport />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <ErrorBoundaryWithContext component="RootApp" fallback={
+            <div className="min-h-screen bg-charcoal text-white p-6 flex flex-col items-center justify-center">
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-6 max-w-md w-full">
+                <h1 className="text-xl font-bold mb-4">Something went wrong</h1>
+                <p className="mb-6">The application encountered an error and could not continue. Please try refreshing the page.</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="w-full bg-white text-red-900 py-2 rounded hover:bg-gray-100"
+                >
+                  Refresh Page
+                </button>
+              </div>
+            </div>
+          }>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/log" element={<LogHeadache />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/analysis" element={<Analysis />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/support" element={<SupportServices />} />
+                <Route path="/policy" element={<Policy />} />
+                <Route path="/test-dashboard" element={<TestDashboard />} />
+                <Route path="/pilot-testing-prep" element={<PilotTestingPrep />} />
+                <Route path="/data-export" element={<DataExport />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </ErrorBoundaryWithContext>
         </TooltipProvider>
       </TestProvider>
     </QueryClientProvider>
