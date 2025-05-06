@@ -9,6 +9,8 @@ import { BeveragesSection } from "./sections/BeveragesSection";
 import { StressTriggersSection } from "./sections/StressTriggersSection";
 import { ActivitiesSection } from "./sections/ActivitiesSection";
 import { PremiumVariablesSection } from "./sections/PremiumVariablesSection";
+import { WeatherSection } from "./sections/WeatherSection";
+import { MenstrualCycleSection } from "./sections/MenstrualCycleSection";
 
 export default function LogTriggers() {
   const [foodItems, setFoodItems] = useState([{ food: "", hours: "" }]);
@@ -21,6 +23,12 @@ export default function LogTriggers() {
 
   return (
     <div className="space-y-6">
+      {/* Weather integration - appears at the top as it's environmental data */}
+      <WeatherSection />
+      
+      {/* Menstrual cycle tracking - appears near the top as it's a potential primary trigger */}
+      <MenstrualCycleSection />
+      
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Food Triggers</h2>
