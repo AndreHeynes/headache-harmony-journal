@@ -1,0 +1,127 @@
+
+import React, { createContext, useState, ReactNode, useEffect } from "react";
+import { 
+  TestContextType, 
+  TestEvent, 
+  PremiumFeatures,
+  defaultPremiumFeatures, 
+  SessionInfo 
+} from "./types";
+import { generateSessionId, createErrorEvent } from "./utils";
+
+// Create the context
+export const TestContext = createContext<TestContextType>({
+  isTestMode: false,
+  setIsTestMode: () => {},
+  isPremiumOverride: false,
+  setIsPremiumOverride: () => {},
+  testEvents: [],
+  logTestEvent: () => {},
+  clearTestEvents: () => {},
+  premiumFeatures: defaultPremiumFeatures,
+  updatePremiumFeature: () => {},
+  trackError: () => {},
+  sessionInfo: {
+    sessionId: generateSessionId(),
+    startTime: Date.now(),
+    totalEvents: 0,
+    errorCount: 0
+  },
+  showTestGuide: false,
+  setShowTestGuide: () => {}
+});
+
+// Provider component
+export const TestProvider = ({ children }: { children: ReactNode }) => {
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [isPremiumOverride, setIsPremiumOverride] = useState(false);
+  const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
+  const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatures>(defaultPremiumFeatures);
+  const [showTestGuide, setShowTestGuide] = useState(false);
+  
+  // Initialize session info
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo>({
+    sessionId: generateSessionId(),
+    startTime: Date.now(),
+    totalEvents: 0,
+    errorCount: 0
+  });
+
+  const logTestEvent = (event: Omit<TestEvent, "timestamp">) => {
+    const newEvent: TestEvent = {
+      ...event,
+      timestamp: Date.now()
+    };
+    
+    setTestEvents(prev => [newEvent, ...prev]);
+    
+    // Update session info
+    setSessionInfo(prev => ({
+      ...prev,
+      totalEvents: prev.totalEvents + 1,
+      errorCount: event.type === "error" ? prev.errorCount + 1 : prev.errorCount
+    }));
+    
+    console.log("Test event logged:", newEvent);
+  };
+
+  const clearTestEvents = () => {
+    setTestEvents([]);
+    // Reset error count but maintain session info
+    setSessionInfo(prev => ({
+      ...prev,
+      errorCount: 0,
+      totalEvents: 0
+    }));
+  };
+
+  const updatePremiumFeature = (feature: keyof PremiumFeatures, value: boolean) => {
+    setPremiumFeatures(prev => ({
+      ...prev,
+      [feature]: value
+    }));
+  };
+  
+  // Helper function for tracking errors
+  const trackError = (error: unknown, component?: string, severity?: string, action?: string) => {
+    logTestEvent(createErrorEvent(error, component, severity, action));
+  };
+
+  // This effect runs when isPremiumOverride changes
+  React.useEffect(() => {
+    if (isPremiumOverride) {
+      // When premium override is enabled, enable all premium features
+      setPremiumFeatures({
+        insights: true,
+        variables: true,
+        neck_correlation: true,
+        export: true,
+        menstrual_tracking: true,
+        weather_tracking: true
+      });
+    } else {
+      // When premium override is disabled, disable all premium features
+      setPremiumFeatures(defaultPremiumFeatures);
+    }
+  }, [isPremiumOverride]);
+
+  return (
+    <TestContext.Provider value={{
+      isTestMode,
+      setIsTestMode,
+      isPremiumOverride,
+      setIsPremiumOverride,
+      testEvents,
+      logTestEvent,
+      clearTestEvents,
+      premiumFeatures,
+      updatePremiumFeature,
+      trackError,
+      sessionInfo,
+      showTestGuide,
+      setShowTestGuide
+    }}>
+      {children}
+    </TestContext.Provider>
+  );
+};
