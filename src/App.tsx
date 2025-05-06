@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import PilotTestingPrep from "./pages/PilotTestingPrep";
 import { TestGuideModal } from "./components/testing/TestGuideModal";
 import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
 import { SecurityHeaders } from "./components/security/SecurityHeaders";
+import DataExport from "./pages/DataExport";
 
 const queryClient = new QueryClient({
   // Adding security-focused default options
@@ -95,6 +95,7 @@ const App = () => {
               <Route path="/policy" element={<Policy />} />
               <Route path="/test-dashboard" element={<TestDashboard />} />
               <Route path="/pilot-testing-prep" element={<PilotTestingPrep />} />
+              <Route path="/data-export" element={<DataExport />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

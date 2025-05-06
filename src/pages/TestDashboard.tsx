@@ -1,15 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Activity, ListFilter, Download, RotateCcw } from "lucide-react";
+import { ChevronLeft, Activity, ListFilter, Download, RotateCcw, FileText } from "lucide-react";
 import { useTestContext, TestEvent } from "@/contexts/TestContext";
 import { TestEventList } from "@/components/testing/TestEventList";
 import { TestFeedbackForm } from "@/components/testing/TestFeedbackForm";
 import { TestSettings } from "@/components/testing/TestSettings";
 import { TestAnalytics } from "@/components/testing/TestAnalytics";
+import { HeadacheDataExport } from "@/components/export/HeadacheDataExport";
 
 export default function TestDashboard() {
   const navigate = useNavigate();
@@ -114,6 +114,7 @@ export default function TestDashboard() {
         <TabsList className="w-full bg-gray-800 border-gray-700 mb-6">
           <TabsTrigger value="events" className="flex-1">Events</TabsTrigger>
           <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
+          <TabsTrigger value="export" className="flex-1">Export</TabsTrigger>
           <TabsTrigger value="feedback" className="flex-1">Feedback</TabsTrigger>
           <TabsTrigger value="settings" className="flex-1">Settings</TabsTrigger>
         </TabsList>
@@ -124,6 +125,35 @@ export default function TestDashboard() {
         
         <TabsContent value="analytics" className="mt-0">
           <TestAnalytics events={testEvents} />
+        </TabsContent>
+        
+        <TabsContent value="export" className="mt-0">
+          <div className="space-y-6">
+            <HeadacheDataExport isPremium={true} />
+            
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-purple-400" />
+                  Export Test Feedback
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 mb-4">
+                  As a pilot tester, your feedback on the export functionality is valuable. 
+                  Please try exporting your headache data and share your experience.
+                </p>
+                <div className="flex space-x-3 mt-4">
+                  <Button 
+                    onClick={() => navigate("/data-export")}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    Open Full Export Page
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
         
         <TabsContent value="feedback" className="mt-0">
