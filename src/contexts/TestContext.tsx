@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { ErrorSeverity, getBrowserInfo } from "@/utils/errorReporting";
 
@@ -7,6 +6,8 @@ interface TestContextType {
   setIsTestMode: (value: boolean) => void;
   isPremiumOverride: boolean;
   setIsPremiumOverride: (value: boolean) => void;
+  premiumFeatures: PremiumFeatureState;
+  togglePremiumFeature: (feature: PremiumFeature, enabled: boolean) => void;
   testEvents: TestEvent[];
   logTestEvent: (event: Omit<TestEvent, "timestamp">) => void;
   clearTestEvents: () => void;
@@ -14,6 +15,23 @@ interface TestContextType {
   setShowTestGuide: (value: boolean) => void;
   trackError: (error: unknown, component?: string, severity?: ErrorSeverity, userAction?: string) => void;
   sessionInfo: SessionInfo;
+}
+
+export type PremiumFeature = 
+  | "insights" 
+  | "variables" 
+  | "export" 
+  | "patterns" 
+  | "custom_reports"
+  | "neck_correlation";
+
+export interface PremiumFeatureState {
+  insights: boolean;
+  variables: boolean;
+  export: boolean;
+  patterns: boolean;
+  custom_reports: boolean;
+  neck_correlation: boolean;
 }
 
 export interface SessionInfo {
@@ -36,9 +54,20 @@ export interface TestEvent {
 
 const TestContext = createContext<TestContextType | undefined>(undefined);
 
+// Default premium features configuration (all disabled)
+const DEFAULT_PREMIUM_FEATURES: PremiumFeatureState = {
+  insights: false,
+  variables: false,
+  export: false,
+  patterns: false,
+  custom_reports: false,
+  neck_correlation: false
+};
+
 export function TestProvider({ children }: { children: ReactNode }) {
   const [isTestMode, setIsTestMode] = useState<boolean>(false);
   const [isPremiumOverride, setIsPremiumOverride] = useState<boolean>(false);
+  const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatureState>(DEFAULT_PREMIUM_FEATURES);
   const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
   const [showTestGuide, setShowTestGuide] = useState<boolean>(false);
   const [sessionInfo, setSessionInfo] = useState<SessionInfo>({
@@ -55,8 +84,14 @@ export function TestProvider({ children }: { children: ReactNode }) {
     const storedTestMode = localStorage.getItem('testMode') === 'true';
     const storedPremiumOverride = localStorage.getItem('premiumOverride') === 'true';
     
+    // Load individual premium feature settings
+    const storedPremiumFeatures = localStorage.getItem('premiumFeatures');
+    const parsedFeatures = storedPremiumFeatures ? 
+      JSON.parse(storedPremiumFeatures) : DEFAULT_PREMIUM_FEATURES;
+    
     setIsTestMode(storedTestMode);
     setIsPremiumOverride(storedPremiumOverride);
+    setPremiumFeatures(parsedFeatures);
   }, []);
 
   // Save test mode settings to localStorage when they change
@@ -64,12 +99,30 @@ export function TestProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('testMode', isTestMode.toString());
     localStorage.setItem('premiumOverride', isPremiumOverride.toString());
     
+    // When premium override is toggled, update all features accordingly
+    if (isPremiumOverride) {
+      const allEnabled = Object.keys(premiumFeatures).reduce((acc, key) => {
+        return { ...acc, [key]: true };
+      }, {} as PremiumFeatureState);
+      setPremiumFeatures(allEnabled);
+      localStorage.setItem('premiumFeatures', JSON.stringify(allEnabled));
+    } else {
+      // When premium is disabled, turn off all features
+      setPremiumFeatures(DEFAULT_PREMIUM_FEATURES);
+      localStorage.setItem('premiumFeatures', JSON.stringify(DEFAULT_PREMIUM_FEATURES));
+    }
+    
     // Check if this is the first time enabling test mode
     if (isTestMode && localStorage.getItem('testGuideShown') !== 'true') {
       setShowTestGuide(true);
       localStorage.setItem('testGuideShown', 'true');
     }
   }, [isTestMode, isPremiumOverride]);
+
+  // Save individual premium features when they change
+  useEffect(() => {
+    localStorage.setItem('premiumFeatures', JSON.stringify(premiumFeatures));
+  }, [premiumFeatures]);
 
   // Update session info when events are added
   useEffect(() => {
@@ -125,6 +178,25 @@ export function TestProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('unhandledrejection', handleRejection);
     };
   }, [isTestMode]);
+
+  const togglePremiumFeature = (feature: PremiumFeature, enabled: boolean) => {
+    setPremiumFeatures(prev => {
+      const updatedFeatures = { ...prev, [feature]: enabled };
+      localStorage.setItem('premiumFeatures', JSON.stringify(updatedFeatures));
+      
+      // Log this premium feature toggle for testing data
+      if (isTestMode) {
+        logTestEvent({
+          type: "action",
+          details: `Premium feature '${feature}' ${enabled ? "enabled" : "disabled"}`,
+          component: "PremiumFeatureToggle",
+          metadata: { feature, enabled }
+        });
+      }
+      
+      return updatedFeatures;
+    });
+  };
 
   const logTestEvent = (event: Omit<TestEvent, "timestamp">) => {
     if (!isTestMode) return;
@@ -186,6 +258,8 @@ export function TestProvider({ children }: { children: ReactNode }) {
       setIsTestMode,
       isPremiumOverride,
       setIsPremiumOverride,
+      premiumFeatures,
+      togglePremiumFeature,
       testEvents,
       logTestEvent,
       clearTestEvents,

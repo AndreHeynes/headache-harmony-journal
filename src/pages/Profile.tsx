@@ -21,7 +21,12 @@ export default function Profile() {
   
   const handleToggleTestMode = (enabled: boolean) => {
     setIsTestMode(enabled);
-    setIsPremiumOverride(enabled);
+    
+    // When test mode is enabled, we also enable premium override
+    // Individual features can still be controlled in the test dashboard
+    if (enabled) {
+      setIsPremiumOverride(enabled);
+    }
     
     logTestEvent({
       type: "action",

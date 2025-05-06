@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useTestContext } from "@/contexts/TestContext";
 import { toast } from "sonner";
+import { PremiumFeatureToggles } from "./PremiumFeatureToggles";
 
 export function TestSettings() {
   const { isTestMode, isPremiumOverride } = useTestContext();
@@ -41,6 +42,7 @@ export function TestSettings() {
     // Clear all localStorage items related to testing
     localStorage.removeItem('testMode');
     localStorage.removeItem('premiumOverride');
+    localStorage.removeItem('premiumFeatures');
     localStorage.removeItem('testUserId');
     localStorage.removeItem('testDeviceType');
     
@@ -50,6 +52,10 @@ export function TestSettings() {
 
   return (
     <div className="space-y-6">
+      {/* Premium Feature Controls */}
+      <PremiumFeatureToggles />
+    
+      {/* General Test Settings */}
       <Card className="bg-gray-800/50 border-gray-700">
         <CardHeader>
           <CardTitle className="text-white">Test Mode Settings</CardTitle>

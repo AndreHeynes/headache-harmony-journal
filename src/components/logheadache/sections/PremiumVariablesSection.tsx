@@ -2,12 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { Crown, Sun, Moon, CloudRain, Coffee, CreditCard, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { useTestContext } from "@/contexts/TestContext";
 
-interface PremiumVariablesSectionProps {
-  isPremium: boolean;
-}
+export function PremiumVariablesSection() {
+  const { premiumFeatures } = useTestContext();
+  
+  // Check if premium variables are enabled
+  const isPremium = premiumFeatures.variables;
 
-export function PremiumVariablesSection({ isPremium }: PremiumVariablesSectionProps) {
   const handleUpgradeClick = () => {
     toast.info("Secure payment processing", {
       description: "You'll be redirected to our secure payment processor"

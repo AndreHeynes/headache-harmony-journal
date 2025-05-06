@@ -19,7 +19,7 @@ export default function Analysis() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedInsight, setSelectedInsight] = useState<string | null>(null);
   
-  const { isPremiumOverride, logTestEvent } = useTestContext();
+  const { premiumFeatures, logTestEvent } = useTestContext();
   
   const navigate = useNavigate();
 
@@ -42,7 +42,17 @@ export default function Analysis() {
       component: "PremiumInsights"
     });
     
-    if (!isPremiumOverride) {
+    // Check for special premium features that might have separate toggles
+    const isNeckPainInsight = cardType === 'neck-pain';
+    
+    if (isNeckPainInsight && !premiumFeatures.neck_correlation) {
+      toast.info("Premium Neck Pain Feature", {
+        description: "Upgrade to premium to access neck pain correlation insights"
+      });
+      return;
+    }
+    
+    if (!premiumFeatures.insights && !isNeckPainInsight) {
       toast.info("Premium Feature", {
         description: "Upgrade to premium to access detailed insights"
       });
@@ -70,6 +80,9 @@ export default function Analysis() {
     });
     navigate(-1);
   };
+
+  // Determine if neck pain insights should be shown
+  const showNeckPainInsights = premiumFeatures.neck_correlation;
 
   return (
     <div className="bg-charcoal text-white p-4 pb-20">
@@ -107,14 +120,12 @@ export default function Analysis() {
             topTriggers={4} 
           />
           
-          <PremiumInsights 
-            isPremium={isPremiumOverride} 
-            onCardClick={handleInsightCardClick} 
-          />
+          <PremiumInsights onCardClick={handleInsightCardClick} />
           
           <CorrelationAnalysis />
           
-          <NeckPainInsights />
+          {/* Only show neck pain insights if the premium feature is enabled */}
+          {showNeckPainInsights && <NeckPainInsights />}
         </>
       )}
       
