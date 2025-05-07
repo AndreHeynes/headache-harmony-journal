@@ -1,9 +1,9 @@
 
-import { Home, PlusCircle, BookOpen, BarChart2, User } from "lucide-react";
+import { PlusCircle, BookOpen, BarChart2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { icon: Home, label: "Home", href: "/dashboard" },
+  { icon: "logo", label: "Home", href: "/dashboard" },
   { icon: PlusCircle, label: "Log", href: "/log" },
   { icon: BookOpen, label: "Journal", href: "/journal" },
   { icon: BarChart2, label: "Reports", href: "/analysis" },
@@ -24,7 +24,11 @@ export default function BottomNav() {
               location.pathname === item.href ? "text-primary" : "text-white/60 hover:text-white/80"
             }`}
           >
-            <item.icon className="h-5 w-5 mb-1" />
+            {item.icon === "logo" ? (
+              <img src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" className="h-5 w-5 mb-1" alt="Home" />
+            ) : (
+              <item.icon className="h-5 w-5 mb-1" />
+            )}
             <span>{item.label}</span>
           </Link>
         ))}

@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Activity, ChartLine, Search } from "lucide-react";
+import { ChartLine, Search } from "lucide-react";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -20,8 +20,12 @@ export default function Index() {
       <div className="max-w-md mx-auto p-6 space-y-8 animate-fade-in">
         {/* Logo and Welcome Section */}
         <div className="text-center space-y-6">
-          <div className="w-24 h-24 mx-auto bg-gray-800/50 border border-gray-700 rounded-full flex items-center justify-center">
-            <Activity className="w-12 h-12 text-primary" />
+          <div className="w-32 h-32 mx-auto flex items-center justify-center">
+            <img 
+              src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" 
+              alt="Headache Journal Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-white">
@@ -39,13 +43,17 @@ export default function Index() {
         {/* Feature Icons */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { icon: Activity, label: "Participate" },
+            { icon: "/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png", label: "Participate" },
             { icon: Search, label: "Understand" },
             { icon: ChartLine, label: "Recognize" }
           ].map((item, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
               <div className="w-16 h-16 rounded-full bg-gray-800/50 border border-gray-700 flex items-center justify-center">
-                <item.icon className="w-8 h-8 text-primary" />
+                {typeof item.icon === 'string' ? (
+                  <img src={item.icon} alt={item.label} className="w-8 h-8" />
+                ) : (
+                  <item.icon className="w-8 h-8 text-primary" />
+                )}
               </div>
               <span className="text-gray-400 text-sm">{item.label}</span>
             </div>
