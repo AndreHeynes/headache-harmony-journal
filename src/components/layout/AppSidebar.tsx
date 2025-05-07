@@ -1,5 +1,5 @@
 
-import { PlusCircle, BarChart2, Settings, BookOpen } from "lucide-react";
+import { PlusCircle, BarChart2, Settings } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,6 @@ import {
 const menuItems = [
   { title: "Dashboard", icon: "/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png", url: "/" },
   { title: "New Entry", icon: PlusCircle, url: "/new" },
-  { title: "Entries", icon: BookOpen, url: "/entries" },
   { title: "Insights", icon: BarChart2, url: "/insights" },
   { title: "Settings", icon: Settings, url: "/settings" },
 ];

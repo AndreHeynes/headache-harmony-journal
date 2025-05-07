@@ -1,11 +1,10 @@
 
-import { PlusCircle, BookOpen, BarChart2, User } from "lucide-react";
+import { PlusCircle, BarChart2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
   { icon: "logo", label: "Home", href: "/dashboard" },
   { icon: PlusCircle, label: "Log", href: "/log" },
-  { icon: BookOpen, label: "Entries", href: "/journal" },
   { icon: BarChart2, label: "Reports", href: "/analysis" },
   { icon: User, label: "Profile", href: "/profile" },
 ];

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,8 +23,7 @@ export function SignUpForm() {
   const [agreedToNewsletters, setAgreedToNewsletters] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAgeVerification, setShowAgeVerification] = useState(false);
-  const [isOver16, setIsOver16] = useState<boolean | null>(null);
-  const [hasParentalConsent, setHasParentalConsent] = useState(false);
+  const [isAdult, setIsAdult] = useState<boolean | null>(null);
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
@@ -56,8 +54,7 @@ export function SignUpForm() {
       try {
         // Load stored age verification status
         const ageData = JSON.parse(ageVerified);
-        setIsOver16(ageData.isOver16);
-        setHasParentalConsent(ageData.hasParentalConsent);
+        setIsAdult(ageData.isAdult);
       } catch (error) {
         console.error("Error parsing age verification data:", error);
         // If parsing fails, show age verification again
@@ -116,15 +113,13 @@ export function SignUpForm() {
     return isValid;
   };
 
-  const handleAgeVerification = (isOver16: boolean, hasParentalConsent: boolean) => {
-    setIsOver16(isOver16);
-    setHasParentalConsent(hasParentalConsent);
+  const handleAgeVerification = (isAdult: boolean) => {
+    setIsAdult(isAdult);
     setShowAgeVerification(false);
     
     // Store age verification status securely
     secureSetItem('age-verified', {
-      isOver16,
-      hasParentalConsent,
+      isAdult,
       verifiedAt: new Date().toISOString()
     });
   };
@@ -143,7 +138,7 @@ export function SignUpForm() {
       return;
     }
     
-    if (!isOver16 && !hasParentalConsent) {
+    if (!isAdult) {
       setShowAgeVerification(true);
       return;
     }
