@@ -44,7 +44,7 @@ export function AgeVerificationModal({ open, onConfirm }: AgeVerificationProps) 
       return;
     }
     
-    onConfirm(ageNum >= 18);
+    onConfirm(true);
   };
 
   return (
@@ -78,7 +78,7 @@ export function AgeVerificationModal({ open, onConfirm }: AgeVerificationProps) 
           {error && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-2">
               <AlertCircle className="h-5 w-5 text-red-400 mt-0.5" />
-              <div className="text-red-300 text-sm">{error}</div>
+              <div className="text-sm text-red-300">{error}</div>
             </div>
           )}
         </div>
