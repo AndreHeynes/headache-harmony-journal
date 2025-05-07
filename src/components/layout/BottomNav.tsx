@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 const navItems = [
   { icon: "logo", label: "Home", href: "/dashboard" },
   { icon: PlusCircle, label: "Log", href: "/log" },
-  { icon: BookOpen, label: "Journal", href: "/journal" },
+  { icon: BookOpen, label: "Entries", href: "/journal" },
   { icon: BarChart2, label: "Reports", href: "/analysis" },
   { icon: User, label: "Profile", href: "/profile" },
 ];
@@ -25,7 +25,7 @@ export default function BottomNav() {
             }`}
           >
             {item.icon === "logo" ? (
-              <img src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" className="h-5 w-5 mb-1" alt="Home" />
+              <img src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" className="h-5 w-5 mb-1 rounded-full" alt="Home" />
             ) : (
               <item.icon className="h-5 w-5 mb-1" />
             )}

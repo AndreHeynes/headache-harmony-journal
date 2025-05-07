@@ -1,4 +1,3 @@
-
 import { Activity, ArrowRight, Clock, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +24,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between px-4 h-16">
           <div className="flex items-center space-x-2">
             <Activity className="h-6 w-6 text-primary" />
-            <span className="font-bold text-white">My Headache Journal</span>
+            <span className="font-bold text-white">My Headache Experience Journal</span>
           </div>
           <div className="h-8 w-8 rounded-full bg-gray-700" />
         </div>
