@@ -1,156 +1,22 @@
 
-import { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useQuery } from '@tanstack/react-query';
 import { toast } from "sonner";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-// Define variable types for consistent processing
-export type VariableType = 'trigger' | 'symptom' | 'treatment' | 'neutral';
-export type VariableValueType = 'numeric' | 'scale' | 'boolean' | 'selection' | 'text';
-export type VariableTrackingTime = 'before' | 'during' | 'after';
+// Types and utilities
+import { VariableDefinition, VariableType, VariableValueType, VariableTrackingTime } from './variables/types';
+import { VARIABLE_TEMPLATES } from './variables/templates';
+import { fetchWeatherData } from './variables/weatherApi';
 
-interface VariableDefinition {
-  id: string;
-  name: string;
-  description: string;
-  type: VariableType;
-  valueType: VariableValueType;
-  trackingTime: VariableTrackingTime;
-  options?: string[]; // For selection type
-  min?: number; // For scale/numeric types
-  max?: number; // For scale/numeric types
-  defaultValue?: any;
-}
-
-// Predefined variable templates that users can choose from
-const VARIABLE_TEMPLATES: VariableDefinition[] = [
-  {
-    id: 'stress',
-    name: 'Stress Level',
-    description: 'Track your stress level before headaches',
-    type: 'trigger',
-    valueType: 'scale',
-    trackingTime: 'before',
-    min: 0,
-    max: 10,
-    defaultValue: 5
-  },
-  {
-    id: 'sleep',
-    name: 'Sleep Quality',
-    description: 'Rate your sleep quality',
-    type: 'trigger',
-    valueType: 'selection',
-    trackingTime: 'before',
-    options: ['excellent', 'good', 'fair', 'poor'],
-    defaultValue: ''
-  },
-  {
-    id: 'water',
-    name: 'Water Intake',
-    description: 'Number of glasses of water per day',
-    type: 'trigger',
-    valueType: 'numeric',
-    trackingTime: 'before',
-    min: 0,
-    max: 20,
-    defaultValue: 0
-  },
-  {
-    id: 'light',
-    name: 'Light Sensitivity',
-    description: 'Select your light sensitivity level',
-    type: 'symptom',
-    valueType: 'selection',
-    trackingTime: 'during',
-    options: ['none', 'mild', 'moderate', 'severe'],
-    defaultValue: ''
-  },
-  {
-    id: 'weather',
-    name: 'Weather Condition',
-    description: 'Current weather condition',
-    type: 'trigger',
-    valueType: 'selection',
-    trackingTime: 'before',
-    options: ['sunny', 'cloudy', 'rainy', 'stormy', 'humid', 'dry'],
-    defaultValue: ''
-  },
-  {
-    id: 'cycle',
-    name: 'Menstrual Cycle',
-    description: 'Track menstrual cycle phase',
-    type: 'trigger',
-    valueType: 'selection',
-    trackingTime: 'before',
-    options: ['menstrual', 'follicular', 'ovulation', 'luteal'],
-    defaultValue: ''
-  },
-  {
-    id: 'noise',
-    name: 'Noise Sensitivity',
-    description: 'Select your noise sensitivity level',
-    type: 'symptom',
-    valueType: 'selection',
-    trackingTime: 'during',
-    options: ['none', 'mild', 'moderate', 'severe'],
-    defaultValue: ''
-  },
-  {
-    id: 'caffeine',
-    name: 'Caffeine Intake',
-    description: 'Number of caffeinated drinks consumed',
-    type: 'trigger',
-    valueType: 'numeric',
-    trackingTime: 'before',
-    min: 0,
-    max: 10,
-    defaultValue: 0
-  },
-  {
-    id: 'screen_time',
-    name: 'Screen Time',
-    description: 'Hours spent looking at screens',
-    type: 'trigger',
-    valueType: 'numeric',
-    trackingTime: 'before',
-    min: 0,
-    max: 24,
-    defaultValue: 0
-  },
-  {
-    id: 'medication_effective',
-    name: 'Medication Effectiveness',
-    description: 'How effective was your medication?',
-    type: 'treatment',
-    valueType: 'scale',
-    trackingTime: 'after',
-    min: 0,
-    max: 10,
-    defaultValue: 5
-  }
-];
-
-interface WeatherData {
-  condition: string;
-  temperature: number;
-  humidity: number;
-}
+// Components
+import { WarningBanner } from './variables/WarningBanner';
+import { VariableCounter } from './variables/VariableCounter';
+import { SelectedVariablesList } from './variables/SelectedVariablesList';
+import { VariableTemplatesList } from './variables/VariableTemplatesList';
+import { FinalReview } from './variables/FinalReview';
+import { CustomVariableForm } from './variables/CustomVariableForm';
+import { ActionButtons } from './variables/ActionButtons';
 
 export default function LogVariables() {
   const navigate = useNavigate();
@@ -172,22 +38,7 @@ export default function LogVariables() {
   // Weather API Integration (could be used for one of the variables)
   const { data: weatherData } = useQuery({
     queryKey: ['weather'],
-    queryFn: async (): Promise<WeatherData> => {
-      try {
-        // Note: In a real app, you'd want to handle location permission and use a real weather API
-        // This is just a mock implementation
-        return {
-          condition: 'sunny',
-          temperature: 22,
-          humidity: 45
-        };
-      } catch (error) {
-        toast("Weather data unavailable", {
-          description: "Using manual weather input instead"
-        });
-        throw error;
-      }
-    },
+    queryFn: fetchWeatherData,
     enabled: true, // Enable the query by default
   });
 
@@ -236,17 +87,21 @@ export default function LogVariables() {
       setSelectedVariables([...selectedVariables, newVariable]);
       
       // Reset form
-      setCustomVariableName('');
-      setCustomDescription('');
-      setCustomVariableType('trigger');
-      setCustomValueType('scale');
-      setCustomTrackingTime('before');
-      setVariableOptions([]);
+      resetForm();
       
       toast.success("Custom variable added", {
         description: `${newVariable.name} has been added to your tracking list`
       });
     }
+  };
+
+  const resetForm = () => {
+    setCustomVariableName('');
+    setCustomDescription('');
+    setCustomVariableType('trigger');
+    setCustomValueType('scale');
+    setCustomTrackingTime('before');
+    setVariableOptions([]);
   };
 
   const handleRemoveVariable = (variable: VariableDefinition) => {
@@ -289,26 +144,11 @@ export default function LogVariables() {
     setEditing(false);
     setVariableSelectionStep(true);
     setCurrentEditingVariable(null);
-    setCustomVariableName('');
-    setCustomDescription('');
-    setCustomVariableType('trigger');
-    setCustomValueType('scale');
-    setCustomTrackingTime('before');
-    setVariableOptions([]);
+    resetForm();
 
     toast.success("Variable updated", {
       description: `${updatedVariable.name} has been updated`
     });
-  };
-
-  const handleAddOption = (option: string) => {
-    if (option && !variableOptions.includes(option)) {
-      setVariableOptions([...variableOptions, option]);
-    }
-  };
-
-  const handleRemoveOption = (option: string) => {
-    setVariableOptions(variableOptions.filter(o => o !== option));
   };
 
   const handleSaveVariables = () => {
@@ -351,12 +191,7 @@ export default function LogVariables() {
       setEditing(false);
       setVariableSelectionStep(true);
       setCurrentEditingVariable(null);
-      setCustomVariableName('');
-      setCustomDescription('');
-      setCustomVariableType('trigger');
-      setCustomValueType('scale');
-      setCustomTrackingTime('before');
-      setVariableOptions([]);
+      resetForm();
     } else if (finalReview) {
       // Back from final review
       setFinalReview(false);
@@ -392,337 +227,55 @@ export default function LogVariables() {
         <div className="w-8"></div> {/* Spacer for alignment */}
       </header>
 
-      {/* Warning Banner */}
-      <div className="mb-6 bg-amber-500/20 border border-amber-500/30 rounded-xl p-4">
-        <div className="flex items-start space-x-3">
-          <i className="fa-solid fa-triangle-exclamation text-amber-500 mt-1"></i>
-          <p className="text-sm text-amber-200">Variables cannot be modified after submission. Please review carefully before saving.</p>
-        </div>
-      </div>
-
-      {/* Variable Counter */}
-      <section className="mb-6 bg-indigo-500/10 rounded-xl p-4 border border-indigo-500/20">
-        <div className="flex items-center justify-between">
-          <span className="text-indigo-300">Variables Added</span>
-          <span className="text-xl font-semibold text-indigo-300">{selectedVariables.length}/{MAX_VARIABLES}</span>
-        </div>
-      </section>
+      <WarningBanner />
+      <VariableCounter count={selectedVariables.length} maxCount={MAX_VARIABLES} />
 
       {/* Main Content */}
       {finalReview ? (
-        // Final Review Screen
-        <Card className="bg-gray-800/50 border-white/10 mb-6">
-          <div className="p-6 space-y-6">
-            <h2 className="text-lg font-medium text-white mb-4">Final Review</h2>
-            
-            {selectedVariables.length > 0 ? (
-              <div className="space-y-4">
-                {selectedVariables.map((variable, index) => (
-                  <div key={variable.id} className="bg-gray-700/30 rounded-lg p-4 border border-gray-600 relative">
-                    <h3 className="font-medium text-indigo-300">{variable.name}</h3>
-                    <div className="text-sm text-gray-400 mt-1">{variable.description}</div>
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-400">
-                      <div>Type: <span className="text-gray-300 capitalize">{variable.type}</span></div>
-                      <div>Value: <span className="text-gray-300 capitalize">{variable.valueType}</span></div>
-                      <div>Timing: <span className="text-gray-300 capitalize">{variable.trackingTime}</span></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <p>No variables added yet.</p>
-              </div>
-            )}
-            
-            <div className="border-t border-gray-700 pt-6 flex justify-between">
-              <Button variant="outline" onClick={() => setFinalReview(false)} className="bg-gray-700/30 border-gray-600">
-                Back to Edit
-              </Button>
-              <Button
-                onClick={handleSaveVariables}
-                className="bg-indigo-600 hover:bg-indigo-700"
-                disabled={selectedVariables.length === 0}
-              >
-                Save & Lock Variables
-              </Button>
-            </div>
-          </div>
-        </Card>
+        <FinalReview 
+          variables={selectedVariables} 
+          onGoBack={() => setFinalReview(false)} 
+          onSave={handleSaveVariables} 
+        />
       ) : variableSelectionStep ? (
-        // Variable Selection Step
         <div className="space-y-6">
-          {/* Selected Variables */}
-          {selectedVariables.length > 0 && (
-            <Card className="bg-gray-800/50 border-white/10 mb-6">
-              <div className="p-6 space-y-6">
-                <h2 className="text-lg font-medium text-white">Selected Variables</h2>
-                <div className="space-y-3">
-                  {selectedVariables.map(variable => (
-                    <div key={variable.id} className="bg-gray-700/30 rounded-lg p-4 border border-gray-600 flex justify-between items-center">
-                      <div>
-                        <h3 className="font-medium text-white">{variable.name}</h3>
-                        <p className="text-sm text-gray-400">{variable.description}</p>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditVariable(variable)}
-                          className="bg-gray-600/50 border-gray-500"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleRemoveVariable(variable)}
-                          className="bg-red-900/30 border-red-800/50 text-red-300 hover:bg-red-900/50"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          )}
+          <SelectedVariablesList 
+            variables={selectedVariables} 
+            onEdit={handleEditVariable} 
+            onRemove={handleRemoveVariable} 
+          />
 
-          {/* Variable Templates */}
-          {remainingSlots > 0 && (
-            <Card className="bg-gray-800/50 border-white/10 mb-6">
-              <div className="p-6 space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-medium text-white">Available Templates</h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setVariableSelectionStep(false)}
-                    className="bg-indigo-900/30 border-indigo-500/30 text-indigo-300"
-                  >
-                    Create Custom
-                  </Button>
-                </div>
-                <div className="space-y-3">
-                  {availableTemplates.length > 0 ? (
-                    availableTemplates.map(template => (
-                      <div key={template.id} className="bg-gray-700/30 rounded-lg p-4 border border-gray-600 flex justify-between items-center">
-                        <div>
-                          <h3 className="font-medium text-white">{template.name}</h3>
-                          <p className="text-sm text-gray-400">{template.description}</p>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleAddVariable(template)}
-                          className="bg-indigo-900/30 border-indigo-500/30 text-indigo-300"
-                        >
-                          Add
-                        </Button>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-4 text-gray-400">
-                      <p>No more templates available.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          )}
+          <VariableTemplatesList 
+            templates={availableTemplates} 
+            onAdd={handleAddVariable}
+            onCreateCustom={() => setVariableSelectionStep(false)}
+            remainingSlots={remainingSlots}
+          />
 
-          {/* Action Buttons */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-900/95 border-t border-gray-800">
-            <div className="flex space-x-3">
-              <Button
-                variant="outline"
-                className="flex-1 bg-gray-800 text-gray-300"
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="flex-1 bg-indigo-600 text-white"
-                onClick={() => setFinalReview(true)}
-                disabled={selectedVariables.length === 0}
-              >
-                Review & Save
-              </Button>
-            </div>
-          </div>
+          <ActionButtons 
+            onCancel={handleCancel} 
+            onReview={() => setFinalReview(true)} 
+            isDisabled={selectedVariables.length === 0} 
+          />
         </div>
       ) : (
-        // Custom Variable Form
-        <Card className="bg-gray-800/50 border-white/10 mb-20">
-          <div className="p-6 space-y-6">
-            <h2 className="text-lg font-medium text-white">{editing ? 'Edit Variable' : 'Create Custom Variable'}</h2>
-
-            <div className="space-y-4">
-              <div>
-                <Label className="text-white/60 mb-2 block">Variable Name</Label>
-                <Input
-                  value={customVariableName}
-                  onChange={(e) => setCustomVariableName(e.target.value)}
-                  placeholder="Enter variable name"
-                  className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <Label className="text-white/60 mb-2 block">Description</Label>
-                <Textarea
-                  value={customDescription}
-                  onChange={(e) => setCustomDescription(e.target.value)}
-                  placeholder="Describe what this variable tracks"
-                  className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <Label className="text-white/60 mb-2 block">Variable Type</Label>
-                <RadioGroup value={customVariableType} onValueChange={(value) => setCustomVariableType(value as VariableType)}>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="trigger" id="trigger" className="text-indigo-500" />
-                      <Label htmlFor="trigger" className="text-gray-300">Trigger</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="symptom" id="symptom" className="text-indigo-500" />
-                      <Label htmlFor="symptom" className="text-gray-300">Symptom</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="treatment" id="treatment" className="text-indigo-500" />
-                      <Label htmlFor="treatment" className="text-gray-300">Treatment</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="neutral" id="neutral" className="text-indigo-500" />
-                      <Label htmlFor="neutral" className="text-gray-300">Neutral Factor</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
-                <Label className="text-white/60 mb-2 block">Tracking Time</Label>
-                <RadioGroup value={customTrackingTime} onValueChange={(value) => setCustomTrackingTime(value as VariableTrackingTime)}>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="before" id="before" className="text-indigo-500" />
-                      <Label htmlFor="before" className="text-gray-300">Before Headache</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="during" id="during" className="text-indigo-500" />
-                      <Label htmlFor="during" className="text-gray-300">During Headache</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="after" id="after" className="text-indigo-500" />
-                      <Label htmlFor="after" className="text-gray-300">After Headache</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
-                <Label className="text-white/60 mb-2 block">Value Type</Label>
-                <RadioGroup value={customValueType} onValueChange={(value) => setCustomValueType(value as VariableValueType)}>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="scale" id="scale" className="text-indigo-500" />
-                      <Label htmlFor="scale" className="text-gray-300">Scale (0-10)</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="numeric" id="numeric" className="text-indigo-500" />
-                      <Label htmlFor="numeric" className="text-gray-300">Numeric Value</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="boolean" id="boolean" className="text-indigo-500" />
-                      <Label htmlFor="boolean" className="text-gray-300">Yes/No</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="selection" id="selection" className="text-indigo-500" />
-                      <Label htmlFor="selection" className="text-gray-300">Multiple Options</Label>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-gray-700/30 border border-gray-600 rounded-lg p-4">
-                      <RadioGroupItem value="text" id="text" className="text-indigo-500" />
-                      <Label htmlFor="text" className="text-gray-300">Text Entry</Label>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              {/* Options for selection type */}
-              {customValueType === 'selection' && (
-                <div className="space-y-3">
-                  <Label className="text-white/60 mb-2 block">Options</Label>
-                  
-                  {variableOptions.length > 0 && (
-                    <div className="space-y-2 mb-3">
-                      {variableOptions.map((option, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-gray-700/50 rounded p-2 border border-gray-600">
-                          <span className="text-gray-300">{option}</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveOption(option)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Add an option"
-                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleAddOption((e.target as HTMLInputElement).value);
-                          (e.target as HTMLInputElement).value = '';
-                        }
-                      }}
-                    />
-                    <Button
-                      onClick={(e) => {
-                        const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                        handleAddOption(input.value);
-                        input.value = '';
-                      }}
-                      className="bg-indigo-600 hover:bg-indigo-700"
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* Fixed Action Buttons (only show for custom variable form) */}
-      {!variableSelectionStep && !finalReview && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-900/95 border-t border-gray-800">
-          <div className="flex space-x-3">
-            <Button
-              variant="outline"
-              className="flex-1 bg-gray-800 text-gray-300"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1 bg-indigo-600 text-white"
-              onClick={editing ? handleUpdateVariable : () => handleAddVariable()}
-              disabled={!customVariableName || (customValueType === 'selection' && variableOptions.length < 2)}
-            >
-              {editing ? 'Update Variable' : 'Add Variable'}
-            </Button>
-          </div>
-        </div>
+        <CustomVariableForm 
+          isEditing={editing}
+          variableName={customVariableName}
+          setVariableName={setCustomVariableName}
+          description={customDescription}
+          setDescription={setCustomDescription}
+          variableType={customVariableType}
+          setVariableType={setCustomVariableType}
+          valueType={customValueType}
+          setValueType={setCustomValueType}
+          trackingTime={customTrackingTime}
+          setTrackingTime={setCustomTrackingTime}
+          options={variableOptions}
+          setOptions={setVariableOptions}
+          onCancel={handleCancel}
+          onSubmit={editing ? handleUpdateVariable : () => handleAddVariable()}
+        />
       )}
     </div>
   );
