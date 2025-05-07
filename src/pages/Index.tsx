@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChartLine, Search } from "lucide-react";
+import { ChartLine, Search, Users } from "lucide-react";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Index() {
             <img 
               src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" 
               alt="Headache Journal Logo" 
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain rounded-full"
             />
           </div>
           <div className="space-y-2">
@@ -43,7 +43,7 @@ export default function Index() {
         {/* Feature Icons */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { icon: "/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png", label: "Participate" },
+            { icon: Users, label: "Participate" },
             { icon: Search, label: "Understand" },
             { icon: ChartLine, label: "Recognize" }
           ].map((item, index) => (
