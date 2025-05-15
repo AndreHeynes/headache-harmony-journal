@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +22,7 @@ import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
 import { SecurityHeaders } from "./components/security/SecurityHeaders";
 import DataExport from "./pages/DataExport";
 import ErrorBoundaryWithContext from "./components/testing/ErrorBoundary";
+import LogPainLocationPage from "./pages/LogPainLocation";
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -114,6 +114,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/log" element={<LogHeadache />} />
+                <Route path="/pain-location" element={<LogPainLocationPage />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/analysis" element={<Analysis />} />
                 <Route path="/signin" element={<SignIn />} />
