@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { Skull } from "lucide-react";
 
@@ -14,7 +12,6 @@ type HeadRegion = {
   id: string;
   name: string;
   description: string;
-  path: string;
   position: "anterior" | "posterior" | "both";
 };
 
@@ -23,56 +20,48 @@ const headRegions: HeadRegion[] = [
     id: "frontLeft", 
     name: "Front Left", 
     description: "Left side of the forehead and temple",
-    path: "M80 30 C65 30, 55 60, 55 100 C55 120, 65 130, 80 140 L80 30 Z",
     position: "anterior"
   },
   { 
     id: "frontRight", 
     name: "Front Right", 
     description: "Right side of the forehead and temple",
-    path: "M120 30 C135 30, 145 60, 145 100 C145 120, 135 130, 120 140 L120 30 Z",
     position: "anterior"
   },
   { 
     id: "centerFront", 
     name: "Center Front", 
     description: "Central forehead",
-    path: "M80 30 L120 30 L120 140 L80 140 Z",
     position: "anterior"
   },
   { 
     id: "lowerFace", 
     name: "Lower Face", 
     description: "Jaw and lower facial area",
-    path: "M55 100 C55 135, 75 160, 100 170 C125 160, 145 135, 145 100 L145 120 C145 130, 135 150, 100 165 C65 150, 55 130, 55 120 Z",
     position: "anterior"
   },
   { 
     id: "backLower", 
     name: "Occipital (Back Lower)", 
     description: "Lower back of the head and neck",
-    path: "M55 100 C55 135, 75 160, 100 170 C125 160, 145 135, 145 100 L145 120 C145 130, 135 150, 100 165 C65 150, 55 130, 55 120 Z",
     position: "posterior"
   },
   { 
     id: "backCenter", 
     name: "Parietal (Back Center)", 
     description: "Central back of the head",
-    path: "M55 30 C55 70, 65 90, 100 100 C135 90, 145 70, 145 30 Z",
     position: "posterior"
   },
   { 
     id: "backLeft", 
     name: "Left Temporal", 
     description: "Left side of the head",
-    path: "M55 30 C40 60, 40 100, 55 120 L55 30 Z",
     position: "posterior"
   },
   { 
     id: "backRight", 
     name: "Right Temporal", 
     description: "Right side of the head",
-    path: "M145 30 C160 60, 160 100, 145 120 L145 30 Z",
     position: "posterior"
   }
 ];
@@ -113,76 +102,36 @@ export default function LogPainLocation() {
             </Button>
           </div>
           
-          <div className="relative aspect-square mx-auto max-w-md">
-            <TooltipProvider>
-              <svg viewBox="0 0 200 200" className="w-full h-full">
-                {/* Skull outline */}
-                <path 
-                  d="M100 15
-                     C 60 15, 40 60, 40 110
-                     C 40 140, 60 165, 100 185
-                     C 140 165, 160 140, 160 110
-                     C 160 60, 140 15, 100 15"
-                  stroke="#8E9196"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                
-                {viewMode === "anterior" ? (
-                  <>
-                    {/* Face features for anterior view */}
-                    <g stroke="#8E9196" strokeWidth="1" fill="none">
-                      {/* Eyes */}
-                      <ellipse cx="75" cy="90" rx="12" ry="8" />
-                      <ellipse cx="125" cy="90" rx="12" ry="8" />
-                      
-                      {/* Nose */}
-                      <path d="M100 95 L100 115 M85 115 L100 115 L115 115" />
-                      
-                      {/* Mouth */}
-                      <path d="M75 135 C85 143, 115 143, 125 135" />
-                    </g>
-                  </>
-                ) : (
-                  <>
-                    {/* Back of head features */}
-                    <g stroke="#8E9196" strokeWidth="1" fill="none">
-                      {/* Back of skull ridge */}
-                      <path d="M60 80 C75 70, 125 70, 140 80" />
-                      
-                      {/* Occipital protrusion */}
-                      <path d="M100 165 C100 155, 100 155, 100 145" />
-                    </g>
-                  </>
-                )}
-                
-                {/* Interactive regions */}
-                {headRegions
-                  .filter(region => region.position === viewMode || region.position === "both")
-                  .map((region) => (
-                    <Tooltip key={region.id}>
-                      <TooltipTrigger asChild>
-                        <path 
-                          d={region.path}
-                          className={cn(
-                            "cursor-pointer transition-colors opacity-80",
-                            selectedRegion === region.id 
-                              ? "fill-emerald-500 stroke-cyan-300 stroke-[1.5px]" 
-                              : "fill-transparent hover:fill-cyan-500/30 stroke-cyan-500/50 hover:stroke-cyan-300/80"
-                          )}
-                          onClick={() => handleRegionSelect(region.id)}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="bg-gray-800 text-white border-gray-700">
-                        <p>{region.name}: {region.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-              </svg>
-            </TooltipProvider>
+          <div className="relative mx-auto max-w-md">
+            <div className="flex flex-col items-center">
+              <Skull 
+                className={`w-40 h-40 ${viewMode === "anterior" ? "text-cyan-400" : "text-cyan-600"}`} 
+                strokeWidth={1.5}
+              />
+              <p className="text-gray-300 mt-2">
+                {viewMode === "anterior" ? "Front View" : "Back View"}
+              </p>
+            </div>
             
-            <div className="absolute bottom-0 left-0 text-gray-300 text-xs">
-              {viewMode === "anterior" ? "Anterior View" : "Posterior View"}
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {headRegions
+                .filter(region => region.position === viewMode || region.position === "both")
+                .map((region) => (
+                  <Button 
+                    key={region.id}
+                    onClick={() => handleRegionSelect(region.id)}
+                    variant="secondary"
+                    className={`
+                      bg-gray-700/40 hover:bg-gray-700/60 text-white text-left
+                      ${selectedRegion === region.id ? "border-2 border-emerald-500" : "border border-gray-600"}
+                    `}
+                  >
+                    <div>
+                      <div className="font-medium">{region.name}</div>
+                      <div className="text-xs text-gray-300">{region.description}</div>
+                    </div>
+                  </Button>
+                ))}
             </div>
           </div>
 
@@ -205,30 +154,30 @@ export default function LogPainLocation() {
           <div className="grid grid-cols-3 gap-2">
             <Button 
               variant="secondary" 
-              className={cn(
-                "bg-gray-700/40 hover:bg-gray-700/60 text-white",
-                painDistribution === "left" && "bg-primary/50 border border-primary"
-              )}
+              className={`
+                bg-gray-700/40 hover:bg-gray-700/60 text-white
+                ${painDistribution === "left" && "bg-primary/50 border border-primary"}
+              `}
               onClick={() => setPainDistribution("left")}
             >
               Left Side
             </Button>
             <Button 
               variant="secondary" 
-              className={cn(
-                "bg-gray-700/40 hover:bg-gray-700/60 text-white",
-                painDistribution === "both" && "bg-primary/50 border border-primary"
-              )}
+              className={`
+                bg-gray-700/40 hover:bg-gray-700/60 text-white
+                ${painDistribution === "both" && "bg-primary/50 border border-primary"}
+              `}
               onClick={() => setPainDistribution("both")}
             >
               Both Sides
             </Button>
             <Button 
               variant="secondary" 
-              className={cn(
-                "bg-gray-700/40 hover:bg-gray-700/60 text-white",
-                painDistribution === "right" && "bg-primary/50 border border-primary"
-              )}
+              className={`
+                bg-gray-700/40 hover:bg-gray-700/60 text-white
+                ${painDistribution === "right" && "bg-primary/50 border border-primary"}
+              `}
               onClick={() => setPainDistribution("right")}
             >
               Right Side
