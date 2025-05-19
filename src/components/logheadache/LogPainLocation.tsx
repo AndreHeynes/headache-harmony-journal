@@ -13,77 +13,52 @@ type HeadRegion = {
   id: string;
   name: string;
   description: string;
-  paths: {
-    anterior?: string;
-    posterior?: string;
-  };
+  path: string;
+  position: "anterior" | "posterior" | "both";
 };
 
 const headRegions: HeadRegion[] = [
   { 
-    id: "forehead", 
-    name: "Forehead", 
-    description: "Upper front of the head",
-    paths: {
-      anterior: "M60 50 C 80 35, 120 35, 140 50"
-    }
+    id: "frontLeft", 
+    name: "Front Left", 
+    description: "Left side of the forehead and temple",
+    path: "M50 80 L80 80 L80 120 L50 120 Z",
+    position: "anterior"
   },
   { 
-    id: "eyes", 
-    name: "Eyes", 
-    description: "Around the eyes",
-    paths: {
-      anterior: "M70 80 C 75 70, 85 65, 95 70 M130 80 C 125 70, 115 65, 105 70"
-    }
+    id: "frontRight", 
+    name: "Front Right", 
+    description: "Right side of the forehead and temple",
+    path: "M120 80 L150 80 L150 120 L120 120 Z",
+    position: "anterior"
   },
   { 
-    id: "upperSinuses", 
-    name: "Upper Sinuses", 
-    description: "Upper nasal cavities",
-    paths: {
-      anterior: "M85 95 C 95 105, 105 105, 115 95"
-    }
+    id: "centerFront", 
+    name: "Center Front", 
+    description: "Central forehead",
+    path: "M80 80 L120 80 L120 120 L80 120 Z",
+    position: "anterior"
   },
   { 
-    id: "lowerSinuses", 
-    name: "Lower Sinuses", 
-    description: "Lower nasal and cheek areas",
-    paths: {
-      anterior: "M80 115 C 90 125, 110 125, 120 115"
-    }
+    id: "lowerFace", 
+    name: "Lower Face", 
+    description: "Jaw and lower facial area",
+    path: "M50 120 L150 120 L150 150 L100 170 L50 150 Z",
+    position: "anterior"
   },
   { 
-    id: "crown", 
-    name: "Crown", 
-    description: "Top of the head",
-    paths: {
-      posterior: "M70 40 C 80 30, 120 30, 130 40"
-    }
+    id: "backLower", 
+    name: "Back Lower", 
+    description: "Lower back of the head and neck",
+    path: "M50 140 L150 140 L150 170 L100 180 L50 170 Z",
+    position: "posterior"
   },
   { 
-    id: "temple", 
-    name: "Temple", 
-    description: "Side of the head behind the eyes",
-    paths: {
-      posterior: "M40 80 C 45 70, 48 60, 50 50 M160 80 C 155 70, 152 60, 150 50",
-      anterior: "M45 80 C 50 70, 53 60, 55 50 M155 80 C 150 70, 147 60, 145 50"
-    }
-  },
-  { 
-    id: "occipital", 
-    name: "Occipital", 
-    description: "Back of the head",
-    paths: {
-      posterior: "M60 100 C 60 140, 80 160, 100 160 C 120 160, 140 140, 140 100"
-    }
-  },
-  { 
-    id: "base", 
-    name: "Base", 
-    description: "Lower back of the head/upper neck",
-    paths: {
-      posterior: "M60 160 C 70 170, 130 170, 140 160"
-    }
+    id: "backCenter", 
+    name: "Back Center", 
+    description: "Central back of the head",
+    path: "M50 80 L150 80 L150 140 L50 140 Z",
+    position: "posterior"
   }
 ];
 
@@ -102,101 +77,120 @@ export default function LogPainLocation() {
     });
   };
 
-  // Filter regions by view
-  const anteriorRegions = headRegions.filter(region => region.paths.anterior);
-  const posteriorRegions = headRegions.filter(region => region.paths.posterior);
-
   return (
     <div className="space-y-6">
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-        <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Head Region</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {/* Posterior View */}
-            <div className="relative aspect-square">
-              <svg viewBox="0 0 200 200" className="w-full h-full rounded-lg bg-gray-900/60">
-                {/* Base skull outline */}
-                <g stroke="white" fill="none" strokeWidth="1">
-                  <path 
-                    d="M100 20 C 60 20, 30 60, 30 100 C 30 140, 60 180, 100 180 C 140 180, 170 140, 170 100 C 170 60, 140 20, 100 20" 
-                    strokeLinecap="round"
-                  />
-                  {/* Detail lines for pencil effect */}
-                  <path d="M80 40 C 90 50, 110 50, 120 40" strokeLinecap="round" strokeDasharray="1,2" />
-                  <path d="M50 70 C 70 90, 130 90, 150 70" strokeLinecap="round" strokeDasharray="1,2" />
-                  <path d="M40 100 C 70 120, 130 120, 160 100" strokeLinecap="round" strokeDasharray="1,2" />
-                </g>
+        <div className="p-4 space-y-8">
+          <h2 className="text-lg font-medium text-white text-center">Where did the pain start?</h2>
+          
+          <div className="grid grid-cols-1 gap-8">
+            {/* Anterior View */}
+            <div className="relative aspect-square mx-auto max-w-md">
+              <div className="absolute top-0 left-4 text-gray-300">Right</div>
+              <div className="absolute top-0 right-4 text-gray-300">Left</div>
+              
+              <svg viewBox="0 0 200 200" className="w-full h-full">
+                {/* Base outline */}
+                <path 
+                  d="M100 30 C 60 30, 40 70, 40 120 C 40 140, 60 160, 100 180 C 140 160, 160 140, 160 120 C 160 70, 140 30, 100 30" 
+                  stroke="#0EA5E9" 
+                  strokeWidth="1" 
+                  fill="none"
+                />
+                
+                {/* Center dividing line */}
+                <line 
+                  x1="100" y1="30" 
+                  x2="100" y2="180" 
+                  stroke="#0EA5E9" 
+                  strokeWidth="1" 
+                  strokeDasharray="5,5" 
+                />
+                
+                {/* Eye outline */}
+                <ellipse 
+                  cx="100" cy="110" 
+                  rx="25" ry="10" 
+                  stroke="#0EA5E9" 
+                  strokeWidth="1" 
+                  fill="none" 
+                />
                 
                 {/* Interactive regions */}
                 <TooltipProvider>
-                  {posteriorRegions.map((region) => (
-                    <Tooltip key={region.id}>
-                      <TooltipTrigger asChild>
-                        <path 
-                          d={region.paths.posterior}
-                          className={cn(
-                            "cursor-pointer stroke-[3px] hover:stroke-primary/60 fill-transparent transition-colors",
-                            selectedRegion === region.id ? "stroke-primary fill-primary/10" : "stroke-white/30"
-                          )}
-                          onClick={() => handleRegionSelect(region.id)}
-                          strokeLinecap="round"
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="bg-gray-800 text-white border-gray-700">
-                        <p>{region.name}: {region.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
+                  {headRegions
+                    .filter(region => region.position === "anterior" || region.position === "both")
+                    .map((region) => (
+                      <Tooltip key={region.id}>
+                        <TooltipTrigger asChild>
+                          <path 
+                            d={region.path}
+                            className={cn(
+                              "cursor-pointer transition-colors opacity-80",
+                              selectedRegion === region.id 
+                                ? "fill-emerald-500 stroke-cyan-300 stroke-[1.5px]" 
+                                : "fill-transparent hover:fill-cyan-500/30 stroke-cyan-500/50"
+                            )}
+                            onClick={() => handleRegionSelect(region.id)}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="bg-gray-800 text-white border-gray-700">
+                          <p>{region.name}: {region.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
                 </TooltipProvider>
               </svg>
-              <div className="absolute bottom-2 left-2 right-2 text-center bg-gray-900/70 text-xs text-white py-1 rounded">
-                Posterior View
-              </div>
             </div>
             
-            {/* Anterior View */}
-            <div className="relative aspect-square">
-              <svg viewBox="0 0 200 200" className="w-full h-full rounded-lg bg-gray-900/60">
-                {/* Base skull outline */}
-                <g stroke="white" fill="none" strokeWidth="1">
-                  <path 
-                    d="M100 20 C 60 20, 30 60, 30 120 L 50 160 L 150 160 L 170 120 C 170 60, 140 20, 100 20"
-                    strokeLinecap="round"
-                  />
-                  {/* Eyes outline */}
-                  <ellipse cx="70" cy="80" rx="15" ry="10" />
-                  <ellipse cx="130" cy="80" rx="15" ry="10" />
-                  {/* Detail lines for pencil effect */}
-                  <path d="M60 70 C 80 60, 120 60, 140 70" strokeLinecap="round" strokeDasharray="1,2" />
-                  <path d="M70 100 C 85 110, 115 110, 130 100" strokeLinecap="round" strokeDasharray="1,2" />
-                  <path d="M60 140 C 80 150, 120 150, 140 140" strokeLinecap="round" strokeDasharray="1,2" />
-                </g>
+            {/* Posterior View */}
+            <div className="relative aspect-square mx-auto max-w-md">
+              <div className="absolute bottom-0 left-4 text-gray-300">Left</div>
+              <div className="absolute bottom-0 right-4 text-gray-300">Right</div>
+              
+              <svg viewBox="0 0 200 200" className="w-full h-full">
+                {/* Base outline */}
+                <path 
+                  d="M100 30 C 60 30, 40 70, 40 120 C 40 140, 60 160, 100 180 C 140 160, 160 140, 160 120 C 160 70, 140 30, 100 30" 
+                  stroke="#0EA5E9" 
+                  strokeWidth="1" 
+                  fill="none"
+                />
                 
+                {/* Center dividing line */}
+                <line 
+                  x1="100" y1="30" 
+                  x2="100" y2="180" 
+                  stroke="#0EA5E9" 
+                  strokeWidth="1" 
+                  strokeDasharray="5,5" 
+                />
+
                 {/* Interactive regions */}
                 <TooltipProvider>
-                  {anteriorRegions.map((region) => (
-                    <Tooltip key={region.id}>
-                      <TooltipTrigger asChild>
-                        <path 
-                          d={region.paths.anterior}
-                          className={cn(
-                            "cursor-pointer stroke-[3px] hover:stroke-primary/60 fill-transparent transition-colors",
-                            selectedRegion === region.id ? "stroke-primary fill-primary/10" : "stroke-white/30"
-                          )}
-                          onClick={() => handleRegionSelect(region.id)}
-                          strokeLinecap="round"
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="bg-gray-800 text-white border-gray-700">
-                        <p>{region.name}: {region.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
+                  {headRegions
+                    .filter(region => region.position === "posterior" || region.position === "both")
+                    .map((region) => (
+                      <Tooltip key={region.id}>
+                        <TooltipTrigger asChild>
+                          <path 
+                            d={region.path}
+                            className={cn(
+                              "cursor-pointer transition-colors opacity-80",
+                              selectedRegion === region.id 
+                                ? "fill-emerald-500 stroke-cyan-300 stroke-[1.5px]" 
+                                : "fill-transparent hover:fill-cyan-500/30 stroke-cyan-500/50"
+                            )}
+                            onClick={() => handleRegionSelect(region.id)}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="bg-gray-800 text-white border-gray-700">
+                          <p>{region.name}: {region.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
                 </TooltipProvider>
               </svg>
-              <div className="absolute bottom-2 left-2 right-2 text-center bg-gray-900/70 text-xs text-white py-1 rounded">
-                Anterior View
-              </div>
             </div>
           </div>
 
@@ -204,7 +198,9 @@ export default function LogPainLocation() {
           {selectedRegion && (
             <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-md">
               <p className="text-white">
-                Selected: <span className="font-medium text-primary">{headRegions.find(r => r.id === selectedRegion)?.name}</span>
+                Selected: <span className="font-medium text-primary">
+                  {headRegions.find(r => r.id === selectedRegion)?.name}
+                </span>
               </p>
             </div>
           )}
