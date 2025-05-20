@@ -19,17 +19,17 @@ export function HeadSvgDisplay({
   svgRef
 }: HeadSvgDisplayProps) {
   return (
-    <svg ref={svgRef} viewBox="0 0 380 400" className="w-full">
+    <svg ref={svgRef} viewBox="0 0 380 400" className="w-full" style={{ position: "absolute", top: 0, left: 0 }}>
       {viewMode === "anterior" ? (
         <g id="anterior-view">
-          {/* Head outline - centering between LEFT and RIGHT labels and moved more towards LEFT */}
+          {/* Head outline - centering between LEFT and RIGHT labels */}
           <path 
             d="M170,50 C240,50 270,100 280,150 C290,200 280,250 260,280 C240,310 200,330 170,340 C140,330 100,310 80,280 C60,250 50,200 60,150 C70,100 100,50 170,50 Z" 
             fill="none" 
             stroke="#3E7D9C" 
             strokeWidth="2"
           />
-          {/* Neck outline - moved to match head position */}
+          {/* Neck outline */}
           <path 
             d="M120,340 C120,380 115,400 115,420 C115,440 225,440 225,420 C225,400 220,380 220,340" 
             fill="none" 
@@ -63,20 +63,20 @@ export function HeadSvgDisplay({
             </g>
           ))}
           
-          {/* Fixed LEFT/RIGHT Labels - positions made completely static */}
+          {/* Fixed LEFT/RIGHT Labels */}
           <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">RIGHT</text>
           <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">LEFT</text>
         </g>
       ) : (
-        <g id="posterior-view" transform="translate(0, 0)">
-          {/* Head outline - moved more towards LEFT */}
+        <g id="posterior-view">
+          {/* Head outline */}
           <path 
             d="M170,50 C240,50 270,100 280,150 C290,200 280,250 260,280 C240,310 200,330 170,340 C140,330 100,310 80,280 C60,250 50,200 60,150 C70,100 100,50 170,50 Z" 
             fill="none" 
             stroke="#3E7D9C" 
             strokeWidth="2"
           />
-          {/* Neck outline - moved to match head position */}
+          {/* Neck outline */}
           <path 
             d="M120,340 C120,380 115,400 115,420 C115,440 225,440 225,420 C225,400 220,380 220,340" 
             fill="none" 
@@ -110,7 +110,7 @@ export function HeadSvgDisplay({
             </g>
           ))}
 
-          {/* Fixed LEFT/RIGHT Labels - positions made completely static */}
+          {/* Fixed LEFT/RIGHT Labels */}
           <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">RIGHT</text>
           <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">LEFT</text>
         </g>

@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { HeadSvgDisplay } from "./HeadSvgDisplay";
@@ -15,6 +15,12 @@ export function HeadRegionSelector({
 }: HeadRegionSelectorProps) {
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  
+  // Use effect to maintain container state when view changes
+  useEffect(() => {
+    // Reset active region when view changes to prevent potential UI glitches
+    setActiveRegion(null);
+  }, [viewMode]);
   
   const handleRegionSelect = (region: string) => {
     setActiveRegion(null);
@@ -41,12 +47,12 @@ export function HeadRegionSelector({
         {viewMode === "anterior" ? "Switch to Back View" : "Switch to Front View"}
       </Button>
 
-      <div className="relative w-full max-w-lg mx-auto">
+      <div className="relative w-full max-w-lg mx-auto" style={{ minHeight: "400px" }}>
         <HeadSvgDisplay
           viewMode={viewMode}
           regions={getCurrentRegions()}
           selectedRegion={selectedRegion}
-          activeRegion={null}
+          activeRegion={activeRegion}
           onRegionSelect={handleRegionSelect}
           svgRef={svgRef}
         />
@@ -54,7 +60,7 @@ export function HeadRegionSelector({
       
       <SelectionStatus
         selectedRegion={selectedRegion}
-        activeRegion={null}
+        activeRegion={activeRegion}
       />
     </div>
   );
