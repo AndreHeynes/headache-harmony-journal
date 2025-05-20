@@ -3,8 +3,8 @@ import { DraggableRegion } from "./types";
 
 export const anteriorRegionsData: DraggableRegion[] = [
   { id: "forehead", x: 140, y: 100, width: 80, height: 30, name: "Forehead" },
-  { id: "temple-left", x: 295, y: 140, width: 60, height: 30, name: "Left Temple" },
-  { id: "temple-right", x: 25, y: 140, width: 60, height: 30, name: "Right Temple" },
+  { id: "temple-left", x: 295, y: 110, width: 60, height: 30, name: "Left Temple" },
+  { id: "temple-right", x: 25, y: 110, width: 60, height: 30, name: "Right Temple" },
   { id: "eyes-left", x: 190, y: 170, width: 55, height: 30, name: "Left Eye" },
   { id: "eyes-right", x: 105, y: 170, width: 55, height: 30, name: "Right Eye" },
   { id: "upper-sinuses", x: 140, y: 210, width: 80, height: 30, name: "Upper Sinuses" },
