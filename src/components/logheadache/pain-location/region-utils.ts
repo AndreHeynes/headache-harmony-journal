@@ -1,0 +1,34 @@
+
+import { DraggableRegion } from "./types";
+
+export const anteriorRegionsData: DraggableRegion[] = [
+  { id: "forehead", x: 110, y: 75, width: 80, height: 30, name: "Forehead" },
+  { id: "upper-sinuses", x: 85, y: 115, width: 65, height: 30, name: "Upper Sinuses" },
+  { id: "lower-sinuses", x: 85, y: 155, width: 65, height: 30, name: "Lower Sinuses" },
+  { id: "eyes-left", x: 160, y: 115, width: 55, height: 30, name: "Left Eye" },
+  { id: "eyes-right", x: 160, y: 155, width: 55, height: 30, name: "Right Eye" },
+  { id: "temple-left", x: 50, y: 135, width: 60, height: 30, name: "Left Temple" },
+  { id: "temple-right", x: 190, y: 135, width: 60, height: 30, name: "Right Temple" },
+];
+
+export const posteriorRegionsData: DraggableRegion[] = [
+  { id: "top-head", x: 110, y: 90, width: 80, height: 30, name: "Top of head" },
+  { id: "bump-head", x: 110, y: 160, width: 80, height: 30, name: "Bump of head" },
+  { id: "base-head", x: 110, y: 230, width: 80, height: 30, name: "Base of head" },
+];
+
+export const getRegionDisplayName = (regionId: string): string => {
+  const nameMap: Record<string, string> = {
+    "forehead": "Forehead",
+    "upper-sinuses": "Upper Sinuses",
+    "lower-sinuses": "Lower Sinuses",
+    "eyes-left": "Left Eye",
+    "eyes-right": "Right Eye",
+    "temple-left": "Left Temple",
+    "temple-right": "Right Temple",
+    "top-head": "Top of head",
+    "bump-head": "Bump of head",
+    "base-head": "Base of head"
+  };
+  return nameMap[regionId] || regionId.replace(/-/g, ' ');
+};
