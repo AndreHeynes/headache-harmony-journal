@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -167,7 +168,7 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
           {/* Anterior View */}
           {viewMode === "anterior" && (
             <g id="anterior-view">
-              {/* Head outline */}
+              {/* Head outline - centering between LEFT and RIGHT labels */}
               <path 
                 d="M150,50 C220,50 250,100 260,150 C270,200 260,250 240,280 C220,310 180,330 150,340 C120,330 80,310 60,280 C40,250 30,200 40,150 C50,100 80,50 150,50 Z" 
                 fill="none" 
@@ -201,18 +202,18 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                     onMouseDown={(e) => handleMouseDown(e, region.id)}
                   />
                   <text 
-                    x={region.x + region.width/2 - (region.name.length * 1.8)} 
+                    x={region.x + region.width/2 - (region.name.length * 1.5)} 
                     y={region.y + region.height/2 + 4} 
-                    className="fill-white text-[10px] font-medium pointer-events-none"
+                    className="fill-white text-[8px] font-medium pointer-events-none"
                   >
                     {region.name}
                   </text>
                 </g>
               ))}
               
-              {/* LEFT/RIGHT Labels */}
-              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
-              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              {/* LEFT/RIGHT Labels - switched sides */}
+              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
             </g>
           )}
           
@@ -253,18 +254,18 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                     onMouseDown={(e) => handleMouseDown(e, region.id)}
                   />
                   <text 
-                    x={region.x + region.width/2 - (region.name.length * 1.8)} 
+                    x={region.x + region.width/2 - (region.name.length * 1.5)} 
                     y={region.y + region.height/2 + 4} 
-                    className="fill-white text-[10px] font-medium pointer-events-none"
+                    className="fill-white text-[8px] font-medium pointer-events-none"
                   >
                     {region.name}
                   </text>
                 </g>
               ))}
 
-              {/* LEFT/RIGHT Labels */}
-              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
-              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              {/* LEFT/RIGHT Labels - switched sides */}
+              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
             </g>
           )}
         </svg>
