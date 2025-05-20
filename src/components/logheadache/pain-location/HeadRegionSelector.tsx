@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
@@ -10,16 +10,128 @@ interface HeadRegionSelectorProps {
   toggleView: () => void;
 }
 
+interface DraggableRegion {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  name: string;
+}
+
 export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode, toggleView }: HeadRegionSelectorProps) {
+  const [anteriorRegions, setAnteriorRegions] = useState<DraggableRegion[]>([
+    { id: "forehead", x: 110, y: 75, width: 80, height: 30, name: "Forehead" },
+    { id: "upper-sinuses", x: 85, y: 115, width: 65, height: 30, name: "Upper Sinuses" },
+    { id: "lower-sinuses", x: 85, y: 155, width: 65, height: 30, name: "Lower Sinuses" },
+    { id: "eyes-left", x: 160, y: 115, width: 55, height: 30, name: "Left Eye" },
+    { id: "eyes-right", x: 160, y: 155, width: 55, height: 30, name: "Right Eye" },
+    { id: "temple-left", x: 50, y: 135, width: 60, height: 30, name: "Left Temple" },
+    { id: "temple-right", x: 190, y: 135, width: 60, height: 30, name: "Right Temple" },
+  ]);
+
+  const [posteriorRegions, setPosteriorRegions] = useState<DraggableRegion[]>([
+    { id: "top-head", x: 110, y: 90, width: 80, height: 30, name: "Top of head" },
+    { id: "bump-head", x: 110, y: 160, width: 80, height: 30, name: "Bump of head" },
+    { id: "base-head", x: 110, y: 230, width: 80, height: 30, name: "Base of head" },
+  ]);
+
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const svgRef = useRef<SVGSVGElement>(null);
+  
   const handleRegionSelect = (region: string) => {
-    setSelectedRegion(region);
-    const regionName = getRegionDisplayName(region);
-    
-    toast({
-      title: "Region selected",
-      description: `You selected: ${regionName}`,
-    });
+    if (activeRegion === region) {
+      setActiveRegion(null);
+      setSelectedRegion(region);
+      const regionName = getRegionDisplayName(region);
+      
+      toast({
+        title: "Region selected",
+        description: `You selected: ${regionName}`,
+      });
+    } else {
+      setActiveRegion(region);
+    }
   };
+
+  const handleMouseDown = (e: React.MouseEvent, regionId: string) => {
+    if (activeRegion === regionId) {
+      const svgRect = svgRef.current?.getBoundingClientRect();
+      if (svgRect) {
+        const x = e.clientX - svgRect.left;
+        const y = e.clientY - svgRect.top;
+        
+        // Find region to get its position
+        const regions = viewMode === "anterior" ? anteriorRegions : posteriorRegions;
+        const region = regions.find(r => r.id === regionId);
+        
+        if (region) {
+          setDragOffset({ 
+            x: x - region.x, 
+            y: y - region.y 
+          });
+        }
+        
+        // Prevent text selection during drag
+        e.preventDefault();
+      }
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (activeRegion && svgRef.current) {
+      const svgRect = svgRef.current.getBoundingClientRect();
+      const x = e.clientX - svgRect.left;
+      const y = e.clientY - svgRect.top;
+      
+      if (viewMode === "anterior") {
+        setAnteriorRegions(prev => 
+          prev.map(region => 
+            region.id === activeRegion 
+              ? { 
+                  ...region, 
+                  x: x - dragOffset.x, 
+                  y: y - dragOffset.y 
+                } 
+              : region
+          )
+        );
+      } else {
+        setPosteriorRegions(prev => 
+          prev.map(region => 
+            region.id === activeRegion 
+              ? { 
+                  ...region, 
+                  x: x - dragOffset.x, 
+                  y: y - dragOffset.y 
+                } 
+              : region
+          )
+        );
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (activeRegion) {
+      // Remove active region to stop dragging
+      setActiveRegion(null);
+    }
+  };
+
+  useEffect(() => {
+    // Add event listeners for dragging
+    if (activeRegion) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [activeRegion, dragOffset]);
 
   const getRegionDisplayName = (regionId: string): string => {
     const nameMap: Record<string, string> = {
@@ -37,6 +149,10 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
     return nameMap[regionId] || regionId.replace(/-/g, ' ');
   };
 
+  const getRegionsForCurrentView = () => {
+    return viewMode === "anterior" ? anteriorRegions : posteriorRegions;
+  };
+
   return (
     <div className="space-y-6">
       <Button 
@@ -48,7 +164,7 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
       </Button>
 
       <div className="relative w-full max-w-md mx-auto">
-        <svg viewBox="0 0 300 400" className="w-full">
+        <svg ref={svgRef} viewBox="0 0 300 400" className="w-full">
           {/* Anterior View */}
           {viewMode === "anterior" && (
             <g id="anterior-view">
@@ -67,82 +183,33 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                 strokeWidth="2"
               />
               
-              {/* Forehead */}
-              <rect 
-                id="forehead" 
-                x="110" y="75" 
-                width="80" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'forehead' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('forehead')}
-              />
-              <text x="125" y="95" className="fill-white text-xs font-medium pointer-events-none">Forehead</text>
-
-              {/* Upper Sinuses */}
-              <rect 
-                id="upper-sinuses" 
-                x="85" y="115" 
-                width="65" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'upper-sinuses' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('upper-sinuses')}
-              />
-              <text x="90" y="135" className="fill-white text-xs font-medium pointer-events-none">Upper Sinuses</text>
-              
-              {/* Lower Sinuses */}
-              <rect 
-                id="lower-sinuses" 
-                x="85" y="155" 
-                width="65" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'lower-sinuses' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('lower-sinuses')}
-              />
-              <text x="90" y="175" className="fill-white text-xs font-medium pointer-events-none">Lower Sinuses</text>
-
-              {/* Left Eye */}
-              <rect 
-                id="eyes-left" 
-                x="160" y="115" 
-                width="55" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'eyes-left' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('eyes-left')}
-              />
-              <text x="175" y="135" className="fill-white text-xs font-medium pointer-events-none">Left Eye</text>
-              
-              {/* Right Eye */}
-              <rect 
-                id="eyes-right" 
-                x="160" y="155" 
-                width="55" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'eyes-right' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('eyes-right')}
-              />
-              <text x="172" y="175" className="fill-white text-xs font-medium pointer-events-none">Right Eye</text>
-
-              {/* Temple Left */}
-              <rect 
-                id="temple-left" 
-                x="50" y="135" 
-                width="60" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'temple-left' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('temple-left')}
-              />
-              <text x="60" y="155" className="fill-white text-xs font-medium pointer-events-none">Left Temple</text>
-              
-              {/* Temple Right */}
-              <rect 
-                id="temple-right" 
-                x="190" y="135" 
-                width="60" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'temple-right' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('temple-right')}
-              />
-              <text x="198" y="155" className="fill-white text-xs font-medium pointer-events-none">Right Temple</text>
+              {/* Render anterior regions */}
+              {anteriorRegions.map((region) => (
+                <g key={region.id}>
+                  <rect 
+                    id={region.id}
+                    x={region.x} 
+                    y={region.y} 
+                    width={region.width} 
+                    height={region.height} 
+                    rx="10" 
+                    ry="10"
+                    className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${
+                      selectedRegion === region.id ? 'fill-cyan-400' : 
+                      activeRegion === region.id ? 'fill-cyan-300' : 'fill-cyan-500/80'
+                    }`}
+                    onClick={() => handleRegionSelect(region.id)}
+                    onMouseDown={(e) => handleMouseDown(e, region.id)}
+                  />
+                  <text 
+                    x={region.x + region.width/2 - (region.name.length * 2.5)} 
+                    y={region.y + region.height/2 + 5} 
+                    className="fill-white text-xs font-medium pointer-events-none"
+                  >
+                    {region.name}
+                  </text>
+                </g>
+              ))}
               
               {/* LEFT/RIGHT Labels */}
               <text x="10" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
@@ -168,42 +235,37 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                 strokeWidth="2"
               />
 
-              {/* Top of head */}
-              <rect 
-                id="top-head" 
-                x="110" y="90" 
-                width="80" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'top-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('top-head')}
-              />
-              <text x="120" y="110" className="fill-white text-xs font-medium pointer-events-none">Top of head</text>
-
-              {/* Bump of head */}
-              <rect 
-                id="bump-head" 
-                x="110" y="160" 
-                width="80" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'bump-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('bump-head')}
-              />
-              <text x="117" y="180" className="fill-white text-xs font-medium pointer-events-none">Bump of head</text>
-
-              {/* Base of head */}
-              <rect 
-                id="base-head" 
-                x="110" y="230" 
-                width="80" height="30" 
-                rx="10" ry="10"
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'base-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
-                onClick={() => handleRegionSelect('base-head')}
-              />
-              <text x="118" y="250" className="fill-white text-xs font-medium pointer-events-none">Base of head</text>
+              {/* Render posterior regions */}
+              {posteriorRegions.map((region) => (
+                <g key={region.id}>
+                  <rect 
+                    id={region.id}
+                    x={region.x} 
+                    y={region.y} 
+                    width={region.width} 
+                    height={region.height} 
+                    rx="10" 
+                    ry="10"
+                    className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${
+                      selectedRegion === region.id ? 'fill-cyan-400' : 
+                      activeRegion === region.id ? 'fill-cyan-300' : 'fill-cyan-500/80'
+                    }`}
+                    onClick={() => handleRegionSelect(region.id)}
+                    onMouseDown={(e) => handleMouseDown(e, region.id)}
+                  />
+                  <text 
+                    x={region.x + region.width/2 - (region.name.length * 2.5)} 
+                    y={region.y + region.height/2 + 5} 
+                    className="fill-white text-xs font-medium pointer-events-none"
+                  >
+                    {region.name}
+                  </text>
+                </g>
+              ))}
 
               {/* LEFT/RIGHT Labels */}
-              <text x="10" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
-              <text x="245" y="170" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
+              <text x="5" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
+              <text x="250" y="170" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
             </g>
           )}
         </svg>
@@ -215,6 +277,14 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
             Selected: <span className="font-medium text-primary">
               {getRegionDisplayName(selectedRegion)}
             </span>
+          </p>
+        </div>
+      )}
+
+      {activeRegion && (
+        <div className="mt-2 p-2 bg-cyan-500/20 border border-cyan-500/50 rounded-md">
+          <p className="text-sm text-white">
+            <span className="font-medium">Drag Mode:</span> Click to place "{getRegionDisplayName(activeRegion)}"
           </p>
         </div>
       )}
