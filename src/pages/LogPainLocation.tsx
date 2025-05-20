@@ -8,8 +8,8 @@ export default function LogPainLocationPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-dark via-charcoal to-primary-dark pb-24">
-      <header className="fixed top-0 w-full bg-charcoal/80 backdrop-blur-sm border-b border-white/5 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a192f] via-[#172a46] to-[#0a192f] pb-24">
+      <header className="fixed top-0 w-full bg-[#0a192f]/80 backdrop-blur-sm border-b border-white/5 z-50">
         <div className="flex items-center px-4 h-16">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ChevronLeft className="h-6 w-6 text-white/60" />
@@ -22,8 +22,8 @@ export default function LogPainLocationPage() {
         <LogPainLocation />
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-charcoal/80 backdrop-blur-sm border-t border-white/5">
-        <Button className="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-medium"
+      <footer className="fixed bottom-0 left-0 right-0 p-4 bg-[#0a192f]/80 backdrop-blur-sm border-t border-white/5">
+        <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-medium"
                 onClick={() => navigate('/log')}>
           Continue
         </Button>
