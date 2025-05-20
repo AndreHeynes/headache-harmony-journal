@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -168,16 +167,16 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
           {/* Anterior View */}
           {viewMode === "anterior" && (
             <g id="anterior-view">
-              {/* Head outline - centering between LEFT and RIGHT labels */}
+              {/* Head outline - centering between LEFT and RIGHT labels and moved more towards LEFT */}
               <path 
-                d="M150,50 C220,50 250,100 260,150 C270,200 260,250 240,280 C220,310 180,330 150,340 C120,330 80,310 60,280 C40,250 30,200 40,150 C50,100 80,50 150,50 Z" 
+                d="M170,50 C240,50 270,100 280,150 C290,200 280,250 260,280 C240,310 200,330 170,340 C140,330 100,310 80,280 C60,250 50,200 60,150 C70,100 100,50 170,50 Z" 
                 fill="none" 
                 stroke="#3E7D9C" 
                 strokeWidth="2"
               />
-              {/* Neck outline */}
+              {/* Neck outline - moved to match head position */}
               <path 
-                d="M100,340 C100,380 95,400 95,420 C95,440 205,440 205,420 C205,400 200,380 200,340" 
+                d="M120,340 C120,380 115,400 115,420 C115,440 225,440 225,420 C225,400 220,380 220,340" 
                 fill="none" 
                 stroke="#3E7D9C" 
                 strokeWidth="2"
@@ -220,16 +219,16 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
           {/* Posterior View */}
           {viewMode === "posterior" && (
             <g id="posterior-view" transform="translate(0, 0)">
-              {/* Head outline */}
+              {/* Head outline - moved more towards LEFT */}
               <path 
-                d="M150,50 C220,50 250,100 260,150 C270,200 260,250 240,280 C220,310 180,330 150,340 C120,330 80,310 60,280 C40,250 30,200 40,150 C50,100 80,50 150,50 Z" 
+                d="M170,50 C240,50 270,100 280,150 C290,200 280,250 260,280 C240,310 200,330 170,340 C140,330 100,310 80,280 C60,250 50,200 60,150 C70,100 100,50 170,50 Z" 
                 fill="none" 
                 stroke="#3E7D9C" 
                 strokeWidth="2"
               />
-              {/* Neck outline */}
+              {/* Neck outline - moved to match head position */}
               <path 
-                d="M100,340 C100,380 95,400 95,420 C95,440 205,440 205,420 C205,400 200,380 200,340" 
+                d="M120,340 C120,380 115,400 115,420 C115,440 225,440 225,420 C225,400 220,380 220,340" 
                 fill="none" 
                 stroke="#3E7D9C" 
                 strokeWidth="2"
