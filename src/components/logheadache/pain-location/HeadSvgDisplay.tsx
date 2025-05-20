@@ -1,5 +1,4 @@
 
-import { useRef } from "react";
 import { DraggableRegion } from "./types";
 
 interface HeadSvgDisplayProps {
@@ -8,7 +7,6 @@ interface HeadSvgDisplayProps {
   selectedRegion: string | null;
   activeRegion: string | null;
   onRegionSelect: (region: string) => void;
-  onRegionMouseDown: (e: React.MouseEvent, regionId: string) => void;
   svgRef: React.RefObject<SVGSVGElement>;
 }
 
@@ -18,7 +16,6 @@ export function HeadSvgDisplay({
   selectedRegion,
   activeRegion,
   onRegionSelect,
-  onRegionMouseDown,
   svgRef
 }: HeadSvgDisplayProps) {
   return (
@@ -52,11 +49,9 @@ export function HeadSvgDisplay({
                 rx="10" 
                 ry="10"
                 className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${
-                  selectedRegion === region.id ? 'fill-cyan-400' : 
-                  activeRegion === region.id ? 'fill-cyan-300' : 'fill-cyan-500/80'
+                  selectedRegion === region.id ? 'fill-cyan-400' : 'fill-cyan-500/80'
                 }`}
                 onClick={() => onRegionSelect(region.id)}
-                onMouseDown={(e) => onRegionMouseDown(e, region.id)}
               />
               <text 
                 x={region.x + region.width/2 - (region.name.length * 1.5)} 
@@ -101,11 +96,9 @@ export function HeadSvgDisplay({
                 rx="10" 
                 ry="10"
                 className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${
-                  selectedRegion === region.id ? 'fill-cyan-400' : 
-                  activeRegion === region.id ? 'fill-cyan-300' : 'fill-cyan-500/80'
+                  selectedRegion === region.id ? 'fill-cyan-400' : 'fill-cyan-500/80'
                 }`}
                 onClick={() => onRegionSelect(region.id)}
-                onMouseDown={(e) => onRegionMouseDown(e, region.id)}
               />
               <text 
                 x={region.x + region.width/2 - (region.name.length * 1.5)} 
