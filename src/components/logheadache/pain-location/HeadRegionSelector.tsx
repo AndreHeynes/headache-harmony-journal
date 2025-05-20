@@ -10,34 +10,30 @@ interface HeadRegionSelectorProps {
   toggleView: () => void;
 }
 
-const headRegions = {
-  anterior: [
-    { id: "forehead", name: "Forehead", top: "15%", left: "50%" },
-    { id: "upperSinuses", name: "Upper Sinuses", top: "35%", left: "30%" },
-    { id: "eyes", name: "Eyes", top: "35%", left: "70%" },
-    { id: "leftTemple", name: "Temple", top: "48%", left: "10%" },
-    { id: "rightTemple", name: "Temple", top: "48%", left: "90%" },
-    { id: "lowerSinuses", name: "Lower Sinuses", top: "55%", left: "50%" }
-  ],
-  posterior: [
-    { id: "topOfHead", name: "Top of head", top: "25%", left: "50%" },
-    { id: "bumpOfHead", name: "Bump of head", top: "50%", left: "50%" },
-    { id: "baseOfHead", name: "Base of head", top: "75%", left: "50%" }
-  ]
-};
-
-export { headRegions };
-
 export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode, toggleView }: HeadRegionSelectorProps) {
   const handleRegionSelect = (region: string) => {
     setSelectedRegion(region);
-    const regionName = [...headRegions.anterior, ...headRegions.posterior]
-      .find(r => r.id === region)?.name;
+    const regionName = getRegionDisplayName(region);
     
     toast({
       title: "Region selected",
       description: `You selected: ${regionName}`,
     });
+  };
+
+  const getRegionDisplayName = (regionId: string): string => {
+    const nameMap: Record<string, string> = {
+      "forehead": "Forehead",
+      "upper-sinuses": "Upper Sinuses",
+      "eyes": "Eyes",
+      "temple-left": "Left Temple",
+      "temple-right": "Right Temple",
+      "lower-sinuses": "Lower Sinuses",
+      "top-head": "Top of head",
+      "bump-head": "Bump of head",
+      "base-head": "Base of head"
+    };
+    return nameMap[regionId] || regionId.replace(/-/g, ' ');
   };
 
   return (
@@ -50,51 +46,112 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
         {viewMode === "anterior" ? "Switch to Back View" : "Switch to Front View"}
       </Button>
 
-      <div className="relative w-full h-[400px]">
-        {/* Head outline */}
-        <div className="absolute inset-0 mx-auto w-3/4 h-full rounded-full border-2 border-cyan-400/40">
-          {/* Side markers */}
-          <div className="absolute top-1/2 -left-16 text-white text-2xl font-bold">LEFT</div>
-          <div className="absolute top-1/2 -right-16 text-white text-2xl font-bold">RIGHT</div>
-          
-          {/* Face features (simplified) */}
-          {viewMode === "anterior" && (
-            <div className="absolute w-full h-full">
-              {/* Simplified face outline */}
-              <div className="absolute bottom-[25%] left-1/2 -translate-x-1/2 w-1/2 h-1/4 border-t-2 border-cyan-400/40 rounded-t-full"></div>
-            </div>
+      <div className="relative w-full max-w-md mx-auto">
+        <svg viewBox="0 0 300 200" className="w-full">
+          {viewMode === "anterior" ? (
+            // Anterior View
+            <g id="anterior-view">
+              <rect 
+                id="forehead" 
+                x="100" y="30" 
+                width="100" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'forehead' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('forehead')}
+              />
+              <text x="125" y="50" className="fill-white text-xs pointer-events-none font-medium">Forehead</text>
+
+              <rect 
+                id="upper-sinuses" 
+                x="85" y="70" 
+                width="60" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'upper-sinuses' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('upper-sinuses')}
+              />
+              <text x="90" y="90" className="fill-white text-xs pointer-events-none font-medium">Upper Sinuses</text>
+
+              <rect 
+                id="eyes" 
+                x="155" y="70" 
+                width="60" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'eyes' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('eyes')}
+              />
+              <text x="170" y="90" className="fill-white text-xs pointer-events-none font-medium">Eyes</text>
+
+              <rect 
+                id="temple-left" 
+                x="50" y="80" 
+                width="40" height="20" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'temple-left' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('temple-left')}
+              />
+              <text x="52" y="95" className="fill-white text-xs pointer-events-none font-medium">Left Temple</text>
+
+              <rect 
+                id="temple-right" 
+                x="210" y="80" 
+                width="40" height="20" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'temple-right' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('temple-right')}
+              />
+              <text x="212" y="95" className="fill-white text-xs pointer-events-none font-medium">Right Temple</text>
+              
+              <rect 
+                id="lower-sinuses" 
+                x="100" y="110" 
+                width="100" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'lower-sinuses' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('lower-sinuses')}
+              />
+              <text x="115" y="130" className="fill-white text-xs pointer-events-none font-medium">Lower Sinuses</text>
+
+              {/* Side markers */}
+              <text x="25" y="100" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+              <text x="250" y="100" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+            </g>
+          ) : (
+            // Posterior View
+            <g id="posterior-view">
+              <rect 
+                id="top-head" 
+                x="100" y="30" 
+                width="100" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'top-head' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('top-head')}
+              />
+              <text x="125" y="50" className="fill-white text-xs pointer-events-none font-medium">Top of head</text>
+
+              <rect 
+                id="bump-head" 
+                x="100" y="70" 
+                width="100" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'bump-head' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('bump-head')}
+              />
+              <text x="125" y="90" className="fill-white text-xs pointer-events-none font-medium">Bump of head</text>
+
+              <rect 
+                id="base-head" 
+                x="100" y="110" 
+                width="100" height="30" 
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'base-head' ? 'stroke-2' : 'stroke-1'}`}
+                onClick={() => handleRegionSelect('base-head')}
+              />
+              <text x="125" y="130" className="fill-white text-xs pointer-events-none font-medium">Base of head</text>
+
+              {/* Side markers */}
+              <text x="25" y="100" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+              <text x="250" y="100" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+            </g>
           )}
-          
-          {/* Neck */}
-          <div className="absolute -bottom-[20%] left-1/2 -translate-x-1/2 w-1/3 h-[20%] bg-transparent border-l-2 border-r-2 border-cyan-400/40"></div>
-          
-          {/* Pain regions */}
-          {headRegions[viewMode].map((region) => (
-            <Button
-              key={region.id}
-              onClick={() => handleRegionSelect(region.id)}
-              className={`
-                absolute transform -translate-x-1/2 -translate-y-1/2 
-                bg-cyan-500/80 hover:bg-cyan-500 text-white
-                border-2 min-w-[100px] py-2
-                ${selectedRegion === region.id ? "border-white" : "border-cyan-200/30"}
-              `}
-              style={{
-                top: region.top,
-                left: region.left
-              }}
-            >
-              {region.name}
-            </Button>
-          ))}
-        </div>
+        </svg>
       </div>
       
       {selectedRegion && (
         <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-md">
           <p className="text-white">
             Selected: <span className="font-medium text-primary">
-              {[...headRegions.anterior, ...headRegions.posterior].find(r => r.id === selectedRegion)?.name}
+              {getRegionDisplayName(selectedRegion)}
             </span>
           </p>
         </div>

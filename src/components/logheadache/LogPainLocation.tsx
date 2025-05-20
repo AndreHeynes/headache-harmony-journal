@@ -26,7 +26,7 @@ export default function LogPainLocation() {
           <h2 className="text-lg font-medium text-white">Where did the pain start?</h2>
           <HeadRegionSelector 
             selectedRegion={selectedRegion} 
-            setSelectedRegion={(region) => setSelectedRegion(region)} 
+            setSelectedRegion={setSelectedRegion} 
             viewMode={viewMode}
             toggleView={toggleView}
           />
