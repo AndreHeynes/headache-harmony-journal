@@ -8,7 +8,7 @@ export default function LogPainLocationPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a192f] via-[#172a46] to-[#0a192f] pb-24">
+    <div className="min-h-screen bg-[#0a192f] pb-24">
       <header className="fixed top-0 w-full bg-[#0a192f]/80 backdrop-blur-sm border-b border-white/5 z-50">
         <div className="flex items-center px-4 h-16">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>

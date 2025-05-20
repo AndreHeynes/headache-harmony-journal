@@ -21,7 +21,7 @@ export default function LogPainLocation() {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Where did the pain start?</h2>
           <HeadRegionSelector 
@@ -33,7 +33,7 @@ export default function LogPainLocation() {
         </div>
       </Card>
 
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Pain Distribution</h2>
           <PainDistributionSelector 
@@ -43,7 +43,7 @@ export default function LogPainLocation() {
         </div>
       </Card>
 
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Distribution Pattern</h2>
           <PainPatternSelector 
@@ -53,7 +53,7 @@ export default function LogPainLocation() {
         </div>
       </Card>
 
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <PainSpreadSelector 
             painSpreads={painSpreads} 

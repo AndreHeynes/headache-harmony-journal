@@ -47,101 +47,130 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
       </Button>
 
       <div className="relative w-full max-w-md mx-auto">
-        <svg viewBox="0 0 300 200" className="w-full">
-          {viewMode === "anterior" ? (
-            // Anterior View
+        <svg viewBox="0 0 300 600" className="w-full">
+          {/* Anterior View */}
+          {viewMode === "anterior" && (
             <g id="anterior-view">
+              {/* Head outline */}
+              <path 
+                d="M150,50 C220,50 250,100 260,150 C270,200 260,250 240,280 C220,310 180,330 150,340 C120,330 80,310 60,280 C40,250 30,200 40,150 C50,100 80,50 150,50 Z" 
+                fill="none" 
+                stroke="#3E7D9C" 
+                strokeWidth="2"
+              />
+              {/* Neck outline */}
+              <path 
+                d="M100,340 C100,380 95,400 95,420 C95,440 205,440 205,420 C205,400 200,380 200,340" 
+                fill="none" 
+                stroke="#3E7D9C" 
+                strokeWidth="2"
+              />
+              
+              {/* Forehead */}
               <rect 
                 id="forehead" 
-                x="100" y="30" 
-                width="100" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'forehead' ? 'stroke-2' : 'stroke-1'}`}
+                x="108" y="75" 
+                width="84" height="45" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'forehead' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('forehead')}
               />
-              <text x="125" y="50" className="fill-white text-xs pointer-events-none font-medium">Forehead</text>
+              <text x="120" y="105" className="fill-white text-sm font-medium pointer-events-none">Forehead</text>
 
+              {/* Upper Sinuses */}
               <rect 
                 id="upper-sinuses" 
-                x="85" y="70" 
-                width="60" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'upper-sinuses' ? 'stroke-2' : 'stroke-1'}`}
+                x="70" y="130" 
+                width="75" height="45" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'upper-sinuses' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('upper-sinuses')}
               />
-              <text x="90" y="90" className="fill-white text-xs pointer-events-none font-medium">Upper Sinuses</text>
+              <text x="76" y="160" className="fill-white text-sm font-medium pointer-events-none">Upper</text>
+              <text x="76" y="175" className="fill-white text-sm font-medium pointer-events-none">Sinuses</text>
 
+              {/* Eyes */}
               <rect 
                 id="eyes" 
-                x="155" y="70" 
-                width="60" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'eyes' ? 'stroke-2' : 'stroke-1'}`}
+                x="155" y="130" 
+                width="75" height="45" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'eyes' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('eyes')}
               />
-              <text x="170" y="90" className="fill-white text-xs pointer-events-none font-medium">Eyes</text>
+              <text x="172" y="160" className="fill-white text-sm font-medium pointer-events-none">Eyes</text>
 
-              <rect 
-                id="temple-left" 
-                x="50" y="80" 
-                width="40" height="20" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'temple-left' ? 'stroke-2' : 'stroke-1'}`}
-                onClick={() => handleRegionSelect('temple-left')}
-              />
-              <text x="52" y="95" className="fill-white text-xs pointer-events-none font-medium">Left Temple</text>
-
+              {/* Temple Right */}
               <rect 
                 id="temple-right" 
-                x="210" y="80" 
-                width="40" height="20" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'temple-right' ? 'stroke-2' : 'stroke-1'}`}
+                x="230" y="185" 
+                width="65" height="40" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'temple-right' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('temple-right')}
               />
-              <text x="212" y="95" className="fill-white text-xs pointer-events-none font-medium">Right Temple</text>
+              <text x="234" y="210" className="fill-white text-sm font-medium pointer-events-none">Temple</text>
               
-              <rect 
-                id="lower-sinuses" 
-                x="100" y="110" 
-                width="100" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'lower-sinuses' ? 'stroke-2' : 'stroke-1'}`}
-                onClick={() => handleRegionSelect('lower-sinuses')}
-              />
-              <text x="115" y="130" className="fill-white text-xs pointer-events-none font-medium">Lower Sinuses</text>
-
-              {/* Side markers */}
-              <text x="25" y="100" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
-              <text x="250" y="100" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              {/* LEFT/RIGHT Labels */}
+              <text x="20" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
+              <text x="235" y="130" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
             </g>
-          ) : (
-            // Posterior View
-            <g id="posterior-view">
+          )}
+          
+          {/* Posterior View */}
+          {viewMode === "posterior" && (
+            <g id="posterior-view" transform="translate(0, 0)">
+              {/* Head outline */}
+              <path 
+                d="M150,50 C220,50 250,100 260,150 C270,200 260,250 240,280 C220,310 180,330 150,340 C120,330 80,310 60,280 C40,250 30,200 40,150 C50,100 80,50 150,50 Z" 
+                fill="none" 
+                stroke="#3E7D9C" 
+                strokeWidth="2"
+              />
+              {/* Neck outline */}
+              <path 
+                d="M100,340 C100,380 95,400 95,420 C95,440 205,440 205,420 C205,400 200,380 200,340" 
+                fill="none" 
+                stroke="#3E7D9C" 
+                strokeWidth="2"
+              />
+
+              {/* Top of head */}
               <rect 
                 id="top-head" 
-                x="100" y="30" 
-                width="100" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'top-head' ? 'stroke-2' : 'stroke-1'}`}
+                x="100" y="90" 
+                width="100" height="50" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'top-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('top-head')}
               />
-              <text x="125" y="50" className="fill-white text-xs pointer-events-none font-medium">Top of head</text>
+              <text x="112" y="120" className="fill-white text-sm font-medium pointer-events-none">Top of head</text>
 
+              {/* Bump of head */}
               <rect 
                 id="bump-head" 
-                x="100" y="70" 
-                width="100" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'bump-head' ? 'stroke-2' : 'stroke-1'}`}
+                x="100" y="160" 
+                width="100" height="50" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'bump-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('bump-head')}
               />
-              <text x="125" y="90" className="fill-white text-xs pointer-events-none font-medium">Bump of head</text>
+              <text x="107" y="190" className="fill-white text-sm font-medium pointer-events-none">Bump of head</text>
 
+              {/* Base of head */}
               <rect 
                 id="base-head" 
-                x="100" y="110" 
-                width="100" height="30" 
-                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-1 cursor-pointer ${selectedRegion === 'base-head' ? 'stroke-2' : 'stroke-1'}`}
+                x="100" y="230" 
+                width="100" height="50" 
+                rx="10" ry="10"
+                className={`fill-cyan-500/80 hover:fill-cyan-400 stroke-white stroke-2 cursor-pointer ${selectedRegion === 'base-head' ? 'fill-cyan-400' : 'fill-cyan-500/80'}`}
                 onClick={() => handleRegionSelect('base-head')}
               />
-              <text x="125" y="130" className="fill-white text-xs pointer-events-none font-medium">Base of head</text>
+              <text x="108" y="260" className="fill-white text-sm font-medium pointer-events-none">Base of head</text>
 
-              {/* Side markers */}
-              <text x="25" y="100" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
-              <text x="250" y="100" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
+              {/* LEFT/RIGHT Labels */}
+              <text x="20" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
+              <text x="235" y="170" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
             </g>
           )}
         </svg>
