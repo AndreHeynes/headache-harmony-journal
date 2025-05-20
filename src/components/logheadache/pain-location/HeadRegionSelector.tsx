@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -163,8 +162,8 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
         {viewMode === "anterior" ? "Switch to Back View" : "Switch to Front View"}
       </Button>
 
-      <div className="relative w-full max-w-md mx-auto">
-        <svg ref={svgRef} viewBox="0 0 300 400" className="w-full">
+      <div className="relative w-full max-w-lg mx-auto">
+        <svg ref={svgRef} viewBox="0 0 380 400" className="w-full">
           {/* Anterior View */}
           {viewMode === "anterior" && (
             <g id="anterior-view">
@@ -202,9 +201,9 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                     onMouseDown={(e) => handleMouseDown(e, region.id)}
                   />
                   <text 
-                    x={region.x + region.width/2 - (region.name.length * 2.5)} 
-                    y={region.y + region.height/2 + 5} 
-                    className="fill-white text-xs font-medium pointer-events-none"
+                    x={region.x + region.width/2 - (region.name.length * 1.8)} 
+                    y={region.y + region.height/2 + 4} 
+                    className="fill-white text-[10px] font-medium pointer-events-none"
                   >
                     {region.name}
                   </text>
@@ -212,8 +211,8 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
               ))}
               
               {/* LEFT/RIGHT Labels */}
-              <text x="10" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
-              <text x="245" y="170" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
+              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
             </g>
           )}
           
@@ -254,9 +253,9 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
                     onMouseDown={(e) => handleMouseDown(e, region.id)}
                   />
                   <text 
-                    x={region.x + region.width/2 - (region.name.length * 2.5)} 
-                    y={region.y + region.height/2 + 5} 
-                    className="fill-white text-xs font-medium pointer-events-none"
+                    x={region.x + region.width/2 - (region.name.length * 1.8)} 
+                    y={region.y + region.height/2 + 4} 
+                    className="fill-white text-[10px] font-medium pointer-events-none"
                   >
                     {region.name}
                   </text>
@@ -264,8 +263,8 @@ export function HeadRegionSelector({ selectedRegion, setSelectedRegion, viewMode
               ))}
 
               {/* LEFT/RIGHT Labels */}
-              <text x="5" y="170" className="fill-white text-xl font-bold pointer-events-none">LEFT</text>
-              <text x="250" y="170" className="fill-white text-xl font-bold pointer-events-none">RIGHT</text>
+              <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+              <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
             </g>
           )}
         </svg>
