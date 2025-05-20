@@ -12,9 +12,9 @@ export const anteriorRegionsData: DraggableRegion[] = [
 ];
 
 export const posteriorRegionsData: DraggableRegion[] = [
-  { id: "top-head", x: 110, y: 90, width: 80, height: 30, name: "Top of head" },
-  { id: "bump-head", x: 110, y: 160, width: 80, height: 30, name: "Bump of head" },
-  { id: "base-head", x: 110, y: 230, width: 80, height: 30, name: "Base of head" },
+  { id: "top-head", x: 140, y: 100, width: 80, height: 30, name: "Top of head" },
+  { id: "bump-head", x: 140, y: 180, width: 80, height: 30, name: "Bump of head" },
+  { id: "base-head", x: 140, y: 260, width: 80, height: 30, name: "Base of head" },
 ];
 
 export const getRegionDisplayName = (regionId: string): string => {
