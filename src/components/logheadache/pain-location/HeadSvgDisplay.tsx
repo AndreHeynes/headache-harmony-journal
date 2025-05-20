@@ -63,9 +63,9 @@ export function HeadSvgDisplay({
             </g>
           ))}
           
-          {/* LEFT/RIGHT Labels - switched sides */}
-          <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
-          <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+          {/* Fixed LEFT/RIGHT Labels - positions made completely static */}
+          <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">RIGHT</text>
+          <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">LEFT</text>
         </g>
       ) : (
         <g id="posterior-view" transform="translate(0, 0)">
@@ -110,9 +110,9 @@ export function HeadSvgDisplay({
             </g>
           ))}
 
-          {/* LEFT/RIGHT Labels - switched sides */}
-          <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none">RIGHT</text>
-          <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none">LEFT</text>
+          {/* Fixed LEFT/RIGHT Labels - positions made completely static */}
+          <text x="5" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">RIGHT</text>
+          <text x="330" y="170" className="fill-white text-sm font-bold pointer-events-none select-none">LEFT</text>
         </g>
       )}
     </svg>
