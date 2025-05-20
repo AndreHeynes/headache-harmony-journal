@@ -56,7 +56,7 @@ export function HeadSvgDisplay({
               <text 
                 x={region.x + region.width/2 - (region.name.length * 1.5)} 
                 y={region.y + region.height/2 + 4} 
-                className="fill-white text-[8px] font-medium pointer-events-none"
+                className="fill-white text-[8px] font-medium pointer-events-none select-none"
               >
                 {region.name}
               </text>
@@ -103,7 +103,7 @@ export function HeadSvgDisplay({
               <text 
                 x={region.x + region.width/2 - (region.name.length * 1.5)} 
                 y={region.y + region.height/2 + 4} 
-                className="fill-white text-[8px] font-medium pointer-events-none"
+                className="fill-white text-[8px] font-medium pointer-events-none select-none"
               >
                 {region.name}
               </text>

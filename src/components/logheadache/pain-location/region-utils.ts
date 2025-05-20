@@ -3,12 +3,12 @@ import { DraggableRegion } from "./types";
 
 export const anteriorRegionsData: DraggableRegion[] = [
   { id: "forehead", x: 110, y: 75, width: 80, height: 30, name: "Forehead" },
-  { id: "upper-sinuses", x: 85, y: 115, width: 65, height: 30, name: "Upper Sinuses" },
-  { id: "lower-sinuses", x: 85, y: 155, width: 65, height: 30, name: "Lower Sinuses" },
-  { id: "eyes-left", x: 160, y: 115, width: 55, height: 30, name: "Left Eye" },
-  { id: "eyes-right", x: 160, y: 155, width: 55, height: 30, name: "Right Eye" },
-  { id: "temple-left", x: 50, y: 135, width: 60, height: 30, name: "Left Temple" },
-  { id: "temple-right", x: 190, y: 135, width: 60, height: 30, name: "Right Temple" },
+  { id: "upper-sinuses", x: 110, y: 115, width: 80, height: 30, name: "Upper Sinuses" },
+  { id: "lower-sinuses", x: 110, y: 155, width: 80, height: 30, name: "Lower Sinuses" },
+  { id: "eyes-left", x: 220, y: 135, width: 55, height: 30, name: "Left Eye" },
+  { id: "eyes-right", x: 45, y: 135, width: 55, height: 30, name: "Right Eye" },
+  { id: "temple-left", x: 230, y: 95, width: 60, height: 30, name: "Left Temple" },
+  { id: "temple-right", x: 30, y: 95, width: 60, height: 30, name: "Right Temple" },
 ];
 
 export const posteriorRegionsData: DraggableRegion[] = [
