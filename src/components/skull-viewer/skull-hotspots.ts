@@ -1,7 +1,7 @@
 export const SKULL_IMAGES = {
-  front: '/lovable-uploads/4cb42d96-1c03-4fa5-af40-7aec39e2b8b8.jpg',
-  side: '/lovable-uploads/cd0a6969-7b67-43a8-95a6-3ce645f89bb8.jpg',
-  back: '/lovable-uploads/a1d7214d-d71a-42ef-87ee-e0df5339fdab.jpg',
+  front: '/lovable-uploads/39ef7ad6-a428-42e2-8265-698da2f54073.png',
+  side: '/lovable-uploads/151e4d83-0887-45f5-b443-a43471b40e3f.png',
+  back: '/lovable-uploads/ac65d2fa-312f-4eb1-ac40-75e816a39d08.png',
 };
 
 export type SkullView = 'front' | 'side' | 'back';
