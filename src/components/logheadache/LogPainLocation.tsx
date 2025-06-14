@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 
-import { SkullViewer } from "../SkullViewer";
 import { PainDistributionSelector } from "./pain-location/PainDistributionSelector";
 import { PainPatternSelector } from "./pain-location/PainPatternSelector";
 import { PainSpreadSelector } from "./pain-location/PainSpreadSelector";
@@ -18,7 +17,7 @@ export default function LogPainLocation() {
       <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Select Pain Location</h2>
-          <SkullViewer />
+          {/* Pain location selector will be implemented here */}
         </div>
       </Card>
 
