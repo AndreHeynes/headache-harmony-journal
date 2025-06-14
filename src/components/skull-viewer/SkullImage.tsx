@@ -18,29 +18,13 @@ export function SkullImage({
   view 
 }: SkullImageProps) {
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  const handleImageLoad = () => {
-    setImageError(false);
-  };
-
-  // Use placeholder for now since original images are causing issues
-  const displaySrc = imageError || !imageSrc
-    ? 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop&auto=format'
-    : imageSrc;
 
   return (
     <div className="relative w-full max-w-md mx-auto">
       <img 
-        src={displaySrc}
+        src={imageSrc}
         alt={`Skull ${view} view`}
         className="w-full h-auto rounded-lg shadow-lg"
-        onLoad={handleImageLoad}
-        onError={handleImageError}
         style={{ minHeight: '300px', backgroundColor: '#1a1a1a' }}
       />
       
