@@ -9,14 +9,6 @@ export function SkullViewer() {
   const [currentView, setCurrentView] = useState<SkullView>('front');
   const [selectedHotspots, setSelectedHotspots] = useState<string[]>([]);
 
-  // Debug logging
-  console.log('SkullViewer Debug:', {
-    currentView,
-    selectedHotspots,
-    availableImages: SKULL_IMAGES,
-    currentImageSrc: SKULL_IMAGES[currentView]
-  });
-
   const handleHotspotClick = (hotspotId: string) => {
     console.log('SkullViewer: Hotspot click received:', hotspotId);
     setSelectedHotspots(prev => {
@@ -48,13 +40,6 @@ export function SkullViewer() {
 
   return (
     <div className="space-y-6">
-      {/* Debug Panel */}
-      <div className="bg-blue-900/20 border border-blue-500 rounded p-3 text-xs text-blue-200">
-        <strong>Debug Info:</strong><br/>
-        View: {currentView} | Image: {SKULL_IMAGES[currentView]}<br/>
-        Hotspots: {currentHotspots.length} | Selected: {selectedHotspots.length}
-      </div>
-
       {/* View Selection Buttons */}
       <div className="flex justify-center space-x-2">
         {(['front', 'side', 'back'] as SkullView[]).map((view) => (
