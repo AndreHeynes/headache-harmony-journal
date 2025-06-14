@@ -1,6 +1,6 @@
 
 export const SKULL_IMAGES = {
-  front: '/lovable-uploads/f6987888-0500-4d98-98c2-e497abfc42fd.png',
+  front: '/lovable-uploads/4cb42d96-1c03-4fa5-af40-7aec39e2b8b8.png',
   side: '/lovable-uploads/cd0a6969-7b67-43a8-95a6-3ce645f89bb8.png',
   back: '/lovable-uploads/a1d7214d-d71a-42ef-87ee-e0df5339fdab.png',
 };
