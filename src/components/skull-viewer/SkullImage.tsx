@@ -18,41 +18,31 @@ export function SkullImage({
   view 
 }: SkullImageProps) {
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleImageError = () => {
-    console.log('Image failed to load:', imageSrc);
-    setHasError(true);
+    setImageError(true);
   };
 
   const handleImageLoad = () => {
-    console.log('Image loaded successfully:', imageSrc);
-    setHasError(false);
+    setImageError(false);
   };
 
-  // Use a placeholder image if the skull image fails to load
-  const displaySrc = hasError 
-    ? 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop'
+  // Use placeholder for now since original images are causing issues
+  const displaySrc = imageError || !imageSrc
+    ? 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop&auto=format'
     : imageSrc;
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="relative">
-        <img 
-          src={displaySrc}
-          alt={`Skull ${view} view`}
-          className="w-full h-auto rounded-lg shadow-lg"
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-          style={{ minHeight: '300px', backgroundColor: '#1a1a1a' }}
-        />
-        
-        {hasError && (
-          <div className="absolute top-2 left-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded">
-            Using placeholder - original failed
-          </div>
-        )}
-      </div>
+      <img 
+        src={displaySrc}
+        alt={`Skull ${view} view`}
+        className="w-full h-auto rounded-lg shadow-lg"
+        onLoad={handleImageLoad}
+        onError={handleImageError}
+        style={{ minHeight: '300px', backgroundColor: '#1a1a1a' }}
+      />
       
       {/* Render hotspots */}
       {hotspots.map((hotspot) => (
@@ -70,10 +60,7 @@ export function SkullImage({
             height: `${hotspot.size}px`,
             zIndex: getHotspotZIndex(hotspot),
           }}
-          onClick={() => {
-            console.log('Hotspot clicked:', hotspot.id, hotspot.name);
-            onHotspotClick(hotspot.id);
-          }}
+          onClick={() => onHotspotClick(hotspot.id)}
           onMouseEnter={() => setHoveredHotspot(hotspot.id)}
           onMouseLeave={() => setHoveredHotspot(null)}
           title={hotspot.name}
