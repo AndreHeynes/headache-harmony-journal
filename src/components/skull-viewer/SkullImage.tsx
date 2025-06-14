@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Hotspot, getHotspotZIndex } from './skull-hotspots';
 
 interface SkullImageProps {
@@ -18,11 +18,18 @@ export function SkullImage({
   view 
 }: SkullImageProps) {
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
+  const [bustableSrc, setBustableSrc] = useState(imageSrc);
+
+  // This effect adds a timestamp to the image URL to prevent browser caching issues.
+  // It only runs when the image source actually changes (i.e., when switching views).
+  useEffect(() => {
+    setBustableSrc(`${imageSrc}?t=${new Date().getTime()}`);
+  }, [imageSrc]);
 
   return (
     <div className="relative w-full max-w-md mx-auto">
       <img 
-        src={imageSrc}
+        src={bustableSrc}
         alt={`Skull ${view} view`}
         className="w-full h-auto rounded-lg shadow-lg"
         style={{ minHeight: '300px', backgroundColor: '#1a1a1a' }}
