@@ -3,12 +3,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { SkullImage } from './skull-viewer/SkullImage';
-import { SKULL_IMAGES, SKULL_HOTSPOTS } from './skull-viewer/skull-hotspots';
-
-type ViewMode = 'front' | 'side' | 'back';
+import { SKULL_IMAGES, SKULL_HOTSPOTS, SkullView } from './skull-viewer/skull-hotspots';
 
 export function SkullViewer() {
-  const [currentView, setCurrentView] = useState<ViewMode>('front');
+  const [currentView, setCurrentView] = useState<SkullView>('front');
   const [selectedHotspots, setSelectedHotspots] = useState<string[]>([]);
 
   const handleHotspotClick = (hotspotId: string) => {
@@ -43,7 +41,7 @@ export function SkullViewer() {
     <div className="space-y-6">
       {/* View Selection Buttons */}
       <div className="flex justify-center space-x-2">
-        {(['front', 'side', 'back'] as ViewMode[]).map((view) => (
+        {(['front', 'side', 'back'] as SkullView[]).map((view) => (
           <Button
             key={view}
             variant={currentView === view ? "default" : "outline"}

@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
-import { HotspotData } from './skull-hotspots';
+import { Hotspot, getHotspotZIndex } from './skull-hotspots';
 
 interface SkullImageProps {
   imageSrc: string;
-  hotspots: HotspotData[];
+  hotspots: Hotspot[];
   selectedHotspots: string[];
   onHotspotClick: (hotspotId: string) => void;
   view: 'front' | 'side' | 'back';
@@ -32,7 +32,7 @@ export function SkullImage({
       {hotspots.map((hotspot) => (
         <button
           key={hotspot.id}
-          className={`absolute w-4 h-4 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 hover:scale-125 ${
+          className={`absolute rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 hover:scale-125 ${
             selectedHotspots.includes(hotspot.id)
               ? 'bg-cyan-400 shadow-lg shadow-cyan-400/50'
               : 'bg-red-500 hover:bg-red-400'
@@ -40,6 +40,9 @@ export function SkullImage({
           style={{
             left: `${hotspot.x}%`,
             top: `${hotspot.y}%`,
+            width: `${hotspot.size}px`,
+            height: `${hotspot.size}px`,
+            zIndex: getHotspotZIndex(hotspot),
           }}
           onClick={() => onHotspotClick(hotspot.id)}
           onMouseEnter={() => setHoveredHotspot(hotspot.id)}
