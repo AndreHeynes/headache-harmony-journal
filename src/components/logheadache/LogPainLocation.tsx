@@ -2,34 +2,23 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 
-import { HeadRegionSelector } from "./pain-location/HeadRegionSelector";
+import { SkullViewer } from "../SkullViewer";
 import { PainDistributionSelector } from "./pain-location/PainDistributionSelector";
 import { PainPatternSelector } from "./pain-location/PainPatternSelector";
 import { PainSpreadSelector } from "./pain-location/PainSpreadSelector";
 
 export default function LogPainLocation() {
-  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [painDistribution, setPainDistribution] = useState<string | null>(null);
   const [painPattern, setPainPattern] = useState("medial");
   const [painSpreads, setPainSpreads] = useState(false);
   const [spreadPattern, setSpreadPattern] = useState("remain");
-  const [viewMode, setViewMode] = useState<"anterior" | "posterior">("anterior");
-
-  const toggleView = () => {
-    setViewMode(viewMode === "anterior" ? "posterior" : "anterior");
-  };
 
   return (
     <div className="space-y-6">
       <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Where did the pain start?</h2>
-          <HeadRegionSelector 
-            selectedRegion={selectedRegion} 
-            setSelectedRegion={setSelectedRegion} 
-            viewMode={viewMode}
-            toggleView={toggleView}
-          />
+          <h2 className="text-lg font-medium text-white">Select Pain Location</h2>
+          <SkullViewer />
         </div>
       </Card>
 
