@@ -56,7 +56,7 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'side-jaw',
-    x: 25,
+    x: 42,
     y: 75,
     size: 20,
     title: 'Jaw',
