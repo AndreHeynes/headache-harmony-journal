@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -228,8 +227,8 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     const filename = `Headache_Report_${session.id.slice(-8)}_${Date.now()}.pdf`;
     doc.save(filename);
     
-    // Return approximate file size
-    return doc.internal.pageSize.getWidth() * doc.internal.getNumberOfPages() * 1000; // Rough estimate
+    // Return approximate file size - use correct API
+    return doc.internal.pageSize.getWidth() * doc.getNumberOfPages() * 1000; // Fixed the API call
   };
 
   const generateSecureCSV = (session: any): number => {
