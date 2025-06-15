@@ -1,4 +1,3 @@
-
 // All types and hotspot data in one place
 
 export interface Hotspot {
@@ -37,14 +36,51 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   { id: 'front-lower-sinus-left', x: 42, y: 57, size: 7, title: 'Right Lower Sinus', description: 'Lower sinus on the right.', view: 'front' },
   { id: 'front-lower-sinus-right', x: 58, y: 58, size: 7, title: 'Left Lower Sinus', description: 'Lower sinus on the left.', view: 'front' },
   // SIDE
-  { id: 'side-temple', x: 15, y: 40, size: 22, title: 'Temple', description: 'Side temple area.', view: 'side' },
-  { id: 'side-ear', x: 50, y: 50, size: 25, title: 'Ear', description: 'Ear area.', view: 'side' },
-  { id: 'side-forehead', x: 20, y: 30, size: 18, title: 'Forehead', description: 'Side view of the forehead.', view: 'side' },
-  { id: 'side-crown', x: 30, y: 15, size: 20, title: 'Crown', description: 'Top of the head from side view.', view: 'side' },
-  { id: 'side-back-head', x: 75, y: 30, size: 25, title: 'Back of Head', description: 'Posterior portion of the head.', view: 'side' },
-  { id: 'side-jaw', x: 30, y: 70, size: 20, title: 'Jaw', description: 'Jaw area from side view.', view: 'side' },
-  { id: 'side-neck', x: 80, y: 80, size: 18, title: 'Neck', description: 'Neck area from side view.', view: 'side' },
-  { id: 'side-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'Horizontal pressure band from side view.', view: 'side' },
+  {
+    id: 'side-temple',
+    x: 50,
+    y: 50,
+    size: 22,
+    title: 'Temple',
+    description: 'Side temple area, over the ear.',
+    view: 'side',
+  },
+  {
+    id: 'side-back-head',
+    x: 75,
+    y: 30,
+    size: 25,
+    title: 'Parietal',
+    description: 'Parietal region of the skull.',
+    view: 'side',
+  },
+  {
+    id: 'side-jaw',
+    x: 25,
+    y: 75,
+    size: 20,
+    title: 'Jaw',
+    description: 'Anatomical jaw, positioned behind last tooth.',
+    view: 'side',
+  },
+  {
+    id: 'side-neck',
+    x: 80,
+    y: 68,
+    size: 18,
+    title: 'Occiput',
+    description: 'Occipital base of the skull.',
+    view: 'side',
+  },
+  {
+    id: 'side-pressure-band',
+    x: 50,
+    y: 30,
+    size: 75,
+    title: 'Pressure Band',
+    description: 'Horizontal pressure band from side view.',
+    view: 'side',
+  },
   // BACK
   { id: 'back-occiput', x: 50, y: 55, size: 28, title: 'Occipital Area', description: 'Center occipital region.', view: 'back' },
   { id: 'back-top', x: 50, y: 20, size: 19, title: 'Crown of Head', description: 'Top/crown of the skull.', view: 'back' },
