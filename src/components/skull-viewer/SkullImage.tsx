@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { SkullView, SKULL_IMAGES, Hotspot } from './skull-hotspots';
+import { HotspotOverlay } from './HotspotOverlay';
 
 interface SkullImageProps {
   currentView: SkullView;
@@ -8,116 +9,7 @@ interface SkullImageProps {
   selectedHotspots: string[];
   onHotspotToggle: (hotspotId: string) => void;
   selectedSide?: 'left' | 'right';
-  getHotspotZIndex: (hotspot: Hotspot) => number;
-  isPressureBand: (id: string) => boolean;
-  isHalfFace: (id: string) => boolean;
 }
-
-interface HotspotOverlayProps {
-  hotspot: Hotspot;
-  isSelected: boolean;
-  onToggle: (hotspotId: string) => void;
-  selectedSide?: 'left' | 'right';
-  getHotspotZIndex: (hotspot: Hotspot) => number;
-  isPressureBand: (id: string) => boolean;
-  isHalfFace: (id: string) => boolean;
-  currentView: SkullView;
-}
-
-const HotspotOverlay = ({
-  hotspot,
-  isSelected,
-  onToggle,
-  selectedSide,
-  getHotspotZIndex,
-  isPressureBand,
-  isHalfFace,
-  currentView,
-}: HotspotOverlayProps) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    setShowTooltip(true);
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseLeave = () => {
-    setShowTooltip(false);
-  };
-
-  const getDisplayTitle = () => {
-    if (hotspot.view === 'side' && selectedSide) {
-      const title = hotspot.title;
-      if (!title.toLowerCase().includes('left') && !title.toLowerCase().includes('right')) {
-        return `${selectedSide === 'left' ? 'Left' : 'Right'} ${title}`;
-      }
-    }
-    return hotspot.title;
-  };
-
-  return (
-    <>
-      <div
-        className={`absolute cursor-pointer transition-all duration-150 hover:scale-110 ${
-          isSelected ? 'cursor-pointer' : ''
-        }`}
-        style={{
-          left: `${hotspot.x}%`,
-          top: `${hotspot.y}%`,
-          width: isPressureBand(hotspot.id) ? `${hotspot.size}%` : 
-                 isHalfFace(hotspot.id) ? `${hotspot.size * 0.6}%` : `${hotspot.size}%`,
-          height: isPressureBand(hotspot.id) ? `${hotspot.size * 0.15}%` : 
-                  isHalfFace(hotspot.id) ? `${hotspot.size * 1.2}%` : `${hotspot.size}%`,
-          transform: 'translate(-50%, -50%)',
-          background: 'transparent',
-          border: 'none',
-          zIndex: getHotspotZIndex(hotspot),
-          borderRadius: isPressureBand(hotspot.id) ? '50px' : 
-                       isHalfFace(hotspot.id) ? '8px' : '50%',
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle(hotspot.id);
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        id={hotspot.id}
-      />
-      {isSelected && (
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            left: `${hotspot.x}%`,
-            top: `${hotspot.y}%`,
-            transform: 'translate(-50%, -50%)',
-            zIndex: getHotspotZIndex(hotspot) + 1,
-          }}
-        >
-          <div className="w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
-        </div>
-      )}
-
-      {showTooltip && (
-        <div
-          className="fixed z-[9999] bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg pointer-events-none"
-          style={{
-            left: mousePos.x + 10,
-            top: mousePos.y - 40,
-            transform: 'translateY(-100%)',
-          }}
-        >
-          {getDisplayTitle()}
-        </div>
-      )}
-    </>
-  );
-};
 
 const SkullImage = ({
   currentView,
@@ -125,9 +17,6 @@ const SkullImage = ({
   selectedHotspots,
   onHotspotToggle,
   selectedSide,
-  getHotspotZIndex,
-  isPressureBand,
-  isHalfFace,
 }: SkullImageProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -197,9 +86,6 @@ const SkullImage = ({
             isSelected={selectedHotspots.includes(hotspot.id)}
             onToggle={onHotspotToggle}
             selectedSide={selectedSide}
-            getHotspotZIndex={getHotspotZIndex}
-            isPressureBand={isPressureBand}
-            isHalfFace={isHalfFace}
             currentView={currentView}
           />
         ))}
