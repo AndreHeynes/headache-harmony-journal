@@ -11,7 +11,6 @@ interface SkullImageProps {
   getHotspotZIndex: (hotspot: Hotspot) => number;
   isPressureBand: (id: string) => boolean;
   isHalfFace: (id: string) => boolean;
-  showBorders: boolean;
 }
 
 interface HotspotOverlayProps {
@@ -22,7 +21,6 @@ interface HotspotOverlayProps {
   getHotspotZIndex: (hotspot: Hotspot) => number;
   isPressureBand: (id: string) => boolean;
   isHalfFace: (id: string) => boolean;
-  showBorders: boolean;
   currentView: SkullView;
 }
 
@@ -34,7 +32,6 @@ const HotspotOverlay = ({
   getHotspotZIndex,
   isPressureBand,
   isHalfFace,
-  showBorders,
   currentView,
 }: HotspotOverlayProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -63,23 +60,6 @@ const HotspotOverlay = ({
     return hotspot.title;
   };
 
-  const shouldShowBorder = showBorders && currentView === 'side';
-  
-  const getBorderStyle = () => {
-    if (!shouldShowBorder) return {};
-    
-    if (isPressureBand(hotspot.id)) {
-      return {
-        backgroundColor: 'rgba(239, 68, 68, 0.3)',
-        border: '2px solid #ef4444',
-      };
-    }
-    return {
-      backgroundColor: 'rgba(59, 130, 246, 0.3)',
-      border: '2px solid #3b82f6',
-    };
-  };
-
   return (
     <>
       <div
@@ -94,8 +74,8 @@ const HotspotOverlay = ({
           height: isPressureBand(hotspot.id) ? `${hotspot.size * 0.15}%` : 
                   isHalfFace(hotspot.id) ? `${hotspot.size * 1.2}%` : `${hotspot.size}%`,
           transform: 'translate(-50%, -50%)',
-          background: shouldShowBorder ? getBorderStyle().backgroundColor : 'transparent',
-          border: shouldShowBorder ? getBorderStyle().border : 'none',
+          background: 'transparent',
+          border: 'none',
           zIndex: getHotspotZIndex(hotspot),
           borderRadius: isPressureBand(hotspot.id) ? '50px' : 
                        isHalfFace(hotspot.id) ? '8px' : '50%',
@@ -148,7 +128,6 @@ const SkullImage = ({
   getHotspotZIndex,
   isPressureBand,
   isHalfFace,
-  showBorders,
 }: SkullImageProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -221,7 +200,6 @@ const SkullImage = ({
             getHotspotZIndex={getHotspotZIndex}
             isPressureBand={isPressureBand}
             isHalfFace={isHalfFace}
-            showBorders={showBorders}
             currentView={currentView}
           />
         ))}
