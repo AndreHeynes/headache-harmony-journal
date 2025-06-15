@@ -20,6 +20,7 @@ const SkullViewer = () => {
   const [currentView, setCurrentView] = useState<SkullView>('front');
   const [selectedHotspots, setSelectedHotspots] = useState<string[]>([]);
   const [selectedSide, setSelectedSide] = useState<'left' | 'right'>('left');
+  const [showBorders, setShowBorders] = useState(false);
 
   const currentViewHotspots = useMemo(
     () => SKULL_HOTSPOTS.filter((h) => h.view === currentView),
@@ -54,27 +55,37 @@ const SkullViewer = () => {
             ))}
           </div>
           {currentView === 'side' && (
-            <div className="flex gap-2 items-center">
-              <span className="text-sm font-medium text-white">Side:</span>
-              <div className="flex gap-1 border border-gray-600 rounded-lg overflow-hidden">
-                <Button
-                  variant={selectedSide === 'left' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedSide('left')}
-                  className="rounded-none border-0 bg-cyan-600 hover:bg-cyan-700 text-white"
-                >
-                  Left
-                </Button>
-                <Button
-                  variant={selectedSide === 'right' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setSelectedSide('right')}
-                  className="rounded-none border-0 bg-cyan-600 hover:bg-cyan-700 text-white"
-                >
-                  Right
-                </Button>
+            <>
+              <div className="flex gap-2 items-center">
+                <span className="text-sm font-medium text-white">Side:</span>
+                <div className="flex gap-1 border border-gray-600 rounded-lg overflow-hidden">
+                  <Button
+                    variant={selectedSide === 'left' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSelectedSide('left')}
+                    className="rounded-none border-0 bg-cyan-600 hover:bg-cyan-700 text-white"
+                  >
+                    Left
+                  </Button>
+                  <Button
+                    variant={selectedSide === 'right' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSelectedSide('right')}
+                    className="rounded-none border-0 bg-cyan-600 hover:bg-cyan-700 text-white"
+                  >
+                    Right
+                  </Button>
+                </div>
               </div>
-            </div>
+              <Button
+                variant={showBorders ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setShowBorders(!showBorders)}
+                className="bg-orange-600 hover:bg-orange-700 text-white border-orange-600"
+              >
+                {showBorders ? 'Hide Borders' : 'Show Borders'}
+              </Button>
+            </>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -106,6 +117,7 @@ const SkullViewer = () => {
           getHotspotZIndex={getHotspotZIndex}
           isPressureBand={isPressureBand}
           isHalfFace={isHalfFace}
+          showBorders={showBorders}
         />
       </div>
     </div>
