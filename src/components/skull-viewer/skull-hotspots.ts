@@ -1,3 +1,4 @@
+
 // All types and hotspot data in one place
 
 export interface Hotspot {
@@ -14,9 +15,9 @@ export interface Hotspot {
 export type SkullView = 'front' | 'side' | 'back';
 
 export const SKULL_IMAGES = {
-  front: '/lovable-uploads/04ae5d32-56c6-4985-a599-d6f4a495da9e.jpg',
-  side: '/lovable-uploads/0b484054-55ef-4c66-9da2-a7898d965528.jpg',
-  back: '/lovable-uploads/19c9e90e-130d-492e-802a-194bdbd5f739.jpg',
+  front: '/lovable-uploads/c5a5c01e-5749-4190-89d4-d98341af6eae.png',
+  side: '/lovable-uploads/c5e889bd-aa9a-4ea4-bb79-cb37aa082b87.png',
+  back: '/lovable-uploads/15169a8c-c348-405f-9910-083fd38b7517.png',
 };
 
 export const SKULL_HOTSPOTS: Hotspot[] = [
