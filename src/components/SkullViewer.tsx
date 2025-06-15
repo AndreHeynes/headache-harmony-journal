@@ -4,6 +4,7 @@ import { SKULL_HOTSPOTS, SkullView } from './skull-viewer/skull-hotspots';
 import SkullImage from './skull-viewer/SkullImage';
 import { ViewControls } from './skull-viewer/ViewControls';
 import { SelectionInfo } from './skull-viewer/SelectionInfo';
+import { SmartAnalysis } from './skull-viewer/SmartAnalysis';
 
 const SkullViewer = () => {
   const [currentView, setCurrentView] = useState<SkullView>('front');
@@ -48,6 +49,10 @@ const SkullViewer = () => {
           selectedSide={selectedSide}
         />
       </div>
+      
+      {selectedHotspots.length > 0 && (
+        <SmartAnalysis selectedHotspots={selectedHotspots} />
+      )}
     </div>
   );
 };
