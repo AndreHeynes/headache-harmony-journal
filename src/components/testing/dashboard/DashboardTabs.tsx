@@ -8,6 +8,8 @@ import { TestSettings } from "@/components/testing/TestSettings";
 import { TestAnalytics } from "@/components/testing/TestAnalytics";
 import { HeadacheDataExport } from "@/components/export/HeadacheDataExport";
 import { ErrorReports } from "@/components/testing/ErrorReports";
+import { TestDataSeeding } from "@/components/testing/TestDataSeeding";
+import { PerformanceMonitoring } from "@/components/testing/PerformanceMonitoring";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
@@ -26,24 +28,34 @@ export function DashboardTabs({ testEvents }: DashboardTabsProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="w-full bg-gray-800 border-gray-700 mb-6">
-        <TabsTrigger value="events" className="flex-1">Events</TabsTrigger>
-        <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
-        <TabsTrigger value="errors" className="flex-1 relative">
+      <TabsList className="w-full bg-gray-800 border-gray-700 mb-6 grid grid-cols-8">
+        <TabsTrigger value="events" className="text-xs">Events</TabsTrigger>
+        <TabsTrigger value="seeding" className="text-xs">Test Data</TabsTrigger>
+        <TabsTrigger value="performance" className="text-xs">Performance</TabsTrigger>
+        <TabsTrigger value="analytics" className="text-xs">Analytics</TabsTrigger>
+        <TabsTrigger value="errors" className="text-xs relative">
           Errors
           {errorCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {errorCount}
             </span>
           )}
         </TabsTrigger>
-        <TabsTrigger value="export" className="flex-1">Export</TabsTrigger>
-        <TabsTrigger value="feedback" className="flex-1">Feedback</TabsTrigger>
-        <TabsTrigger value="settings" className="flex-1">Settings</TabsTrigger>
+        <TabsTrigger value="export" className="text-xs">Export</TabsTrigger>
+        <TabsTrigger value="feedback" className="text-xs">Feedback</TabsTrigger>
+        <TabsTrigger value="settings" className="text-xs">Settings</TabsTrigger>
       </TabsList>
       
       <TabsContent value="events" className="mt-0">
         <TestEventList events={testEvents} />
+      </TabsContent>
+      
+      <TabsContent value="seeding" className="mt-0">
+        <TestDataSeeding />
+      </TabsContent>
+      
+      <TabsContent value="performance" className="mt-0">
+        <PerformanceMonitoring />
       </TabsContent>
       
       <TabsContent value="analytics" className="mt-0">

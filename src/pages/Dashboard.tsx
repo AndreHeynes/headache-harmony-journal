@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
+import { TestDashboardBanner } from "@/components/testing/TestDashboardBanner";
 
 export default function Dashboard() {
   // This would come from your auth/subscription system
@@ -18,7 +19,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-charcoal pb-20">
+    <div className="bg-charcoal text-white p-4 pb-20">
+      {/* Test Dashboard Banner */}
+      <TestDashboardBanner />
+      
       {/* Header - Updated border opacity */}
       <header className="fixed top-0 w-full bg-gray-800/80 backdrop-blur-sm border-b border-gray-700 z-50">
         <div className="flex items-center justify-between px-4 h-16">
