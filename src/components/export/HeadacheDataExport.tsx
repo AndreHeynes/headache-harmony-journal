@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { ExportConfirmationDialog } from "./ExportConfirmationDialog";
 import { getUserSession, validateUserSession, logExportActivity } from "@/utils/userSession";
 import { checkRateLimit } from "@/utils/rateLimiting";
+import { InlineDisclaimer } from "@/components/disclaimer";
+import { getDisclaimer } from "@/utils/legalContent";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -144,6 +146,8 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
 
   const generateSecurePDF = (session: any): number => {
     const doc = new jsPDF();
+    const disclaimer = getDisclaimer('ai-premium-report');
+    let yPos = 20;
     
     // Add security header with user info
     doc.setFontSize(8);
@@ -159,54 +163,76 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     doc.text(`User Session: ${session.id.slice(-12)}`, 20, 35);
     doc.text(`Beta Tester: ${session.isBetaTester ? 'Yes' : 'No'}`, 20, 40);
     
-    // Add disclaimer
+    // Add comprehensive legal disclaimer
+    doc.setFontSize(12);
+    doc.text("LEGAL DISCLAIMER", 20, 50);
     doc.setFontSize(8);
-    doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, 45);
+    
+    if (disclaimer) {
+      const disclaimerLines = doc.splitTextToSize(disclaimer.content, 170);
+      yPos = 55;
+      disclaimerLines.forEach((line: string) => {
+        if (yPos > 280) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.text(line, 20, yPos);
+        yPos += 4;
+      });
+      
+      // Add new page for data
+      doc.addPage();
+      yPos = 20;
+    } else {
+      // Fallback basic disclaimer
+      doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, 55);
+      yPos = 65;
+    }
     
     // Add patient section title
     doc.setFontSize(14);
-    doc.text("Headache Records", 20, 55);
+    doc.text("Headache Records", 20, yPos);
+    yPos += 10;
     
     // Add headache records
-    let yPosition = 65;
     headacheData.forEach((record, index) => {
       // Ensure we don't go off the page
-      if (yPosition > 250) {
+      if (yPos > 250) {
         doc.addPage();
-        yPosition = 20;
+        yPos = 20;
       }
       
       doc.setFontSize(12);
       const recordDate = new Date(record.date).toLocaleDateString();
-      doc.text(`Record ${index + 1} - ${recordDate}`, 20, yPosition);
-      yPosition += 6;
+      doc.text(`Record ${index + 1} - ${recordDate}`, 20, yPos);
+      yPos += 6;
       
       doc.setFontSize(10);
-      doc.text(`Intensity: ${record.intensity}/10`, 25, yPosition); yPosition += 5;
-      doc.text(`Location: ${record.location}`, 25, yPosition); yPosition += 5;
-      doc.text(`Duration: ${record.duration} minutes`, 25, yPosition); yPosition += 5;
+      doc.text(`Intensity: ${record.intensity}/10`, 25, yPos); yPos += 5;
+      doc.text(`Location: ${record.location}`, 25, yPos); yPos += 5;
+      doc.text(`Duration: ${record.duration} minutes`, 25, yPos); yPos += 5;
       
       if (record.symptoms?.length) {
-        doc.text(`Symptoms: ${record.symptoms.join(", ")}`, 25, yPosition); 
-        yPosition += 5;
+        doc.text(`Symptoms: ${record.symptoms.join(", ")}`, 25, yPos); 
+        yPos += 5;
       }
       
       if (record.triggers?.length) {
-        doc.text(`Triggers: ${record.triggers.join(", ")}`, 25, yPosition); 
-        yPosition += 5;
+        doc.text(`Triggers: ${record.triggers.join(", ")}`, 25, yPos); 
+        yPos += 5;
       }
       
       if (record.treatments?.length) {
-        doc.text(`Treatments: ${record.treatments.join(", ")}`, 25, yPosition); 
-        yPosition += 5;
+        doc.text(`Treatments: ${record.treatments.join(", ")}`, 25, yPos); 
+        yPos += 5;
       }
       
       if (record.notes) {
-        doc.text(`Notes: ${record.notes}`, 25, yPosition); 
-        yPosition += 5;
+        doc.text(`Notes: ${record.notes}`, 25, yPos); 
+        yPos += 5;
       }
       
-      yPosition += 5; // Add some space between records
+      yPos += 5; // Add some space between records
     });
     
     // Add summary section
@@ -373,14 +399,23 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
                           </div>
                           <p className="text-gray-400 text-xs mt-2">
                             {exportFormat === "pdf" ? 
-                              "PDF format includes user verification and security metadata" : 
-                              "CSV format includes security headers and user session info"}
+                              "PDF format includes comprehensive legal disclaimer and security metadata" : 
+                              "CSV format includes security headers and disclaimer information"}
                           </p>
                         </div>
                       </div>
                     </div>
                   </TabsContent>
                 </Tabs>
+
+                <div className="mt-4">
+                  <InlineDisclaimer 
+                    disclaimerId="export-disclaimer"
+                    variant="info"
+                    size="sm"
+                    showTitle={false}
+                  />
+                </div>
               </>
             )}
           </div>

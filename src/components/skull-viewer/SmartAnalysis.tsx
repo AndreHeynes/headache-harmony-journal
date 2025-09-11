@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { SKULL_HOTSPOTS } from './skull-hotspots';
+import { InlineDisclaimer } from '@/components/disclaimer';
 
 interface SmartAnalysisProps {
   selectedHotspots: string[];
@@ -67,26 +68,36 @@ export const SmartAnalysis = ({ selectedHotspots }: SmartAnalysisProps) => {
   if (!analysis) return null;
 
   return (
-    <Card className="mt-4 bg-cyan-50/10 border-cyan-200/20">
-      <div className="p-4">
-        <h3 className="text-sm font-medium text-cyan-100 mb-3">Smart Analysis</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-white/60">Distribution:</span>
-            <span className="ml-2 text-white">{analysis.distribution}</span>
-          </div>
-          <div>
-            <span className="text-white/60">Pattern:</span>
-            <span className="ml-2 text-white">{analysis.pattern}</span>
-          </div>
-          {analysis.regions.length > 0 && (
-            <div className="col-span-2">
-              <span className="text-white/60">Regions:</span>
-              <span className="ml-2 text-white">{analysis.regions.join(', ')}</span>
+    <div className="mt-4 space-y-3">
+      <Card className="bg-cyan-50/10 border-cyan-200/20">
+        <div className="p-4">
+          <h3 className="text-sm font-medium text-cyan-100 mb-3">Smart Analysis</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-white/60">Distribution:</span>
+              <span className="ml-2 text-white">{analysis.distribution}</span>
             </div>
-          )}
+            <div>
+              <span className="text-white/60">Pattern:</span>
+              <span className="ml-2 text-white">{analysis.pattern}</span>
+            </div>
+            {analysis.regions.length > 0 && (
+              <div className="col-span-2">
+                <span className="text-white/60">Regions:</span>
+                <span className="ml-2 text-white">{analysis.regions.join(', ')}</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+      
+      <InlineDisclaimer 
+        disclaimerId="ai-analysis-disclaimer"
+        variant="info"
+        size="sm"
+        condensed={true}
+        showTitle={false}
+      />
+    </div>
   );
 };

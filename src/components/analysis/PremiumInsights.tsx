@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTestContext } from "@/contexts/TestContext";
+import { DisclaimerGate, InlineDisclaimer } from "@/components/disclaimer";
 
 interface PremiumInsightsProps {
   onCardClick: (cardType: string) => void;
@@ -98,38 +99,85 @@ export function PremiumInsights({ onCardClick }: PremiumInsightsProps) {
         </h2>
       </div>
       
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className="flex space-x-3 pb-1">
-          {insights.map((insight) => {
-            // Check if this specific insight is premium and enabled
-            const isEnabled = insight.premium !== undefined 
-              ? insight.premium 
-              : isPremium;
-              
-            return (
-              <div
-                key={insight.type}
-                onClick={() => isEnabled && onCardClick(insight.type)}
-                className={`${isEnabled ? 'cursor-pointer hover:opacity-80' : 'opacity-70'} transition-opacity`}
-              >
-                <InsightCard
-                  title={insight.title}
-                  icon={insight.icon}
-                  iconColor={insight.color}
+      {isPremium ? (
+        <DisclaimerGate disclaimerId="ai-premium-report">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex space-x-3 pb-1">
+              {insights.map((insight) => {
+                // Check if this specific insight is premium and enabled
+                const isEnabled = insight.premium !== undefined 
+                  ? insight.premium 
+                  : isPremium;
+                  
+                return (
+                  <div
+                    key={insight.type}
+                    onClick={() => isEnabled && onCardClick(insight.type)}
+                    className={`${isEnabled ? 'cursor-pointer hover:opacity-80' : 'opacity-70'} transition-opacity`}
+                  >
+                    <InsightCard
+                      title={insight.title}
+                      icon={insight.icon}
+                      iconColor={insight.color}
+                    >
+                      <p className="text-xs text-gray-400 mt-1">{insight.description}</p>
+                      {!isEnabled && (
+                        <div className="absolute top-2 right-2">
+                          <Crown className="h-3 w-3 text-yellow-500" />
+                        </div>
+                      )}
+                    </InsightCard>
+                  </div>
+                );
+              })}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+
+          <div className="mt-3">
+            <InlineDisclaimer 
+              disclaimerId="ai-premium-report"
+              variant="info"
+              size="sm"
+              condensed={true}
+              showTitle={false}
+            />
+          </div>
+        </DisclaimerGate>
+      ) : (
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className="flex space-x-3 pb-1">
+            {insights.map((insight) => {
+              // Check if this specific insight is premium and enabled
+              const isEnabled = insight.premium !== undefined 
+                ? insight.premium 
+                : isPremium;
+                
+              return (
+                <div
+                  key={insight.type}
+                  onClick={() => isEnabled && onCardClick(insight.type)}
+                  className={`${isEnabled ? 'cursor-pointer hover:opacity-80' : 'opacity-70'} transition-opacity`}
                 >
-                  <p className="text-xs text-gray-400 mt-1">{insight.description}</p>
-                  {!isEnabled && (
-                    <div className="absolute top-2 right-2">
-                      <Crown className="h-3 w-3 text-yellow-500" />
-                    </div>
-                  )}
-                </InsightCard>
-              </div>
-            );
-          })}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+                  <InsightCard
+                    title={insight.title}
+                    icon={insight.icon}
+                    iconColor={insight.color}
+                  >
+                    <p className="text-xs text-gray-400 mt-1">{insight.description}</p>
+                    {!isEnabled && (
+                      <div className="absolute top-2 right-2">
+                        <Crown className="h-3 w-3 text-yellow-500" />
+                      </div>
+                    )}
+                  </InsightCard>
+                </div>
+              );
+            })}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      )}
       
       {!isPremium && (
         <div className="mt-3 bg-gray-800/80 border border-gray-700 rounded-lg p-3">
