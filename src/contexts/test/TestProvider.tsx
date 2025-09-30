@@ -8,6 +8,11 @@ import {
   SessionInfo 
 } from "./types";
 import { generateSessionId, createErrorEvent } from "./utils";
+import { 
+  saveTestEvents, 
+  loadTestEvents, 
+  clearTestEvents as clearStoredEvents 
+} from "@/utils/testEventStorage";
 
 // Create the context
 export const TestContext = createContext<TestContextType>({
@@ -47,6 +52,26 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
     errorCount: 0
   });
 
+  // Load events from localStorage on mount
+  useEffect(() => {
+    const storedEvents = loadTestEvents();
+    if (storedEvents.length > 0) {
+      setTestEvents(storedEvents);
+      console.log(`Loaded ${storedEvents.length} events from localStorage`);
+    }
+  }, []);
+
+  // Save events to localStorage whenever they change (with debouncing)
+  useEffect(() => {
+    if (testEvents.length > 0) {
+      const timeoutId = setTimeout(() => {
+        saveTestEvents(testEvents);
+      }, 500); // Debounce by 500ms
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [testEvents]);
+
   const logTestEvent = (event: Omit<TestEvent, "timestamp">) => {
     const newEvent: TestEvent = {
       ...event,
@@ -67,6 +92,8 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
 
   const clearTestEvents = () => {
     setTestEvents([]);
+    // Clear from localStorage as well
+    clearStoredEvents();
     // Reset error count but maintain session info
     setSessionInfo(prev => ({
       ...prev,

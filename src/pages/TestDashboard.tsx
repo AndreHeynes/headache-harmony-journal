@@ -8,6 +8,7 @@ import { TestDashboardHeader } from "@/components/testing/dashboard/TestDashboar
 import { DashboardTabs } from "@/components/testing/dashboard/DashboardTabs";
 import { SessionInfoPanel } from "@/components/testing/dashboard/SessionInfoPanel";
 import { TestModeBanner } from "@/components/testing/dashboard/TestModeBanner";
+import { exportAllEvents } from "@/utils/testEventStorage";
 
 function TestDashboard() {
   const { 
@@ -32,15 +33,7 @@ function TestDashboard() {
 
   const downloadTestData = () => {
     try {
-      const dataStr = JSON.stringify(testEvents, null, 2);
-      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-      
-      const exportFileDefaultName = `headache-tracker-test-data-${new Date().toISOString().split('T')[0]}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
+      exportAllEvents(testEvents, sessionInfo);
       
       logTestEvent({
         type: "action",
