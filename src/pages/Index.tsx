@@ -32,7 +32,7 @@ export default function Index() {
               Welcome
             </h1>
             <h2 className="text-xl text-gray-300">
-              My Headache Experience Journal!
+              My Headache Experience Journal!™
             </h2>
           </div>
           <p className="text-gray-400">

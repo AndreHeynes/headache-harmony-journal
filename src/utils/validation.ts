@@ -77,16 +77,29 @@ export const getPasswordStrength = (password: string): { score: number; feedback
 
 /**
  * Sanitizes input to prevent XSS attacks
- * This is a basic implementation - more robust solutions may be needed
+ * Enhanced implementation with more security checks
  */
 export const sanitizeInput = (input: string): string => {
   if (!input) return '';
   
-  return input
+  // Remove script tags and event handlers
+  let sanitized = input
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/<iframe/gi, '')
+    .replace(/<embed/gi, '')
+    .replace(/<object/gi, '');
+  
+  // HTML entity encoding
+  sanitized = sanitized
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/'/g, "&#039;")
+    .replace(/\//g, "&#x2F;");
+  
+  return sanitized;
 };
 
 /**
