@@ -6,6 +6,8 @@ import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/Auth";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import LogHeadache from "./pages/LogHeadache";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -113,18 +115,22 @@ const App = () => {
             }>
               <Routes>
                   <Route path="/" element={<Index />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/log" element={<LogHeadache />} />
-                  <Route path="/pain-location" element={<LogPainLocationPage />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/analysis" element={<Analysis />} />
+                  <Route path="/auth" element={<Auth />} />
                   <Route path="/signin" element={<SignIn />} />
                   <Route path="/signup" element={<SignUp />} />
                   <Route path="/support" element={<SupportServices />} />
                   <Route path="/policy" element={<Policy />} />
-                  <Route path="/test-dashboard" element={<TestDashboard />} />
-                  <Route path="/pilot-testing-prep" element={<PilotTestingPrep />} />
-                  <Route path="/data-export" element={<DataExport />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/log" element={<ProtectedRoute><LogHeadache /></ProtectedRoute>} />
+                  <Route path="/pain-location" element={<ProtectedRoute><LogPainLocationPage /></ProtectedRoute>} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+                  <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
+                  <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
+                  <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
+                  
                   <Route path="*" element={<NotFound />} />
                 </Routes>
             </ErrorBoundaryWithContext>

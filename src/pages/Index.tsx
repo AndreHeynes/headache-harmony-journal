@@ -1,19 +1,35 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChartLine, Search, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export default function Index() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
   
   const handleStart = () => {
-    navigate("/signup");
+    navigate("/auth");
   };
   
   const handleAccount = () => {
-    navigate("/signin");
+    navigate("/auth");
   };
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-charcoal flex items-center justify-center">
+        <div className="animate-pulse text-white">Loading...</div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-charcoal">
