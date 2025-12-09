@@ -26,6 +26,7 @@ import DataExport from "./pages/DataExport";
 import ErrorBoundaryWithContext from "./components/testing/ErrorBoundary";
 import LogPainLocationPage from "./pages/LogPainLocation";
 import { DisclaimerProvider } from "./components/disclaimer";
+import { BetaAccessGate } from "./components/BetaAccessGate";
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -77,8 +78,9 @@ const App = () => {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TestProvider>
+    <BetaAccessGate>
+      <QueryClientProvider client={queryClient}>
+        <TestProvider>
         <DisclaimerProvider>
           <SecurityHeaders />
           <TooltipProvider>
@@ -138,6 +140,7 @@ const App = () => {
         </DisclaimerProvider>
       </TestProvider>
     </QueryClientProvider>
+    </BetaAccessGate>
   );
 };
 
