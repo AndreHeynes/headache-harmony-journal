@@ -26,7 +26,10 @@ import DataExport from "./pages/DataExport";
 import ErrorBoundaryWithContext from "./components/testing/ErrorBoundary";
 import LogPainLocationPage from "./pages/LogPainLocation";
 import { DisclaimerProvider } from "./components/disclaimer";
+import { BetaSessionProvider } from "./contexts/BetaSessionContext";
 import { BetaAccessGate } from "./components/BetaAccessGate";
+import { SharedHeader } from "./components/SharedHeader";
+import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -78,69 +81,80 @@ const App = () => {
   };
 
   return (
-    <BetaAccessGate>
-      <QueryClientProvider client={queryClient}>
-        <TestProvider>
-        <DisclaimerProvider>
-          <SecurityHeaders />
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <TestGuideModal />
-            <CookieConsentBanner />
-            {showPolicyUpdate && (
-              <div className="fixed top-0 left-0 right-0 bg-indigo-900/90 text-white p-3 z-50 backdrop-blur-sm">
-                <div className="container mx-auto flex items-center justify-between">
-                  <p className="text-sm">Our Privacy Policy has been updated. Please review the <a href="/policy" className="underline">updated policy</a>.</p>
-                  <button 
-                    onClick={handlePolicyUpdateAcknowledge} 
-                    className="bg-white text-indigo-900 text-xs px-3 py-1 rounded hover:bg-gray-100"
-                  >
-                    Acknowledge
-                  </button>
-                </div>
+    <BetaSessionProvider>
+      <BetaAccessGate>
+        <QueryClientProvider client={queryClient}>
+          <TestProvider>
+          <DisclaimerProvider>
+            <div className="min-h-screen flex flex-col">
+              <SharedHeader />
+              {/* Floating feedback button */}
+              <div className="fixed bottom-4 right-4 z-50">
+                <BetaFeedbackForm />
               </div>
-            )}
-            <ErrorBoundaryWithContext component="RootApp" fallback={
-              <div className="min-h-screen bg-charcoal text-white p-6 flex flex-col items-center justify-center">
-                <div className="bg-red-900/20 border border-red-800 rounded-lg p-6 max-w-md w-full">
-                  <h1 className="text-xl font-bold mb-4">Something went wrong</h1>
-                  <p className="mb-6">The application encountered an error and could not continue. Please try refreshing the page.</p>
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="w-full bg-white text-red-900 py-2 rounded hover:bg-gray-100"
-                  >
-                    Refresh Page
-                  </button>
-                </div>
-              </div>
-            }>
-              <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/signin" element={<SignIn />} />
-                  <Route path="/signup" element={<SignUp />} />
-                  <Route path="/support" element={<SupportServices />} />
-                  <Route path="/policy" element={<Policy />} />
-                  
-                  {/* Protected Routes */}
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/log" element={<ProtectedRoute><LogHeadache /></ProtectedRoute>} />
-                  <Route path="/pain-location" element={<ProtectedRoute><LogPainLocationPage /></ProtectedRoute>} />
-                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                  <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
-                  <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
-                  <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
-                  <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
-                  
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-            </ErrorBoundaryWithContext>
-          </TooltipProvider>
-        </DisclaimerProvider>
-      </TestProvider>
-    </QueryClientProvider>
-    </BetaAccessGate>
+              <SecurityHeaders />
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <TestGuideModal />
+                <CookieConsentBanner />
+                {showPolicyUpdate && (
+                  <div className="fixed top-16 left-0 right-0 bg-primary/90 text-primary-foreground p-3 z-40 backdrop-blur-sm">
+                    <div className="container mx-auto flex items-center justify-between">
+                      <p className="text-sm">Our Privacy Policy has been updated. Please review the <a href="/policy" className="underline">updated policy</a>.</p>
+                      <button 
+                        onClick={handlePolicyUpdateAcknowledge} 
+                        className="bg-background text-foreground text-xs px-3 py-1 rounded hover:bg-muted"
+                      >
+                        Acknowledge
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <ErrorBoundaryWithContext component="RootApp" fallback={
+                  <div className="min-h-screen bg-background text-foreground p-6 flex flex-col items-center justify-center">
+                    <div className="bg-destructive/20 border border-destructive rounded-lg p-6 max-w-md w-full">
+                      <h1 className="text-xl font-bold mb-4">Something went wrong</h1>
+                      <p className="mb-6">The application encountered an error and could not continue. Please try refreshing the page.</p>
+                      <button 
+                        onClick={() => window.location.reload()}
+                        className="w-full bg-primary text-primary-foreground py-2 rounded hover:bg-primary/90"
+                      >
+                        Refresh Page
+                      </button>
+                    </div>
+                  </div>
+                }>
+                  <main className="flex-1">
+                    <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/signin" element={<SignIn />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/support" element={<SupportServices />} />
+                        <Route path="/policy" element={<Policy />} />
+                        
+                        {/* Protected Routes */}
+                        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                        <Route path="/log" element={<ProtectedRoute><LogHeadache /></ProtectedRoute>} />
+                        <Route path="/pain-location" element={<ProtectedRoute><LogPainLocationPage /></ProtectedRoute>} />
+                        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                        <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+                        <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
+                        <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
+                        <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
+                        
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                  </main>
+                </ErrorBoundaryWithContext>
+              </TooltipProvider>
+            </div>
+          </DisclaimerProvider>
+        </TestProvider>
+      </QueryClientProvider>
+      </BetaAccessGate>
+    </BetaSessionProvider>
   );
 };
 
