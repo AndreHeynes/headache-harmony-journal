@@ -26,26 +26,22 @@ import DataExport from "./pages/DataExport";
 import ErrorBoundaryWithContext from "./components/testing/ErrorBoundary";
 import LogPainLocationPage from "./pages/LogPainLocation";
 import { DisclaimerProvider } from "./components/disclaimer";
-import { BetaSessionProvider } from "./contexts/BetaSessionContext";
 import { BetaAccessGate } from "./components/BetaAccessGate";
 import { SharedHeader } from "./components/SharedHeader";
 import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
-  // Adding security-focused default options
   defaultOptions: {
     queries: {
       retry: 3,
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       meta: {
         onError: (error: unknown) => {
-          // Global error handler for query errors
           console.error("Query error:", error);
-          // The TestContext will pick this up in the global error handler
         }
       }
     },
@@ -54,7 +50,6 @@ const queryClient = new QueryClient({
       meta: {
         onError: (error: unknown) => {
           console.error("Mutation error:", error);
-          // The TestContext will pick this up in the global error handler
         }
       }
     },
@@ -62,13 +57,11 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  // Check if the privacy policy has been updated and show a notification if needed
   const [showPolicyUpdate, setShowPolicyUpdate] = useState(false);
 
   useEffect(() => {
-    // Check if the privacy policy version viewed is the latest
     const lastPolicyVersion = localStorage.getItem('last-policy-version');
-    const currentPolicyVersion = "2023-06-01"; // This should be updated whenever the policy changes
+    const currentPolicyVersion = "2023-06-01";
     
     if (lastPolicyVersion !== currentPolicyVersion) {
       setShowPolicyUpdate(true);
@@ -81,14 +74,12 @@ const App = () => {
   };
 
   return (
-    <BetaSessionProvider>
-      <BetaAccessGate>
-        <QueryClientProvider client={queryClient}>
-          <TestProvider>
+    <BetaAccessGate>
+      <QueryClientProvider client={queryClient}>
+        <TestProvider>
           <DisclaimerProvider>
             <div className="min-h-screen flex flex-col">
               <SharedHeader />
-              {/* Floating feedback button */}
               <div className="fixed bottom-4 right-4 z-50">
                 <BetaFeedbackForm />
               </div>
@@ -127,25 +118,24 @@ const App = () => {
                 }>
                   <main className="flex-1">
                     <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/auth" element={<Auth />} />
-                        <Route path="/signin" element={<SignIn />} />
-                        <Route path="/signup" element={<SignUp />} />
-                        <Route path="/support" element={<SupportServices />} />
-                        <Route path="/policy" element={<Policy />} />
-                        
-                        {/* Protected Routes */}
-                        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                        <Route path="/log" element={<ProtectedRoute><LogHeadache /></ProtectedRoute>} />
-                        <Route path="/pain-location" element={<ProtectedRoute><LogPainLocationPage /></ProtectedRoute>} />
-                        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                        <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
-                        <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
-                        <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
-                        <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
-                        
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/signin" element={<SignIn />} />
+                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/support" element={<SupportServices />} />
+                      <Route path="/policy" element={<Policy />} />
+                      
+                      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                      <Route path="/log" element={<ProtectedRoute><LogHeadache /></ProtectedRoute>} />
+                      <Route path="/pain-location" element={<ProtectedRoute><LogPainLocationPage /></ProtectedRoute>} />
+                      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                      <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+                      <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
+                      <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
+                      <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
+                      
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
                   </main>
                 </ErrorBoundaryWithContext>
               </TooltipProvider>
@@ -153,8 +143,7 @@ const App = () => {
           </DisclaimerProvider>
         </TestProvider>
       </QueryClientProvider>
-      </BetaAccessGate>
-    </BetaSessionProvider>
+    </BetaAccessGate>
   );
 };
 
