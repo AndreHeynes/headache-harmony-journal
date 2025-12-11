@@ -1,11 +1,120 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID');
+const OURA_CLIENT_SECRET = Deno.env.get('OURA_CLIENT_SECRET');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+// Simple XOR encryption for tokens
+function encryptToken(token: string): string {
+  if (!token || !SUPABASE_SERVICE_ROLE_KEY) return token;
+  
+  const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+  const tokenBytes = new TextEncoder().encode(token);
+  const encrypted = new Uint8Array(tokenBytes.length);
+  
+  for (let i = 0; i < tokenBytes.length; i++) {
+    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  return btoa(String.fromCharCode(...encrypted));
+}
+
+// Standardized OAuth result HTML with page refresh
+function generateOAuthResultHtml(status: 'success' | 'error', message: string): string {
+  const bgColor = status === 'success' ? '#10B981' : '#EF4444';
+  const icon = status === 'success' 
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oura Ring Connection</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    .container {
+      text-align: center;
+      padding: 2.5rem;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .icon { color: ${bgColor}; margin-bottom: 1.5rem; display: flex; justify-content: center; }
+    .provider-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
+    p { color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; line-height: 1.5; }
+    .btn {
+      background: ${bgColor};
+      color: white;
+      border: none;
+      padding: 0.875rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .countdown { margin-top: 1rem; font-size: 0.875rem; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="provider-badge">Oura Ring</div>
+    <div class="icon">${icon}</div>
+    <h1>${status === 'success' ? 'Connected!' : 'Connection Failed'}</h1>
+    <p>${message}</p>
+    <button class="btn" onclick="closeAndRefresh()">Close Window</button>
+    ${status === 'success' ? `<p class="countdown">Auto-closing in <span id="timer">3</span>s...</p>` : ''}
+  </div>
+  <script>
+    function closeAndRefresh() {
+      if (window.opener) {
+        window.opener.postMessage({ type: 'oauth-complete', status: '${status}', provider: 'oura' }, '*');
+        window.opener.location.reload();
+      }
+      window.close();
+    }
+    ${status === 'success' ? `
+    let timeLeft = 3;
+    const timerEl = document.getElementById('timer');
+    const countdown = setInterval(() => {
+      timeLeft--;
+      if (timerEl) timerEl.textContent = timeLeft;
+      if (timeLeft <= 0) { clearInterval(countdown); closeAndRefresh(); }
+    }, 1000);` : ''}
+  </script>
+</body>
+</html>`;
+}
+
 serve(async (req) => {
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state'); // This is the user_id
+    const state = url.searchParams.get('state');
     const error = url.searchParams.get('error');
     const errorDescription = url.searchParams.get('error_description');
 
@@ -14,22 +123,17 @@ serve(async (req) => {
     if (error) {
       console.error('Oura OAuth error:', error, errorDescription);
       return new Response(
-        generateHtmlResponse(false, `Authorization failed: ${errorDescription || error}`),
+        generateOAuthResultHtml('error', `Authorization failed: ${errorDescription || error}`),
         { headers: { 'Content-Type': 'text/html' } }
       );
     }
 
     if (!code || !state) {
       return new Response(
-        generateHtmlResponse(false, 'Missing authorization code or state'),
+        generateOAuthResultHtml('error', 'Missing authorization code or state'),
         { headers: { 'Content-Type': 'text/html' } }
       );
     }
-
-    const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID');
-    const OURA_CLIENT_SECRET = Deno.env.get('OURA_CLIENT_SECRET');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!OURA_CLIENT_ID || !OURA_CLIENT_SECRET) {
       throw new Error('Oura credentials not configured');
@@ -41,9 +145,7 @@ serve(async (req) => {
     console.log('Exchanging code for tokens...');
     const tokenResponse = await fetch('https://api.ouraring.com/oauth/token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
@@ -62,31 +164,28 @@ serve(async (req) => {
     const tokenData = await tokenResponse.json();
     console.log('Token exchange successful, expires_in:', tokenData.expires_in);
 
-    // Calculate token expiry (Oura tokens typically expire in 86400 seconds / 24 hours)
     const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
-
-    // Store connection in database using service role
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
-    // Check for existing connection and update or insert
-    const { data: existing } = await supabase
-      .from('health_tracker_connections')
-      .select('id')
-      .eq('user_id', state)
-      .eq('provider', 'oura')
-      .single();
-
+    // Store ENCRYPTED tokens
     const connectionData = {
       user_id: state,
       provider: 'oura',
-      access_token_encrypted: tokenData.access_token,
-      refresh_token_encrypted: tokenData.refresh_token,
+      access_token_encrypted: encryptToken(tokenData.access_token),
+      refresh_token_encrypted: encryptToken(tokenData.refresh_token),
       token_expires_at: expiresAt.toISOString(),
       is_connected: true,
       sync_enabled: true,
       scopes: ['daily', 'personal'],
       updated_at: new Date().toISOString(),
     };
+
+    const { data: existing } = await supabase
+      .from('health_tracker_connections')
+      .select('id')
+      .eq('user_id', state)
+      .eq('provider', 'oura')
+      .single();
 
     if (existing) {
       const { error: updateError } = await supabase
@@ -112,77 +211,14 @@ serve(async (req) => {
     console.log('Oura connection saved successfully for user:', state);
 
     return new Response(
-      generateHtmlResponse(true, 'Oura Ring connected successfully!'),
+      generateOAuthResultHtml('success', 'Oura Ring connected successfully! Your sleep data will now sync automatically.'),
       { headers: { 'Content-Type': 'text/html' } }
     );
   } catch (error) {
     console.error('Oura OAuth callback error:', error);
     return new Response(
-      generateHtmlResponse(false, `Connection failed: ${error.message}`),
+      generateOAuthResultHtml('error', `Connection failed: ${error.message}`),
       { headers: { 'Content-Type': 'text/html' } }
     );
   }
 });
-
-function generateHtmlResponse(success: boolean, message: string): string {
-  const color = success ? '#10b981' : '#ef4444';
-  const icon = success ? '✓' : '✕';
-  
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Oura Connection</title>
-      <style>
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          margin: 0;
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          color: white;
-        }
-        .container {
-          text-align: center;
-          padding: 40px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          backdrop-filter: blur(10px);
-          max-width: 400px;
-        }
-        .icon {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          background: ${color};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 20px;
-          font-size: 40px;
-        }
-        h1 { margin: 0 0 10px; font-size: 24px; }
-        p { margin: 0; opacity: 0.8; }
-        .close-note {
-          margin-top: 20px;
-          font-size: 14px;
-          opacity: 0.6;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">${icon}</div>
-        <h1>${success ? 'Success!' : 'Error'}</h1>
-        <p>${message}</p>
-        <p class="close-note">You can close this window now.</p>
-      </div>
-      <script>
-        setTimeout(() => { window.close(); }, 3000);
-      </script>
-    </body>
-    </html>
-  `;
-}

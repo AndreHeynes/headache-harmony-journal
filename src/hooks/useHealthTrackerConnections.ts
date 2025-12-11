@@ -47,7 +47,7 @@ export const TRACKER_INFO: TrackerInfo[] = [
     description: 'Sleep and stress tracking from Garmin devices',
     icon: '🏃',
     dataTypes: ['sleep'],
-    available: true,
+    available: false, // Not yet implemented
     requiresNativeApp: false,
   },
   {
@@ -56,7 +56,7 @@ export const TRACKER_INFO: TrackerInfo[] = [
     description: 'Sleep mat and health device data',
     icon: '🛏️',
     dataTypes: ['sleep'],
-    available: true,
+    available: false, // Not yet implemented
     requiresNativeApp: false,
   },
   {
@@ -117,6 +117,11 @@ export function useHealthTrackerConnections() {
   const initiateConnection = async (provider: TrackerProvider) => {
     const trackerInfo = TRACKER_INFO.find(t => t.provider === provider);
     
+    if (!trackerInfo?.available) {
+      toast.info(`${trackerInfo?.name || provider} integration coming soon!`);
+      return;
+    }
+    
     if (trackerInfo?.requiresNativeApp) {
       toast.info(`${trackerInfo.name} requires the native mobile app (coming soon)`);
       return;
@@ -133,10 +138,8 @@ export function useHealthTrackerConnections() {
       if (provider === 'fitbit') {
         toast.info('Connecting to Fitbit...');
         
-        // Get auth URL from edge function
-        const { data, error } = await supabase.functions.invoke('fitbit-auth-url', {
-          body: { user_id: user.id }
-        });
+        // Get auth URL from edge function (now uses JWT for user_id)
+        const { data, error } = await supabase.functions.invoke('fitbit-auth-url');
 
         if (error || !data?.auth_url) {
           console.error('Error getting Fitbit auth URL:', error);
@@ -144,19 +147,7 @@ export function useHealthTrackerConnections() {
           return;
         }
 
-        // Open in a popup
-        const width = 500;
-        const height = 700;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
-        
-        window.open(
-          data.auth_url,
-          'fitbit-oauth',
-          `width=${width},height=${height},left=${left},top=${top}`
-        );
-        
-        toast.info('Complete the authorization in the popup window');
+        openOAuthPopup(data.auth_url, 'fitbit-oauth');
         return;
       }
 
@@ -164,9 +155,8 @@ export function useHealthTrackerConnections() {
       if (provider === 'oura') {
         toast.info('Connecting to Oura Ring...');
         
-        const { data, error } = await supabase.functions.invoke('oura-auth-url', {
-          body: { user_id: user.id }
-        });
+        // Get auth URL from edge function (now uses JWT for user_id)
+        const { data, error } = await supabase.functions.invoke('oura-auth-url');
 
         if (error || !data?.url) {
           console.error('Error getting Oura auth URL:', error);
@@ -174,43 +164,27 @@ export function useHealthTrackerConnections() {
           return;
         }
 
-        const width = 500;
-        const height = 700;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
-        
-        window.open(
-          data.url,
-          'oura-oauth',
-          `width=${width},height=${height},left=${left},top=${top}`
-        );
-        
-        toast.info('Complete the authorization in the popup window');
+        openOAuthPopup(data.url, 'oura-oauth');
         return;
       }
 
       // For other providers, show coming soon message
-      toast.info(`${trackerInfo?.name} connection coming soon! OAuth integration in progress.`);
-      
-      // Create a placeholder connection record
-      const { error } = await supabase
-        .from('health_tracker_connections')
-        .upsert({
-          user_id: user.id,
-          provider,
-          is_connected: false,
-          sync_enabled: true,
-        }, {
-          onConflict: 'user_id,provider'
-        });
-
-      if (error) throw error;
-      
-      await fetchConnections();
+      toast.info(`${trackerInfo?.name} connection coming soon!`);
     } catch (error) {
       console.error('Error creating connection:', error);
       toast.error('Failed to initiate connection');
     }
+  };
+  
+  // Standardized OAuth popup handler
+  const openOAuthPopup = (url: string, name: string) => {
+    const width = 500;
+    const height = 700;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+    
+    window.open(url, name, `width=${width},height=${height},left=${left},top=${top}`);
+    toast.info('Complete the authorization in the popup window');
   };
 
   const disconnectTracker = async (provider: TrackerProvider) => {

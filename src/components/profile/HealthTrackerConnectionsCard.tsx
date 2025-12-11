@@ -133,10 +133,11 @@ export function HealthTrackerConnectionsCard() {
                 )}
                 {!isConnected && (
                   <Button
-                    variant={tracker.available ? "default" : "outline"}
+                    variant={tracker.available ? "default" : "secondary"}
                     size="sm"
                     onClick={() => initiateConnection(tracker.provider)}
                     disabled={!tracker.available}
+                    className={!tracker.available ? "opacity-50 cursor-not-allowed" : ""}
                   >
                     {tracker.available ? 'Connect' : 'Coming Soon'}
                   </Button>
