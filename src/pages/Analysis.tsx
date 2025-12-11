@@ -11,6 +11,8 @@ import { OverviewStats } from "@/components/analysis/OverviewStats";
 import { PremiumInsights } from "@/components/analysis/PremiumInsights";
 import { CorrelationAnalysis } from "@/components/analysis/CorrelationAnalysis";
 import { TrendComparison } from "@/components/analysis/TrendComparison";
+import { MedicationAnalysis } from "@/components/analysis/MedicationAnalysis";
+import { LifestyleAnalysis } from "@/components/analysis/LifestyleAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
 import BottomNav from "@/components/layout/BottomNav";
@@ -114,18 +116,17 @@ export default function Analysis() {
         />
       ) : (
         <>
-          <OverviewStats 
-            episodes={12} 
-            avgDuration="2.5h" 
-            dailyFrequency={1.7} 
-            topTriggers={4} 
-          />
+          <OverviewStats daysRange={30} />
           
           <PremiumInsights onCardClick={handleInsightCardClick} />
           
           <CorrelationAnalysis />
           
           <TrendComparison monthsToAnalyze={6} />
+          
+          <MedicationAnalysis />
+          
+          <LifestyleAnalysis />
           
           {/* Only show neck pain insights if the premium feature is enabled */}
           {showNeckPainInsights && <NeckPainInsights />}
