@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link2, Link2Off, RefreshCw, Clock, Smartphone } from "lucide-react";
 import { useHealthTrackerConnections, TRACKER_INFO, TrackerProvider } from "@/hooks/useHealthTrackerConnections";
 import { format } from "date-fns";
+import { CycleDataImport } from "./CycleDataImport";
 
 export function HealthTrackerConnectionsCard() {
   const {
@@ -136,6 +137,11 @@ export function HealthTrackerConnectionsCard() {
             <strong className="text-foreground">Note:</strong> If no external tracker is connected, 
             the app will use your manually logged sleep and menstrual data from headache entries for analysis.
           </p>
+        </div>
+
+        {/* CSV Import Section */}
+        <div className="mt-6 pt-6 border-t border-border">
+          <CycleDataImport />
         </div>
       </CardContent>
     </Card>

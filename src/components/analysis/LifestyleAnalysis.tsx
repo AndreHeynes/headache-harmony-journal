@@ -1,11 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
   Moon, 
   Heart, 
   Loader2, 
   AlertCircle,
   TrendingUp,
-  Lightbulb
+  Lightbulb,
+  Database,
+  FileSpreadsheet
 } from "lucide-react";
 import { useLifestyleAnalysis } from "@/hooks/useLifestyleAnalysis";
 
@@ -19,7 +22,8 @@ export function LifestyleAnalysis() {
     hasMenstrualData,
     recommendations,
     loading,
-    hasData
+    hasData,
+    dataSource
   } = useLifestyleAnalysis();
 
   if (loading) {
@@ -72,11 +76,43 @@ export function LifestyleAnalysis() {
     }
   };
 
+  const getDataSourceBadge = () => {
+    if (!dataSource) return null;
+    
+    switch (dataSource) {
+      case 'unified':
+        return (
+          <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+            <Database className="h-3 w-3 mr-1" />
+            Imported Data
+          </Badge>
+        );
+      case 'triggers':
+        return (
+          <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+            <FileSpreadsheet className="h-3 w-3 mr-1" />
+            From Triggers
+          </Badge>
+        );
+      case 'mixed':
+        return (
+          <Badge variant="outline" className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+            Mixed Sources
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <section className="mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Moon className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Lifestyle Factors</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Moon className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">Lifestyle Factors</h2>
+        </div>
+        {getDataSourceBadge()}
       </div>
 
       {/* Recommendations */}
