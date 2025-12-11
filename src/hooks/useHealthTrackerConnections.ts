@@ -122,10 +122,6 @@ export function useHealthTrackerConnections() {
       return;
     }
 
-    // Placeholder for OAuth flow - will be implemented in Phase 2
-    toast.info(`${trackerInfo?.name} connection coming soon! OAuth integration in progress.`);
-    
-    // For now, create a placeholder connection record
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -133,6 +129,41 @@ export function useHealthTrackerConnections() {
         return;
       }
 
+      // Handle Fitbit OAuth
+      if (provider === 'fitbit') {
+        toast.info('Connecting to Fitbit...');
+        
+        // Get auth URL from edge function
+        const { data, error } = await supabase.functions.invoke('fitbit-auth-url', {
+          body: { user_id: user.id }
+        });
+
+        if (error || !data?.auth_url) {
+          console.error('Error getting Fitbit auth URL:', error);
+          toast.error('Failed to initiate Fitbit connection');
+          return;
+        }
+
+        // Open in a popup
+        const width = 500;
+        const height = 700;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+        
+        window.open(
+          data.auth_url,
+          'fitbit-oauth',
+          `width=${width},height=${height},left=${left},top=${top}`
+        );
+        
+        toast.info('Complete the authorization in the popup window');
+        return;
+      }
+
+      // For other providers, show coming soon message
+      toast.info(`${trackerInfo?.name} connection coming soon! OAuth integration in progress.`);
+      
+      // Create a placeholder connection record
       const { error } = await supabase
         .from('health_tracker_connections')
         .upsert({
