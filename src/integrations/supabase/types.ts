@@ -65,6 +65,51 @@ export type Database = {
         }
         Relationships: []
       }
+      health_tracker_connections: {
+        Row: {
+          access_token_encrypted: string | null
+          created_at: string | null
+          id: string
+          is_connected: boolean | null
+          last_sync_at: string | null
+          provider: string
+          refresh_token_encrypted: string | null
+          scopes: string[] | null
+          sync_enabled: boolean | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          provider: string
+          refresh_token_encrypted?: string | null
+          scopes?: string[] | null
+          sync_enabled?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token_encrypted?: string | null
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_sync_at?: string | null
+          provider?: string
+          refresh_token_encrypted?: string | null
+          scopes?: string[] | null
+          sync_enabled?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -125,6 +170,66 @@ export type Database = {
           session_id?: string
           severity?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      unified_health_data: {
+        Row: {
+          bed_time: string | null
+          created_at: string | null
+          cycle_day: number | null
+          data_type: string
+          date: string
+          id: string
+          menstrual_phase: string | null
+          period_flow: string | null
+          raw_data: Json | null
+          sleep_duration_minutes: number | null
+          sleep_quality_score: number | null
+          sleep_stages: Json | null
+          source: string
+          synced_at: string | null
+          updated_at: string | null
+          user_id: string
+          wake_time: string | null
+        }
+        Insert: {
+          bed_time?: string | null
+          created_at?: string | null
+          cycle_day?: number | null
+          data_type: string
+          date: string
+          id?: string
+          menstrual_phase?: string | null
+          period_flow?: string | null
+          raw_data?: Json | null
+          sleep_duration_minutes?: number | null
+          sleep_quality_score?: number | null
+          sleep_stages?: Json | null
+          source?: string
+          synced_at?: string | null
+          updated_at?: string | null
+          user_id: string
+          wake_time?: string | null
+        }
+        Update: {
+          bed_time?: string | null
+          created_at?: string | null
+          cycle_day?: number | null
+          data_type?: string
+          date?: string
+          id?: string
+          menstrual_phase?: string | null
+          period_flow?: string | null
+          raw_data?: Json | null
+          sleep_duration_minutes?: number | null
+          sleep_quality_score?: number | null
+          sleep_stages?: Json | null
+          source?: string
+          synced_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+          wake_time?: string | null
         }
         Relationships: []
       }

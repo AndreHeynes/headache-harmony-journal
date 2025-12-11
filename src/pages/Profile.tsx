@@ -11,6 +11,7 @@ import { AppSettingsCard } from "@/components/profile/AppSettingsCard";
 import { TestModeToggle } from "@/components/profile/TestModeToggle";
 import { DataManagementCard } from "@/components/profile/DataManagementCard";
 import ExportSettingsCard from "@/components/profile/ExportSettingsCard";
+import { HealthTrackerConnectionsCard } from "@/components/profile/HealthTrackerConnectionsCard";
 import BottomNavWithTest from "@/components/layout/BottomNavWithTest";
 import { toast } from "sonner";
 import { useTestContext } from "@/contexts/TestContext";
@@ -77,6 +78,7 @@ export default function Profile() {
         )}
         
         <PersonalInfoCard />
+        <HealthTrackerConnectionsCard />
         <ExportSettingsCard />
         <NotificationsCard />
         <DataManagementCard />
