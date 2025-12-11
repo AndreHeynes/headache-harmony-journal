@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.fitbit-auth-url]
 verify_jwt = true
+
+[functions.fitbit-sync-sleep]
+verify_jwt = true
