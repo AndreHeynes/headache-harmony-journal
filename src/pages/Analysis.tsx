@@ -10,6 +10,7 @@ import { DateRangeSelector } from "@/components/analysis/DateRangeSelector";
 import { OverviewStats } from "@/components/analysis/OverviewStats";
 import { PremiumInsights } from "@/components/analysis/PremiumInsights";
 import { CorrelationAnalysis } from "@/components/analysis/CorrelationAnalysis";
+import { TrendComparison } from "@/components/analysis/TrendComparison";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
 import BottomNav from "@/components/layout/BottomNav";
@@ -123,6 +124,8 @@ export default function Analysis() {
           <PremiumInsights onCardClick={handleInsightCardClick} />
           
           <CorrelationAnalysis />
+          
+          <TrendComparison monthsToAnalyze={6} />
           
           {/* Only show neck pain insights if the premium feature is enabled */}
           {showNeckPainInsights && <NeckPainInsights />}

@@ -12,6 +12,8 @@ import { getUserSession, validateUserSession, logExportActivity } from "@/utils/
 import { checkRateLimit } from "@/utils/rateLimiting";
 import { InlineDisclaimer } from "@/components/disclaimer";
 import { getDisclaimer } from "@/utils/legalContent";
+import { usePatientProfile } from "@/hooks/usePatientProfile";
+import { format } from "date-fns";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -72,6 +74,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
   const { logTestEvent, isTestMode } = useTestContext();
   const [isGenerating, setIsGenerating] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const { profile } = usePatientProfile();
 
   const handleExportRequest = () => {
     // Validate user session
@@ -152,25 +155,51 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     // Add security header with user info
     doc.setFontSize(8);
     doc.text(`Export ID: ${Date.now()}-${session.id.slice(-8)}`, 20, 10);
-    doc.text(`Generated: ${new Date().toISOString()}`, 20, 15);
+    doc.text(`Generated: ${format(new Date(), 'PPpp')}`, 20, 15);
     
     // Add title
     doc.setFontSize(20);
     doc.text("Headache Experience Journal: Patient Report", 20, 25);
     
-    // Add user session info for security
+    // Add patient identification section
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("PATIENT IDENTIFICATION", 20, 38);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`User Session: ${session.id.slice(-12)}`, 20, 35);
-    doc.text(`Beta Tester: ${session.isBetaTester ? 'Yes' : 'No'}`, 20, 40);
+    
+    const patientName = profile?.fullName || 'Not provided';
+    const patientEmail = profile?.email || 'Not provided';
+    const firstDataDate = profile?.firstDataDate 
+      ? format(new Date(profile.firstDataDate), 'PPP')
+      : 'No data recorded';
+    const trackingPeriod = profile?.trackingPeriodDays 
+      ? `${profile.trackingPeriodDays} days`
+      : 'N/A';
+    
+    doc.text(`Patient Name: ${patientName}`, 20, 46);
+    doc.text(`Email: ${patientEmail}`, 20, 52);
+    doc.text(`First Data Recorded: ${firstDataDate}`, 20, 58);
+    doc.text(`Tracking Period: ${trackingPeriod}`, 20, 64);
+    doc.text(`Total Episodes: ${profile?.totalEpisodes || headacheData.length}`, 20, 70);
+    doc.text(`Report Generated: ${format(new Date(), 'PPP')}`, 20, 76);
+    
+    // Add verification note
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("This report should be verified against the patient presenting to the healthcare provider.", 20, 84);
+    doc.setTextColor(0, 0, 0);
     
     // Add comprehensive legal disclaimer
     doc.setFontSize(12);
-    doc.text("LEGAL DISCLAIMER", 20, 50);
+    doc.setFont("helvetica", "bold");
+    doc.text("LEGAL DISCLAIMER", 20, 92);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     
     if (disclaimer) {
       const disclaimerLines = doc.splitTextToSize(disclaimer.content, 170);
-      yPos = 55;
+      yPos = 100;
       disclaimerLines.forEach((line: string) => {
         if (yPos > 280) {
           doc.addPage();
@@ -185,8 +214,8 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
       yPos = 20;
     } else {
       // Fallback basic disclaimer
-      doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, 55);
-      yPos = 65;
+      doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, 100);
+      yPos = 110;
     }
     
     // Add patient section title
@@ -258,13 +287,26 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
   };
 
   const generateSecureCSV = (session: any): number => {
-    // Create CSV content with security header
+    const patientName = profile?.fullName || 'Not provided';
+    const patientEmail = profile?.email || 'Not provided';
+    const firstDataDate = profile?.firstDataDate 
+      ? format(new Date(profile.firstDataDate), 'PPP')
+      : 'No data recorded';
+    
+    // Create CSV content with patient identification header
     let csvContent = `# Headache Experience Journal Export\n`;
+    csvContent += `# ========================================\n`;
+    csvContent += `# PATIENT IDENTIFICATION\n`;
+    csvContent += `# Patient Name: ${patientName}\n`;
+    csvContent += `# Patient Email: ${patientEmail}\n`;
+    csvContent += `# First Data Recorded: ${firstDataDate}\n`;
+    csvContent += `# Tracking Period: ${profile?.trackingPeriodDays || 0} days\n`;
+    csvContent += `# Total Episodes: ${profile?.totalEpisodes || headacheData.length}\n`;
+    csvContent += `# ========================================\n`;
     csvContent += `# Export ID: ${Date.now()}-${session.id.slice(-8)}\n`;
-    csvContent += `# Generated: ${new Date().toISOString()}\n`;
-    csvContent += `# User Session: ${session.id.slice(-12)}\n`;
-    csvContent += `# Beta Tester: ${session.isBetaTester ? 'Yes' : 'No'}\n`;
-    csvContent += `# CONFIDENTIAL: Contains personal health information\n#\n`;
+    csvContent += `# Generated: ${format(new Date(), 'PPpp')}\n`;
+    csvContent += `# CONFIDENTIAL: Contains personal health information\n`;
+    csvContent += `# This report should be verified against the patient presenting to the healthcare provider.\n#\n`;
     csvContent += "Date,Intensity,Location,Duration,Symptoms,Triggers,Treatments,Notes\n";
     
     headacheData.forEach(record => {

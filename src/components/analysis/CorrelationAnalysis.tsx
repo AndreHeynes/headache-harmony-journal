@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoveHorizontal } from "lucide-react";
+import { MoveHorizontal, Loader2, AlertCircle } from "lucide-react";
 import { 
   ResponsiveContainer, 
   ScatterChart, 
@@ -12,50 +11,19 @@ import {
   Tooltip,
   Cell
 } from 'recharts';
+import { useCorrelationEngine } from "@/hooks/useCorrelationEngine";
 
-interface CorrelationData {
-  x: number;
-  y: number;
-  z: number;
-  name: string;
-}
-
-// Mock data for the heatmaps
-const painTriggerData: CorrelationData[] = [
-  { x: 1, y: 1, z: 10, name: 'Stress' },
-  { x: 1, y: 2, z: 5, name: 'Caffeine' },
-  { x: 2, y: 1, z: 8, name: 'Sleep' },
-  { x: 2, y: 2, z: 15, name: 'Weather' },
-  { x: 3, y: 3, z: 12, name: 'Screen Time' },
-  { x: 3, y: 4, z: 3, name: 'Alcohol' },
-  { x: 4, y: 3, z: 6, name: 'Exercise' },
-  { x: 4, y: 4, z: 9, name: 'Food' },
-];
-
-const durationTreatmentData: CorrelationData[] = [
-  { x: 1, y: 1, z: 14, name: 'Medication' },
-  { x: 1, y: 2, z: 7, name: 'Rest' },
-  { x: 2, y: 1, z: 9, name: 'Hydration' },
-  { x: 2, y: 2, z: 12, name: 'Dark Room' },
-  { x: 3, y: 3, z: 5, name: 'Caffeine' },
-  { x: 3, y: 4, z: 8, name: 'Massage' },
-  { x: 4, y: 3, z: 11, name: 'Cold Pack' },
-  { x: 4, y: 4, z: 6, name: 'Hot Pack' },
-];
-
-// Color scale
+// Color scale based on correlation strength
 const getColor = (value: number) => {
-  // Scale from 0 to max possible value (e.g., 15)
   const maxValue = 15; 
   const ratio = value / maxValue;
   
-  // Color scale from low to high correlation
   if (ratio < 0.33) {
-    return '#a78bfa'; // Light purple (low correlation)
+    return 'hsl(var(--primary) / 0.4)'; // Low correlation
   } else if (ratio < 0.66) {
-    return '#7c3aed'; // Medium purple (medium correlation)
+    return 'hsl(var(--primary) / 0.7)'; // Medium correlation
   } else {
-    return '#4c1d95'; // Dark purple (high correlation)
+    return 'hsl(var(--primary))'; // High correlation
   }
 };
 
@@ -63,9 +31,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-gray-800 border border-gray-700 p-2 rounded-md shadow-md">
-        <p className="text-white font-medium">{data.name}</p>
-        <p className="text-gray-300 text-sm">Correlation: {data.z}</p>
+      <div className="bg-card border border-border p-2 rounded-md shadow-md">
+        <p className="text-foreground font-medium">{data.name}</p>
+        <p className="text-muted-foreground text-sm">Correlation: {data.z}</p>
       </div>
     );
   }
@@ -73,105 +41,196 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export function CorrelationAnalysis() {
+  const { 
+    painTriggerHeatmap, 
+    durationTreatmentHeatmap, 
+    loading, 
+    hasData,
+    triggerCorrelations,
+    treatmentEffectiveness 
+  } = useCorrelationEngine();
+
+  if (loading) {
+    return (
+      <section className="mb-6">
+        <div className="flex items-center justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">Loading correlation data...</span>
+        </div>
+      </section>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-foreground">Correlation Analysis</h2>
+        </div>
+        <Card className="bg-card/50 border-border">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <AlertCircle className="h-5 w-5" />
+              <p>No episode data available yet. Start logging headaches to see correlation analysis.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
+  // Use real data or fallback to minimal display
+  const displayTriggerData = painTriggerHeatmap.length > 0 ? painTriggerHeatmap : [];
+  const displayTreatmentData = durationTreatmentHeatmap.length > 0 ? durationTreatmentHeatmap : [];
+
   return (
     <section className="mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Correlation Analysis</h2>
-        <Button variant="ghost" size="icon" className="text-indigo-400">
+        <h2 className="text-lg font-semibold text-foreground">Correlation Analysis</h2>
+        <Button variant="ghost" size="icon" className="text-primary">
           <MoveHorizontal className="h-5 w-5" />
         </Button>
       </div>
       
       <div className="space-y-3">
-        <Card className="bg-gray-800/50 border-gray-700">
-          <CardHeader className="p-4 pb-0">
-            <CardTitle className="text-sm font-medium">Pain vs. Triggers</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="h-36 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart
-                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                >
-                  <XAxis 
-                    type="number" 
-                    dataKey="x" 
-                    name="Pain Intensity" 
-                    domain={[0, 5]}
-                    tick={{ fill: '#9ca3af' }}
-                    tickCount={5}
-                    axisLine={{ stroke: '#4b5563' }}
-                  />
-                  <YAxis 
-                    type="number" 
-                    dataKey="y" 
-                    name="Trigger Intensity" 
-                    domain={[0, 5]}
-                    tick={{ fill: '#9ca3af' }}
-                    tickCount={5}
-                    axisLine={{ stroke: '#4b5563' }}
-                  />
-                  <ZAxis 
-                    type="number" 
-                    dataKey="z" 
-                    range={[50, 500]} 
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Scatter data={painTriggerData}>
-                    {painTriggerData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={getColor(entry.z)} />
-                    ))}
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Top Trigger Correlations Summary */}
+        {triggerCorrelations.length > 0 && (
+          <Card className="bg-card/50 border-border">
+            <CardHeader className="p-4 pb-2">
+              <CardTitle className="text-sm font-medium text-foreground">Top Trigger Correlations</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="space-y-2">
+                {triggerCorrelations.slice(0, 3).map((tc, index) => (
+                  <div key={tc.trigger} className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{tc.trigger}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-0.5 rounded ${
+                        tc.riskLevel === 'high' ? 'bg-destructive/20 text-destructive' :
+                        tc.riskLevel === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-green-500/20 text-green-400'
+                      }`}>
+                        {tc.correlationScore}x
+                      </span>
+                      <span className="text-xs text-muted-foreground">({tc.occurrences} times)</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Pain vs Triggers Heatmap */}
+        {displayTriggerData.length > 0 && (
+          <Card className="bg-card/50 border-border">
+            <CardHeader className="p-4 pb-0">
+              <CardTitle className="text-sm font-medium text-foreground">Pain vs. Triggers</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="h-36 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                    <XAxis 
+                      type="number" 
+                      dataKey="x" 
+                      name="Pain Intensity" 
+                      domain={[0, 5]}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      tickCount={5}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <YAxis 
+                      type="number" 
+                      dataKey="y" 
+                      name="Trigger Intensity" 
+                      domain={[0, 5]}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      tickCount={5}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <ZAxis type="number" dataKey="z" range={[50, 500]} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Scatter data={displayTriggerData}>
+                      {displayTriggerData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={getColor(entry.z)} />
+                      ))}
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
-        <Card className="bg-gray-800/50 border-gray-700">
-          <CardHeader className="p-4 pb-0">
-            <CardTitle className="text-sm font-medium">Duration vs. Treatment</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="h-36 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart
-                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                >
-                  <XAxis 
-                    type="number" 
-                    dataKey="x" 
-                    name="Duration" 
-                    domain={[0, 5]}
-                    tick={{ fill: '#9ca3af' }}
-                    tickCount={5}
-                    axisLine={{ stroke: '#4b5563' }}
-                  />
-                  <YAxis 
-                    type="number" 
-                    dataKey="y" 
-                    name="Treatment Effectiveness" 
-                    domain={[0, 5]}
-                    tick={{ fill: '#9ca3af' }}
-                    tickCount={5}
-                    axisLine={{ stroke: '#4b5563' }}
-                  />
-                  <ZAxis 
-                    type="number" 
-                    dataKey="z" 
-                    range={[50, 500]} 
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Scatter data={durationTreatmentData}>
-                    {durationTreatmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={getColor(entry.z)} />
-                    ))}
-                  </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Treatment Effectiveness Summary */}
+        {treatmentEffectiveness.length > 0 && (
+          <Card className="bg-card/50 border-border">
+            <CardHeader className="p-4 pb-2">
+              <CardTitle className="text-sm font-medium text-foreground">Treatment Effectiveness</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="space-y-2">
+                {treatmentEffectiveness.slice(0, 3).map((te) => (
+                  <div key={te.treatment} className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{te.treatment}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full" 
+                          style={{ width: `${te.effectivenessRate}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground">{te.effectivenessRate}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Duration vs Treatment Heatmap */}
+        {displayTreatmentData.length > 0 && (
+          <Card className="bg-card/50 border-border">
+            <CardHeader className="p-4 pb-0">
+              <CardTitle className="text-sm font-medium text-foreground">Duration vs. Treatment</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="h-36 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                    <XAxis 
+                      type="number" 
+                      dataKey="x" 
+                      name="Duration" 
+                      domain={[0, 5]}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      tickCount={5}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <YAxis 
+                      type="number" 
+                      dataKey="y" 
+                      name="Treatment Effectiveness" 
+                      domain={[0, 5]}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      tickCount={5}
+                      axisLine={{ stroke: 'hsl(var(--border))' }}
+                    />
+                    <ZAxis type="number" dataKey="z" range={[50, 500]} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Scatter data={displayTreatmentData}>
+                      {displayTreatmentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={getColor(entry.z)} />
+                      ))}
+                    </Scatter>
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </section>
   );
