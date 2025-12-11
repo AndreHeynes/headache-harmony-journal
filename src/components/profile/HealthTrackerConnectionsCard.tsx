@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link2, Link2Off, RefreshCw, Clock, Smartphone } from "lucide-react";
+import { Link2, Link2Off, RefreshCw, Clock, Smartphone, Loader2 } from "lucide-react";
 import { useHealthTrackerConnections, TRACKER_INFO, TrackerProvider } from "@/hooks/useHealthTrackerConnections";
 import { format } from "date-fns";
 import { CycleDataImport } from "./CycleDataImport";
@@ -15,8 +16,17 @@ export function HealthTrackerConnectionsCard() {
     initiateConnection,
     disconnectTracker,
     toggleSync,
+    syncTracker,
     getConnectionStatus,
   } = useHealthTrackerConnections();
+  
+  const [syncing, setSyncing] = useState<TrackerProvider | null>(null);
+  
+  const handleSync = async (provider: TrackerProvider) => {
+    setSyncing(provider);
+    await syncTracker(provider);
+    setSyncing(null);
+  };
 
   if (loading) {
     return (
@@ -103,10 +113,14 @@ export function HealthTrackerConnectionsCard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {/* Sync now - to be implemented */}}
-                      disabled
+                      onClick={() => handleSync(tracker.provider)}
+                      disabled={syncing === tracker.provider}
                     >
-                      <RefreshCw className="h-4 w-4" />
+                      {syncing === tracker.provider ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4" />
+                      )}
                     </Button>
                     <Button
                       variant="destructive"

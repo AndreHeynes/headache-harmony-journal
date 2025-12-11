@@ -230,12 +230,53 @@ export function useHealthTrackerConnections() {
     return connections.find(c => c.provider === provider);
   };
 
+  const syncTracker = async (provider: TrackerProvider, days: number = 7) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Please sign in to sync data');
+        return false;
+      }
+
+      if (provider === 'fitbit') {
+        toast.info('Syncing Fitbit sleep data...');
+        
+        const { data, error } = await supabase.functions.invoke('fitbit-sync-sleep', {
+          body: { user_id: user.id, days }
+        });
+
+        if (error) {
+          console.error('Error syncing Fitbit:', error);
+          toast.error('Failed to sync Fitbit data');
+          return false;
+        }
+
+        if (data?.synced_dates?.length > 0) {
+          toast.success(`Synced ${data.synced_dates.length} days of sleep data`);
+        } else {
+          toast.info('No new sleep data to sync');
+        }
+        
+        await fetchConnections();
+        return true;
+      }
+
+      toast.info(`${provider} sync not yet implemented`);
+      return false;
+    } catch (error) {
+      console.error('Error syncing tracker:', error);
+      toast.error('Failed to sync tracker data');
+      return false;
+    }
+  };
+
   return {
     connections,
     loading,
     initiateConnection,
     disconnectTracker,
     toggleSync,
+    syncTracker,
     getConnectionStatus,
     refetch: fetchConnections,
   };
