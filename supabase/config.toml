@@ -1,1 +1,4 @@
 project_id = "vbutzblgbexuwedzayjv"
+
+[functions.fitbit-oauth-callback]
+verify_jwt = false
