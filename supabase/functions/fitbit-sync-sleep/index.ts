@@ -1,15 +1,86 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const FITBIT_CLIENT_ID = Deno.env.get('FITBIT_CLIENT_ID')!;
 const FITBIT_CLIENT_SECRET = Deno.env.get('FITBIT_CLIENT_SECRET')!;
+
+// Restricted CORS origins
+const ALLOWED_ORIGINS = [
+  'https://vbutzblgbexuwedzayjv.lovable.app',
+  'https://lovable.dev',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+function getCorsHeaders(requestOrigin?: string | null): Record<string, string> {
+  const origin = requestOrigin && ALLOWED_ORIGINS.some(allowed => 
+    requestOrigin === allowed || requestOrigin.endsWith('.lovable.app')
+  ) ? requestOrigin : ALLOWED_ORIGINS[0];
+  
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  };
+}
+
+// Rate limiter
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; retryAfter?: number } {
+  const key = `sync:${userId}`;
+  const now = Date.now();
+  const entry = rateLimitStore.get(key);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + 60000 });
+    return { allowed: true };
+  }
+  
+  if (entry.count >= 10) {
+    return { allowed: false, retryAfter: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+  
+  entry.count++;
+  return { allowed: true };
+}
+
+// Token encryption/decryption
+function decryptToken(encryptedToken: string): string {
+  if (!encryptedToken || !SUPABASE_SERVICE_ROLE_KEY) return encryptedToken;
+  
+  try {
+    const encrypted = new Uint8Array(
+      atob(encryptedToken).split('').map(c => c.charCodeAt(0))
+    );
+    const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+    const decrypted = new Uint8Array(encrypted.length);
+    
+    for (let i = 0; i < encrypted.length; i++) {
+      decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
+    }
+    
+    return new TextDecoder().decode(decrypted);
+  } catch {
+    return encryptedToken; // Fallback for unencrypted tokens
+  }
+}
+
+function encryptToken(token: string): string {
+  if (!token || !SUPABASE_SERVICE_ROLE_KEY) return token;
+  
+  const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+  const tokenBytes = new TextEncoder().encode(token);
+  const encrypted = new Uint8Array(tokenBytes.length);
+  
+  for (let i = 0; i < tokenBytes.length; i++) {
+    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  return btoa(String.fromCharCode(...encrypted));
+}
 
 interface FitbitSleepLog {
   dateOfSleep: string;
@@ -52,9 +123,7 @@ async function refreshAccessToken(refreshToken: string): Promise<{ access_token:
 
 async function fetchSleepData(accessToken: string, date: string): Promise<FitbitSleepLog[] | null> {
   const response = await fetch(`https://api.fitbit.com/1.2/user/-/sleep/date/${date}.json`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
+    headers: { 'Authorization': `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {
@@ -67,6 +136,9 @@ async function fetchSleepData(accessToken: string, date: string): Promise<Fitbit
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -78,6 +150,15 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'User ID is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Rate limit check
+    const rateLimit = checkRateLimit(user_id);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimit.retryAfter }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(rateLimit.retryAfter) } }
       );
     }
 
@@ -100,8 +181,9 @@ serve(async (req) => {
       );
     }
 
-    let accessToken = connection.access_token_encrypted;
-    let refreshToken = connection.refresh_token_encrypted;
+    // Decrypt tokens
+    let accessToken = decryptToken(connection.access_token_encrypted);
+    let refreshToken = decryptToken(connection.refresh_token_encrypted);
 
     // Check if token is expired and refresh if needed
     const tokenExpiry = new Date(connection.token_expires_at);
@@ -110,7 +192,6 @@ serve(async (req) => {
       const newTokens = await refreshAccessToken(refreshToken);
       
       if (!newTokens) {
-        // Mark connection as disconnected
         await supabase
           .from('health_tracker_connections')
           .update({ is_connected: false })
@@ -125,12 +206,12 @@ serve(async (req) => {
       accessToken = newTokens.access_token;
       refreshToken = newTokens.refresh_token;
 
-      // Update tokens in database
+      // Update with ENCRYPTED tokens
       await supabase
         .from('health_tracker_connections')
         .update({
-          access_token_encrypted: newTokens.access_token,
-          refresh_token_encrypted: newTokens.refresh_token,
+          access_token_encrypted: encryptToken(newTokens.access_token),
+          refresh_token_encrypted: encryptToken(newTokens.refresh_token),
           token_expires_at: new Date(Date.now() + newTokens.expires_in * 1000).toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -164,7 +245,6 @@ serve(async (req) => {
           wake: log.levels.summary.wake?.minutes || 0,
         } : null;
 
-        // Upsert sleep data
         const { error: upsertError } = await supabase
           .from('unified_health_data')
           .upsert({
@@ -213,7 +293,7 @@ serve(async (req) => {
     console.error('Error syncing Fitbit sleep data:', err);
     return new Response(
       JSON.stringify({ error: 'Failed to sync sleep data' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...getCorsHeaders(null), 'Content-Type': 'application/json' } }
     );
   }
 });

@@ -1,12 +1,91 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID')!;
+const OURA_CLIENT_SECRET = Deno.env.get('OURA_CLIENT_SECRET')!;
+
+// Restricted CORS origins
+const ALLOWED_ORIGINS = [
+  'https://vbutzblgbexuwedzayjv.lovable.app',
+  'https://lovable.dev',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+function getCorsHeaders(requestOrigin?: string | null): Record<string, string> {
+  const origin = requestOrigin && ALLOWED_ORIGINS.some(allowed => 
+    requestOrigin === allowed || requestOrigin.endsWith('.lovable.app')
+  ) ? requestOrigin : ALLOWED_ORIGINS[0];
+  
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  };
+}
+
+// Rate limiter
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; retryAfter?: number } {
+  const key = `sync:${userId}`;
+  const now = Date.now();
+  const entry = rateLimitStore.get(key);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + 60000 });
+    return { allowed: true };
+  }
+  
+  if (entry.count >= 10) {
+    return { allowed: false, retryAfter: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+  
+  entry.count++;
+  return { allowed: true };
+}
+
+// Token encryption/decryption
+function decryptToken(encryptedToken: string): string {
+  if (!encryptedToken || !SUPABASE_SERVICE_ROLE_KEY) return encryptedToken;
+  
+  try {
+    const encrypted = new Uint8Array(
+      atob(encryptedToken).split('').map(c => c.charCodeAt(0))
+    );
+    const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+    const decrypted = new Uint8Array(encrypted.length);
+    
+    for (let i = 0; i < encrypted.length; i++) {
+      decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
+    }
+    
+    return new TextDecoder().decode(decrypted);
+  } catch {
+    return encryptedToken; // Fallback for unencrypted tokens
+  }
+}
+
+function encryptToken(token: string): string {
+  if (!token || !SUPABASE_SERVICE_ROLE_KEY) return token;
+  
+  const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+  const tokenBytes = new TextEncoder().encode(token);
+  const encrypted = new Uint8Array(tokenBytes.length);
+  
+  for (let i = 0; i < tokenBytes.length; i++) {
+    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  return btoa(String.fromCharCode(...encrypted));
+}
 
 serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -18,14 +97,18 @@ serve(async (req) => {
       throw new Error('user_id is required');
     }
 
+    // Rate limit check
+    const rateLimit = checkRateLimit(user_id);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimit.retryAfter }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(rateLimit.retryAfter) } }
+      );
+    }
+
     console.log(`Syncing Oura sleep data for user ${user_id}, last ${days} days`);
 
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID');
-    const OURA_CLIENT_SECRET = Deno.env.get('OURA_CLIENT_SECRET');
-
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Get the user's Oura connection
     const { data: connection, error: connError } = await supabase
@@ -40,7 +123,9 @@ serve(async (req) => {
       throw new Error('No Oura connection found');
     }
 
-    let accessToken = connection.access_token_encrypted;
+    // Decrypt tokens
+    let accessToken = decryptToken(connection.access_token_encrypted);
+    const refreshToken = decryptToken(connection.refresh_token_encrypted);
     const tokenExpiresAt = new Date(connection.token_expires_at);
 
     // Check if token needs refresh (buffer of 5 minutes)
@@ -49,14 +134,12 @@ serve(async (req) => {
       
       const refreshResponse = await fetch('https://api.ouraring.com/oauth/token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           grant_type: 'refresh_token',
-          refresh_token: connection.refresh_token_encrypted,
-          client_id: OURA_CLIENT_ID!,
-          client_secret: OURA_CLIENT_SECRET!,
+          refresh_token: refreshToken,
+          client_id: OURA_CLIENT_ID,
+          client_secret: OURA_CLIENT_SECRET,
         }),
       });
 
@@ -69,13 +152,13 @@ serve(async (req) => {
       const tokenData = await refreshResponse.json();
       accessToken = tokenData.access_token;
 
-      // Update stored tokens
+      // Update with ENCRYPTED tokens
       const newExpiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
       await supabase
         .from('health_tracker_connections')
         .update({
-          access_token_encrypted: tokenData.access_token,
-          refresh_token_encrypted: tokenData.refresh_token,
+          access_token_encrypted: encryptToken(tokenData.access_token),
+          refresh_token_encrypted: encryptToken(tokenData.refresh_token),
           token_expires_at: newExpiresAt.toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -99,9 +182,7 @@ serve(async (req) => {
     console.log('Fetching Oura sleep data:', sleepUrl.toString());
 
     const sleepResponse = await fetch(sleepUrl.toString(), {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
+      headers: { 'Authorization': `Bearer ${accessToken}` },
     });
 
     if (!sleepResponse.ok) {
@@ -119,7 +200,6 @@ serve(async (req) => {
     for (const record of sleepData.data || []) {
       const sleepDate = record.day;
       
-      // Map Oura data to unified schema
       const healthData = {
         user_id,
         date: sleepDate,
@@ -131,7 +211,7 @@ serve(async (req) => {
         sleep_quality_score: record.score || null,
         sleep_stages: {
           deep: record.contributors?.deep_sleep || null,
-          light: record.contributors?.rem_sleep ? null : null, // Oura uses different metrics
+          light: null,
           rem: record.contributors?.rem_sleep || null,
           awake: null,
           efficiency: record.contributors?.efficiency || null,
@@ -144,7 +224,6 @@ serve(async (req) => {
         updated_at: new Date().toISOString(),
       };
 
-      // Upsert using the unique constraint
       const { error: upsertError } = await supabase
         .from('unified_health_data')
         .upsert(healthData, {
@@ -181,7 +260,7 @@ serve(async (req) => {
     console.error('Oura sync error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 400, headers: { ...getCorsHeaders(null), 'Content-Type': 'application/json' } }
     );
   }
 });

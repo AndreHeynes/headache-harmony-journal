@@ -1,67 +1,121 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID');
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+
+// Restricted CORS origins
+const ALLOWED_ORIGINS = [
+  'https://vbutzblgbexuwedzayjv.lovable.app',
+  'https://lovable.dev',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+function getCorsHeaders(requestOrigin?: string | null): Record<string, string> {
+  const origin = requestOrigin && ALLOWED_ORIGINS.some(allowed => 
+    requestOrigin === allowed || requestOrigin.endsWith('.lovable.app')
+  ) ? requestOrigin : ALLOWED_ORIGINS[0];
+  
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  };
+}
+
+// Simple rate limiter
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; retryAfter?: number } {
+  const key = `auth:${userId}`;
+  const now = Date.now();
+  const entry = rateLimitStore.get(key);
+  
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(key, { count: 1, resetTime: now + 60000 });
+    return { allowed: true };
+  }
+  
+  if (entry.count >= 5) {
+    return { allowed: false, retryAfter: Math.ceil((entry.resetTime - now) / 1000) };
+  }
+  
+  entry.count++;
+  return { allowed: true };
+}
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const OURA_CLIENT_ID = Deno.env.get('OURA_CLIENT_ID');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    
-    if (!OURA_CLIENT_ID) {
-      console.error('OURA_CLIENT_ID not configured');
-      throw new Error('Oura client ID not configured');
-    }
-
-    // Get user from auth header
+    // Extract user from JWT token (secure method)
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      return new Response(
+        JSON.stringify({ error: 'Authorization header required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const supabaseClient = createClient(
-      SUPABASE_URL!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
     );
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      throw new Error('User not authenticated');
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Rate limit check
+    const rateLimit = checkRateLimit(user.id);
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded', retryAfter: rateLimit.retryAfter }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(rateLimit.retryAfter) } }
+      );
+    }
+
+    if (!OURA_CLIENT_ID) {
+      console.error('OURA_CLIENT_ID not configured');
+      return new Response(
+        JSON.stringify({ error: 'Oura integration not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const redirectUri = `${SUPABASE_URL}/functions/v1/oura-oauth-callback`;
+    const scopes = ['daily', 'personal'].join(' ');
     
-    // Oura OAuth scopes: daily (for sleep data), personal (for user info)
-    const scopes = 'daily personal';
-    
-    // Build OAuth URL with state containing user_id
-    const authUrl = new URL('https://cloud.ouraring.com/oauth/authorize');
-    authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('client_id', OURA_CLIENT_ID);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('scope', scopes);
-    authUrl.searchParams.set('state', user.id);
+    const authUrl = `https://cloud.ouraring.com/oauth/authorize?` +
+      `response_type=code&` +
+      `client_id=${OURA_CLIENT_ID}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `scope=${encodeURIComponent(scopes)}&` +
+      `state=${user.id}`;
 
     console.log('Generated Oura auth URL for user:', user.id);
 
     return new Response(
-      JSON.stringify({ url: authUrl.toString() }),
+      JSON.stringify({ url: authUrl }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
-    console.error('Error generating Oura auth URL:', error);
+
+  } catch (err) {
+    console.error('Error generating Oura auth URL:', err);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'Failed to generate authorization URL' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
