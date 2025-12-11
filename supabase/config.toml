@@ -8,3 +8,12 @@ verify_jwt = true
 
 [functions.fitbit-sync-sleep]
 verify_jwt = true
+
+[functions.oura-auth-url]
+verify_jwt = true
+
+[functions.oura-oauth-callback]
+verify_jwt = false
+
+[functions.oura-sync-sleep]
+verify_jwt = true

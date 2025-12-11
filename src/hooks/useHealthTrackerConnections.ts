@@ -160,6 +160,35 @@ export function useHealthTrackerConnections() {
         return;
       }
 
+      // Handle Oura OAuth
+      if (provider === 'oura') {
+        toast.info('Connecting to Oura Ring...');
+        
+        const { data, error } = await supabase.functions.invoke('oura-auth-url', {
+          body: { user_id: user.id }
+        });
+
+        if (error || !data?.url) {
+          console.error('Error getting Oura auth URL:', error);
+          toast.error('Failed to initiate Oura connection');
+          return;
+        }
+
+        const width = 500;
+        const height = 700;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+        
+        window.open(
+          data.url,
+          'oura-oauth',
+          `width=${width},height=${height},left=${left},top=${top}`
+        );
+        
+        toast.info('Complete the authorization in the popup window');
+        return;
+      }
+
       // For other providers, show coming soon message
       toast.info(`${trackerInfo?.name} connection coming soon! OAuth integration in progress.`);
       
@@ -248,6 +277,29 @@ export function useHealthTrackerConnections() {
         if (error) {
           console.error('Error syncing Fitbit:', error);
           toast.error('Failed to sync Fitbit data');
+          return false;
+        }
+
+        if (data?.synced_dates?.length > 0) {
+          toast.success(`Synced ${data.synced_dates.length} days of sleep data`);
+        } else {
+          toast.info('No new sleep data to sync');
+        }
+        
+        await fetchConnections();
+        return true;
+      }
+
+      if (provider === 'oura') {
+        toast.info('Syncing Oura sleep data...');
+        
+        const { data, error } = await supabase.functions.invoke('oura-sync-sleep', {
+          body: { user_id: user.id, days }
+        });
+
+        if (error) {
+          console.error('Error syncing Oura:', error);
+          toast.error('Failed to sync Oura data');
           return false;
         }
 
