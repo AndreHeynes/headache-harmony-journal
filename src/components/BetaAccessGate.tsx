@@ -67,7 +67,7 @@ const BetaGateContent = ({ children }: BetaAccessGateProps) => {
             Please log in with your existing account to continue.
           </p>
           <Button asChild size="lg">
-            <a href="/signin">Go to Login</a>
+            <a href="/auth">Go to Login</a>
           </Button>
         </div>
       </div>
