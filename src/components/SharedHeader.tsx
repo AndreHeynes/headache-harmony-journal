@@ -1,4 +1,4 @@
-import { useBetaSession } from '@/contexts/BetaSessionContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 import {
@@ -11,7 +11,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export const SharedHeader = () => {
-  const { user, logout } = useBetaSession();
+  const { user, betaUser, signOut } = useAuth();
+  
+  // Use betaUser for display, fall back to Supabase user
+  const displayName = betaUser?.full_name || user?.user_metadata?.full_name || 'User';
+  const displayEmail = betaUser?.email || user?.email;
+  const isLoggedIn = !!user || !!betaUser;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,25 +35,25 @@ export const SharedHeader = () => {
           </span>
         </div>
 
-        {user && (
+        {isLoggedIn && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">
-                  {user.full_name || user.email}
+                  {displayName}
                 </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">{user.full_name || 'Beta Tester'}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <p className="text-sm font-medium">{displayName}</p>
+                  <p className="text-xs text-muted-foreground">{displayEmail}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-destructive cursor-pointer">
+              <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out
               </DropdownMenuItem>

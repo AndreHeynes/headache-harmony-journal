@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useBetaSession } from '@/contexts/BetaSessionContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,7 +26,7 @@ const FEEDBACK_ENDPOINT = 'https://plgarmijuqynxeyymkco.supabase.co/functions/v1
 type FeedbackType = 'bug' | 'feature' | 'usability' | 'general';
 
 export const BetaFeedbackForm = () => {
-  const { token } = useBetaSession();
+  const { hasBetaAccess } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>('general');
@@ -37,7 +37,9 @@ export const BetaFeedbackForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!token) {
+    const token = localStorage.getItem('beta_token');
+    
+    if (!token || !hasBetaAccess) {
       toast({
         title: "Error",
         description: "You must be logged in to submit feedback.",

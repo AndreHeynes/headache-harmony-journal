@@ -3,10 +3,23 @@ import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
+interface BetaUser {
+  email: string;
+  full_name: string;
+  product: string;
+}
+
 interface AuthContextType {
+  // Supabase auth
   user: User | null;
   session: Session | null;
   loading: boolean;
+  
+  // Beta info
+  betaUser: BetaUser | null;
+  hasBetaAccess: boolean;
+  
+  // Actions
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
@@ -26,9 +39,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [betaUser, setBetaUser] = useState<BetaUser | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Load beta user from localStorage
+    const storedBetaUser = localStorage.getItem('beta_user');
+    if (storedBetaUser) {
+      try {
+        setBetaUser(JSON.parse(storedBetaUser));
+      } catch (e) {
+        localStorage.removeItem('beta_user');
+      }
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -86,10 +110,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('beta_token');
+    localStorage.removeItem('beta_user');
+    setBetaUser(null);
   };
 
+  const hasBetaAccess = !!betaUser && !!localStorage.getItem('beta_token');
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      betaUser,
+      hasBetaAccess,
+      signUp, 
+      signIn, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );
