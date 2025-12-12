@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { APP_CONFIG } from "@/config/appConfig";
 
 const SignIn = () => {
   const { signIn } = useAuth();
@@ -75,9 +76,11 @@ const SignIn = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-gray-300">Password</Label>
-                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </Link>
+                  {!APP_CONFIG.BETA_MODE && (
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  )}
                 </div>
                 <div className="relative">
                   <Input
@@ -128,22 +131,26 @@ const SignIn = () => {
             </form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-700"></span>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-gray-800 px-2 text-gray-400">Or continue with</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
-                Google
-              </Button>
-              <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
-                Apple
-              </Button>
-            </div>
+            {!APP_CONFIG.BETA_MODE && (
+              <>
+                <div className="relative w-full">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-700"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-gray-800 px-2 text-gray-400">Or continue with</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                    Google
+                  </Button>
+                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                    Apple
+                  </Button>
+                </div>
+              </>
+            )}
             <p className="text-center text-sm text-gray-400 mt-4">
               Don't have an account?{" "}
               <Link to="/signup" className="text-primary hover:underline">
