@@ -3,14 +3,25 @@ import { useTokenValidation } from '@/hooks/useTokenValidation';
 import { useBetaSession } from '@/contexts/BetaSessionContext';
 import { Loader2, ShieldX, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { APP_CONFIG } from '@/config/appConfig';
 
 interface BetaAccessGateProps {
   children: ReactNode;
 }
 
-const SIGNUP_URL = 'https://head-relief-journey-49917.lovable.app/#beta';
+const SIGNUP_URL = APP_CONFIG.BETA_SIGNUP_URL;
 
 export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
+  // In production mode, bypass beta gating entirely
+  if (!APP_CONFIG.BETA_MODE) {
+    return <>{children}</>;
+  }
+
+  return <BetaGateContent>{children}</BetaGateContent>;
+};
+
+// Separate component to use hooks conditionally
+const BetaGateContent = ({ children }: BetaAccessGateProps) => {
   const { isValidating, isValid, error } = useTokenValidation();
   const { isTokenExpired, refreshSession } = useBetaSession();
 

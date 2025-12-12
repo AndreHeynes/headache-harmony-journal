@@ -29,6 +29,7 @@ import { DisclaimerProvider } from "./components/disclaimer";
 import { BetaAccessGate } from "./components/BetaAccessGate";
 import { SharedHeader } from "./components/SharedHeader";
 import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
+import { BetaModeRedirect } from "./components/auth/BetaModeRedirect";
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -120,8 +121,8 @@ const App = () => {
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/auth" element={<Auth />} />
-                      <Route path="/signin" element={<SignIn />} />
-                      <Route path="/signup" element={<SignUp />} />
+                      <Route path="/signin" element={<BetaModeRedirect><SignIn /></BetaModeRedirect>} />
+                      <Route path="/signup" element={<BetaModeRedirect><SignUp /></BetaModeRedirect>} />
                       <Route path="/support" element={<SupportServices />} />
                       <Route path="/policy" element={<Policy />} />
                       

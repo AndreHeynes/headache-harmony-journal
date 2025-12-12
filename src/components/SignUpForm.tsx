@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Mail, Lock, User, AlertCircle } from "lucide-react";
+import { Mail, Lock, User } from "lucide-react";
 import { AgeVerificationModal } from "./privacy/AgeVerificationModal";
 import { isValidEmail, isStrongPassword, getPasswordStrength, sanitizeInput } from "@/utils/validation";
 import { secureSetItem } from "@/utils/secureStorage";
@@ -11,8 +10,10 @@ import { FormField } from "./signup/FormField";
 import { PasswordStrengthIndicator } from "./signup/PasswordStrengthIndicator";
 import { ConsentSection } from "./signup/ConsentSection";
 import { SubmitButton } from "./signup/SubmitButton";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SignUpForm() {
+  const { signUp } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -125,7 +126,7 @@ export function SignUpForm() {
     });
   };
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
@@ -163,12 +164,25 @@ export function SignUpForm() {
     secureSetItem('user-name', sanitizedName);
     secureSetItem('user-email', sanitizedEmail);
 
-    // Simulate registration (will be replaced with actual API call)
-    setTimeout(() => {
-      toast.success("Account created successfully");
+    // Call real Supabase auth
+    const { error } = await signUp(sanitizedEmail, password, sanitizedName);
+    
+    if (error) {
+      console.error("Sign up error:", error);
+      if (error.message.includes("User already registered")) {
+        toast.error("This email is already registered. Please sign in instead.");
+      } else if (error.message.includes("Password")) {
+        toast.error("Password does not meet requirements. Please use a stronger password.");
+      } else {
+        toast.error(error.message || "Failed to create account. Please try again.");
+      }
       setIsLoading(false);
-      navigate("/profile");
-    }, 1500);
+      return;
+    }
+    
+    toast.success("Account created successfully! Please check your email to verify your account.");
+    setIsLoading(false);
+    navigate("/");
   };
 
   return (

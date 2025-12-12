@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,24 +7,37 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Mail, Lock, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
-  const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate authentication (replace with actual auth implementation)
-    setTimeout(() => {
-      toast.success("Successfully signed in");
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      console.error("Sign in error:", error);
+      if (error.message.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Please try again.");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("Please verify your email before signing in.");
+      } else {
+        toast.error(error.message || "Failed to sign in. Please try again.");
+      }
       setIsLoading(false);
-      navigate("/dashboard");
-    }, 1500);
+      return;
+    }
+    
+    toast.success("Successfully signed in");
+    setIsLoading(false);
+    // Navigation is handled by AuthContext onAuthStateChange
   };
 
   return (
