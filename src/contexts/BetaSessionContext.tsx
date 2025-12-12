@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BetaUser {
   email: string;
@@ -19,7 +20,8 @@ interface BetaSessionContextType {
 
 const BetaSessionContext = createContext<BetaSessionContextType | undefined>(undefined);
 
-const VALIDATION_ENDPOINT = 'https://plgarmijuqynxeyymkco.supabase.co/functions/v1/validate-beta-token';
+// Use our local edge function for validation
+const VALIDATION_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-and-auth`;
 
 export const BetaSessionProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<BetaUser | null>(null);
@@ -63,13 +65,18 @@ export const BetaSessionProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Clear beta session
     setUser(null);
     setToken(null);
     setTokenExpiresAt(null);
     localStorage.removeItem('beta_access_token');
     localStorage.removeItem('beta_user');
     localStorage.removeItem('beta_token_expires_at');
+    
+    // Also sign out from Supabase
+    await supabase.auth.signOut();
+    
     // Redirect to HeadacheRecovery signup
     window.location.href = 'https://head-relief-journey-49917.lovable.app/#beta';
   }, []);
@@ -89,6 +96,15 @@ export const BetaSessionProvider = ({ children }: { children: ReactNode }) => {
       
       if (data.valid && data.user) {
         setSession(data.user, token, data.token_expires_at);
+        
+        // If we got a new Supabase session, set it
+        if (data.supabase_session?.access_token) {
+          await supabase.auth.setSession({
+            access_token: data.supabase_session.access_token,
+            refresh_token: data.supabase_session.refresh_token || '',
+          });
+        }
+        
         return true;
       } else {
         logout();
