@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBetaSession } from '@/contexts/BetaSessionContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TokenValidationResult {
   isValidating: boolean;
@@ -7,7 +8,8 @@ interface TokenValidationResult {
   error: string | null;
 }
 
-const VALIDATION_ENDPOINT = 'https://plgarmijuqynxeyymkco.supabase.co/functions/v1/validate-beta-token';
+// Use our local edge function that handles both validation AND auto-auth
+const VALIDATION_ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-and-auth`;
 
 export const useTokenValidation = (): TokenValidationResult => {
   const { user, token, isAuthenticated, isTokenExpired, setSession } = useBetaSession();
@@ -47,6 +49,8 @@ export const useTokenValidation = (): TokenValidationResult => {
       }
 
       try {
+        console.log('Validating token via local endpoint...');
+        
         const response = await fetch(VALIDATION_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -59,9 +63,27 @@ export const useTokenValidation = (): TokenValidationResult => {
         const data = await response.json();
 
         if (data.valid && data.user) {
+          // Set beta session
           setSession(data.user, tokenToValidate, data.token_expires_at);
           setIsValid(true);
           setError(null);
+          
+          // If we got a Supabase session, set it automatically
+          if (data.supabase_session?.access_token) {
+            console.log('Auto-authenticating with Supabase session...');
+            
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: data.supabase_session.access_token,
+              refresh_token: data.supabase_session.refresh_token || '',
+            });
+
+            if (sessionError) {
+              console.error('Failed to set Supabase session:', sessionError.message);
+              // Don't fail the whole flow - beta access still works
+            } else {
+              console.log('Supabase session set successfully - user fully authenticated');
+            }
+          }
           
           // Clean up URL if token was in query params
           if (urlParams.has('token')) {
