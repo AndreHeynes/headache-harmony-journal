@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
+import { APP_CONFIG } from '@/config/appConfig';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,16 +24,18 @@ export const SharedHeader = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <img 
-            src="/lovable-uploads/c5a5c01e-5749-4190-89d4-d98341af6eae.png" 
-            alt="Headache Journal" 
-            className="h-8 w-auto"
+            src="/lovable-uploads/78336bbf-2702-4d43-abaa-d5f6e646d8b4.png" 
+            alt="My Headache Experience Journal" 
+            className="h-8 w-8 rounded-full"
           />
           <span className="font-semibold text-lg hidden sm:inline">
-            Headache Journal
+            My Headache Experience Journal!™
           </span>
-          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-            Beta
-          </span>
+          {APP_CONFIG.BETA_MODE && (
+            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              Beta
+            </span>
+          )}
         </div>
 
         {isLoggedIn && (
