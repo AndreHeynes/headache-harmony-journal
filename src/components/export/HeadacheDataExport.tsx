@@ -18,6 +18,7 @@ import { format } from "date-fns";
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
   isPremium?: boolean;
+  loading?: boolean;
 }
 
 interface HeadacheRecord {
@@ -69,12 +70,16 @@ const demoHeadacheData: HeadacheRecord[] = [
   }
 ];
 
-export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium = false }: HeadacheDataExportProps) {
+export function HeadacheDataExport({ headacheData, isPremium = false, loading = false }: HeadacheDataExportProps) {
   const [exportFormat, setExportFormat] = useState<"pdf" | "csv">("pdf");
   const { logTestEvent, isTestMode } = useTestContext();
   const [isGenerating, setIsGenerating] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { profile } = usePatientProfile();
+  
+  // Use demo data only if no real data provided
+  const exportData = headacheData && headacheData.length > 0 ? headacheData : demoHeadacheData;
+  const isUsingDemoData = !headacheData || headacheData.length === 0;
 
   const handleExportRequest = () => {
     // Validate user session
@@ -113,9 +118,10 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
         component: "HeadacheDataExport",
         metadata: {
           format: exportFormat,
-          recordCount: headacheData.length,
+          recordCount: exportData.length,
           userId: session.id,
-          isBetaTester: session.isBetaTester
+          isBetaTester: session.isBetaTester,
+          isUsingDemoData
         }
       });
     }
@@ -131,7 +137,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
         }
 
         // Log the export activity
-        logExportActivity(exportFormat, headacheData.length, fileSize);
+        logExportActivity(exportFormat, exportData.length, fileSize);
 
         toast.success(`Headache data exported as ${exportFormat.toUpperCase()}`, {
           description: "Export logged for security. You can now share this with your healthcare provider."
@@ -181,7 +187,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     doc.text(`Email: ${patientEmail}`, 20, 52);
     doc.text(`First Data Recorded: ${firstDataDate}`, 20, 58);
     doc.text(`Tracking Period: ${trackingPeriod}`, 20, 64);
-    doc.text(`Total Episodes: ${profile?.totalEpisodes || headacheData.length}`, 20, 70);
+    doc.text(`Total Episodes: ${profile?.totalEpisodes || exportData.length}`, 20, 70);
     doc.text(`Report Generated: ${format(new Date(), 'PPP')}`, 20, 76);
     
     // Add verification note
@@ -224,7 +230,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     yPos += 10;
     
     // Add headache records
-    headacheData.forEach((record, index) => {
+    exportData.forEach((record, index) => {
       // Ensure we don't go off the page
       if (yPos > 250) {
         doc.addPage();
@@ -270,12 +276,12 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     doc.text("Summary", 20, 20);
     
     doc.setFontSize(10);
-    doc.text(`Total Headache Episodes: ${headacheData.length}`, 20, 30);
+    doc.text(`Total Headache Episodes: ${exportData.length}`, 20, 30);
     
-    const avgIntensity = headacheData.reduce((sum, record) => sum + record.intensity, 0) / headacheData.length;
+    const avgIntensity = exportData.reduce((sum, record) => sum + record.intensity, 0) / exportData.length;
     doc.text(`Average Intensity: ${avgIntensity.toFixed(1)}/10`, 20, 35);
     
-    const avgDuration = headacheData.reduce((sum, record) => sum + record.duration, 0) / headacheData.length;
+    const avgDuration = exportData.reduce((sum, record) => sum + record.duration, 0) / exportData.length;
     doc.text(`Average Duration: ${avgDuration.toFixed(0)} minutes`, 20, 40);
     
     // Save the PDF with secure filename
@@ -301,7 +307,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     csvContent += `# Patient Email: ${patientEmail}\n`;
     csvContent += `# First Data Recorded: ${firstDataDate}\n`;
     csvContent += `# Tracking Period: ${profile?.trackingPeriodDays || 0} days\n`;
-    csvContent += `# Total Episodes: ${profile?.totalEpisodes || headacheData.length}\n`;
+    csvContent += `# Total Episodes: ${profile?.totalEpisodes || exportData.length}\n`;
     csvContent += `# ========================================\n`;
     csvContent += `# Export ID: ${Date.now()}-${session.id.slice(-8)}\n`;
     csvContent += `# Generated: ${format(new Date(), 'PPpp')}\n`;
@@ -309,7 +315,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
     csvContent += `# This report should be verified against the patient presenting to the healthcare provider.\n#\n`;
     csvContent += "Date,Intensity,Location,Duration,Symptoms,Triggers,Treatments,Notes\n";
     
-    headacheData.forEach(record => {
+    exportData.forEach(record => {
       const row = [
         new Date(record.date).toLocaleDateString(),
         record.intensity,
@@ -370,6 +376,19 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
               </div>
             ) : (
               <>
+                {/* Demo Data Warning */}
+                {isUsingDemoData && (
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-400" />
+                      <span className="text-amber-300 font-medium text-sm">No Headache Data Found</span>
+                    </div>
+                    <p className="text-amber-200 text-xs">
+                      You haven't logged any completed headache episodes yet. The preview below shows sample data for demonstration purposes only. Start logging your headaches to export your real data.
+                    </p>
+                  </div>
+                )}
+
                 {/* Security Notice */}
                 <div className="bg-green-500/10 border border-green-500/20 rounded-md p-3">
                   <div className="flex items-center gap-2 mb-2">
@@ -399,7 +418,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {headacheData.map((record) => (
+                          {exportData.map((record) => (
                             <TableRow key={record.id} className="border-gray-800">
                               <TableCell className="text-gray-300">
                                 {new Date(record.date).toLocaleDateString()}
@@ -464,7 +483,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
         </CardContent>
         <CardFooter className="justify-between">
           <div className="text-xs text-gray-500">
-            {headacheData.length} records • Security verified
+            {exportData.length} records{isUsingDemoData ? ' (demo)' : ''} • Security verified
           </div>
           <div className="flex space-x-2">
             <Button
@@ -494,7 +513,7 @@ export function HeadacheDataExport({ headacheData = demoHeadacheData, isPremium 
         onClose={() => setShowConfirmDialog(false)}
         onConfirm={handleConfirmedExport}
         exportType={exportFormat}
-        recordCount={headacheData.length}
+        recordCount={exportData.length}
       />
     </>
   );

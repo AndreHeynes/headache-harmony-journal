@@ -1,18 +1,18 @@
-
 import React from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { HeadacheDataExport } from "@/components/export/HeadacheDataExport";
 import { useTestContext } from "@/contexts/TestContext";
 import BottomNavWithTest from "@/components/layout/BottomNavWithTest";
+import { useExportData } from "@/hooks/useExportData";
 
 export default function DataExport() {
   const navigate = useNavigate();
   const { isTestMode, isPremiumOverride, logTestEvent } = useTestContext();
+  const { data: headacheData, loading, hasData } = useExportData();
   
   React.useEffect(() => {
-    // Log page visit for testing analytics
     if (isTestMode) {
       logTestEvent({
         type: "navigation",
@@ -46,7 +46,17 @@ export default function DataExport() {
           This helps them better understand your headache patterns and make more informed treatment decisions.
         </p>
         
-        <HeadacheDataExport isPremium={isPremiumOverride} />
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2 text-gray-400">Loading your headache data...</span>
+          </div>
+        ) : (
+          <HeadacheDataExport 
+            headacheData={hasData ? headacheData : undefined} 
+            isPremium={isPremiumOverride} 
+          />
+        )}
         
         <div className="bg-gray-800/50 border-gray-700 p-4 rounded-lg">
           <h3 className="text-white font-medium mb-2">Sharing Tips</h3>
