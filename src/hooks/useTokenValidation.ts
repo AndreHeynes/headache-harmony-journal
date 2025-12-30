@@ -74,7 +74,7 @@ export const useTokenValidation = (): TokenValidationResult => {
 
           // Handle auto-created Supabase session
           if (data.supabase_session) {
-            console.log('Setting Supabase session for new user');
+            console.log('Setting Supabase session...');
 
             const { error: sessionError } = await supabase.auth.setSession({
               access_token: data.supabase_session.access_token,
@@ -83,12 +83,24 @@ export const useTokenValidation = (): TokenValidationResult => {
 
             if (sessionError) {
               console.error('Failed to set session:', sessionError);
-            } else {
-              setIsNewUser(true);
-              console.log('User automatically logged in!');
+              setError('Failed to establish session. Please try again.');
+              setIsValid(false);
+              localStorage.removeItem('beta_token');
+              localStorage.removeItem('beta_user');
+              return;
             }
+            
+            setIsNewUser(data.is_new_user ?? true);
+            console.log('User automatically logged in!');
+          } else {
+            // This should no longer happen - treat as error
+            console.error('Valid token but no session returned - unexpected state');
+            setError('Authentication failed. Please try clicking your access link again.');
+            setIsValid(false);
+            localStorage.removeItem('beta_token');
+            localStorage.removeItem('beta_user');
+            return;
           }
-          // If no supabase_session, user exists and needs to log in manually
 
           // Clean up URL
           if (urlParams.has('token')) {
