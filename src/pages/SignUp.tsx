@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { SignUpForm } from "@/components/SignUpForm";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { APP_CONFIG } from "@/config/appConfig";
 
 const SignUp = () => {
   return (
@@ -24,22 +25,26 @@ const SignUp = () => {
             <SignUpForm />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <div className="relative w-full">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-700"></span>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-gray-800 px-2 text-gray-400">Or sign up with</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
-                Google
-              </Button>
-              <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
-                Apple
-              </Button>
-            </div>
+            {!APP_CONFIG.BETA_MODE && (
+              <>
+                <div className="relative w-full">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-gray-700"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-gray-800 px-2 text-gray-400">Or sign up with</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                    Google
+                  </Button>
+                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                    Apple
+                  </Button>
+                </div>
+              </>
+            )}
             <p className="text-center text-sm text-gray-400 mt-4">
               Already have an account?{" "}
               <Link to="/signin" className="text-primary hover:underline">
