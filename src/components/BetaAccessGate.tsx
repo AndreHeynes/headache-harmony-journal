@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useTokenValidation } from '@/hooks/useTokenValidation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, ShieldX, LogIn } from 'lucide-react';
+import { Loader2, ShieldX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_CONFIG } from '@/config/appConfig';
 
@@ -22,8 +22,8 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
 
 // Separate component to use hooks conditionally
 const BetaGateContent = ({ children }: BetaAccessGateProps) => {
-  const { isValidating, isValid, isNewUser, error } = useTokenValidation();
-  const { user, loading: authLoading } = useAuth();
+  const { isValidating, isValid, error } = useTokenValidation();
+  const { loading: authLoading } = useAuth();
 
   // Show loading while validating token or checking auth
   if (isValidating || authLoading) {
@@ -35,7 +35,7 @@ const BetaGateContent = ({ children }: BetaAccessGateProps) => {
     );
   }
 
-  // No valid beta token
+  // No valid beta token (covers both missing token AND session establishment failures)
   if (!isValid) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
@@ -56,24 +56,6 @@ const BetaGateContent = ({ children }: BetaAccessGateProps) => {
     );
   }
 
-  // Valid beta token but existing user needs to log in
-  if (isValid && !isNewUser && !user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-        <div className="max-w-md text-center space-y-6">
-          <LogIn className="h-16 w-16 text-primary mx-auto" />
-          <h1 className="text-2xl font-bold text-foreground">Welcome Back!</h1>
-          <p className="text-muted-foreground">
-            Please log in with your existing account to continue.
-          </p>
-          <Button asChild size="lg">
-            <a href="/auth">Go to Login</a>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // All good - render app!
+  // All good - valid token AND session established - render app!
   return <>{children}</>;
 };
