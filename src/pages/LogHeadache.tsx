@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import LogPainLocation from "@/components/logheadache/LogPainLocation";
@@ -27,6 +27,7 @@ export default function LogHeadache() {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentEpisodeId, setCurrentEpisodeId] = useState<string | null>(null);
   const [showEpisodeModal, setShowEpisodeModal] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   
@@ -44,6 +45,19 @@ export default function LogHeadache() {
       setShowEpisodeModal(true);
     }
   }, [activeEpisode, currentEpisodeId]);
+
+  // Auto-start episode if none exists when logging begins
+  useEffect(() => {
+    const autoStartEpisode = async () => {
+      if (!currentEpisodeId && !activeEpisode && !showEpisodeModal) {
+        const episodeId = await startNewEpisode();
+        if (episodeId) {
+          setCurrentEpisodeId(episodeId);
+        }
+      }
+    };
+    autoStartEpisode();
+  }, [currentEpisodeId, activeEpisode, showEpisodeModal, startNewEpisode]);
 
   const handleContinueEpisode = () => {
     if (activeEpisode) {
@@ -64,7 +78,14 @@ export default function LogHeadache() {
     }
   };
 
+  const markStepComplete = (stepId: string) => {
+    setCompletedSteps(prev => new Set([...prev, stepId]));
+  };
+
   const handleNext = async () => {
+    // Mark current step as complete
+    markStepComplete(steps[currentStep].id);
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(current => current + 1);
     } else {
@@ -83,6 +104,8 @@ export default function LogHeadache() {
       navigate(-1);
     }
   };
+
+  const progressPercentage = ((completedSteps.size) / steps.length) * 100;
 
   return (
     <>
@@ -106,10 +129,39 @@ export default function LogHeadache() {
               Step {currentStep + 1} of {steps.length}
             </div>
           </div>
+          {/* Progress bar */}
+          <div className="h-1 bg-gray-700">
+            <div 
+              className="h-full bg-primary transition-all duration-300" 
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
         </header>
 
         <main className="pt-20 px-4 pb-20">
-          <CurrentStepComponent />
+          {/* Step indicators */}
+          <div className="flex justify-center gap-2 mb-4">
+            {steps.map((step, index) => (
+              <div 
+                key={step.id}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                  completedSteps.has(step.id) 
+                    ? 'bg-primary text-charcoal' 
+                    : index === currentStep 
+                      ? 'bg-primary/30 text-white border border-primary' 
+                      : 'bg-gray-700 text-gray-400'
+                }`}
+              >
+                {completedSteps.has(step.id) ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  index + 1
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
         <footer className="fixed bottom-0 left-0 right-0 p-4 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700">
