@@ -1,12 +1,47 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import SkullViewer from "../SkullViewer";
 import { PainSpreadSelector } from "./pain-location/PainSpreadSelector";
+import { useEpisode } from "@/contexts/EpisodeContext";
 
-export default function LogPainLocation() {
+interface LogPainLocationProps {
+  episodeId?: string | null;
+}
+
+export default function LogPainLocation({ episodeId }: LogPainLocationProps) {
   const [painSpreads, setPainSpreads] = useState(false);
   const [spreadPattern, setSpreadPattern] = useState("remain");
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const { updateEpisode, activeEpisode } = useEpisode();
+
+  // Load existing pain location
+  useEffect(() => {
+    if (activeEpisode?.pain_location) {
+      setSelectedLocation(activeEpisode.pain_location);
+    }
+  }, [activeEpisode]);
+
+  const handleLocationChange = async (location: string) => {
+    setSelectedLocation(location);
+    if (episodeId) {
+      const fullLocation = painSpreads 
+        ? `${location} (${spreadPattern})`
+        : location;
+      await updateEpisode(episodeId, { pain_location: fullLocation });
+    }
+  };
+
+  const handleSpreadChange = async (spreads: boolean, pattern: string) => {
+    setPainSpreads(spreads);
+    setSpreadPattern(pattern);
+    
+    if (episodeId && selectedLocation) {
+      const fullLocation = spreads 
+        ? `${selectedLocation} (${pattern})`
+        : selectedLocation;
+      await updateEpisode(episodeId, { pain_location: fullLocation });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -16,7 +51,7 @@ export default function LogPainLocation() {
           <p className="text-sm text-white/70">
             Click on the skull diagram to mark your pain locations. The app will automatically determine distribution patterns.
           </p>
-          <SkullViewer />
+          <SkullViewer onLocationSelect={handleLocationChange} />
         </div>
       </Card>
 
@@ -24,9 +59,9 @@ export default function LogPainLocation() {
         <div className="p-4 space-y-4">
           <PainSpreadSelector 
             painSpreads={painSpreads} 
-            setPainSpreads={setPainSpreads} 
+            setPainSpreads={(spreads) => handleSpreadChange(spreads, spreadPattern)} 
             spreadPattern={spreadPattern} 
-            setSpreadPattern={setSpreadPattern} 
+            setSpreadPattern={(pattern) => handleSpreadChange(painSpreads, pattern)} 
           />
         </div>
       </Card>

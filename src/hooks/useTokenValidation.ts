@@ -56,7 +56,7 @@ export const useTokenValidation = (): TokenValidationResult => {
 
         console.log('Validating token via endpoint...');
 
-        // Call the validate-beta-token endpoint on the landing page
+        // Call the validate-beta-token endpoint
         const response = await fetch(VALIDATION_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -71,10 +71,48 @@ export const useTokenValidation = (): TokenValidationResult => {
           localStorage.setItem('beta_user', JSON.stringify(data.user));
           setUser(data.user);
           setIsValid(true);
+          setIsNewUser(data.isNewUser ?? true);
 
-          // Handle auto-created Supabase session
-          if (data.supabase_session) {
-            console.log('Setting Supabase session...');
+          // Handle magic link token authentication
+          if (data.magicLinkToken) {
+            console.log('Exchanging magic link token for session...');
+
+            // Use verifyOtp to exchange the magic link token for a session
+            const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
+              token_hash: data.magicLinkToken,
+              type: 'magiclink',
+            });
+
+            if (otpError) {
+              console.error('Failed to verify magic link token:', otpError);
+              // Try alternative: email + token
+              const { error: altError } = await supabase.auth.verifyOtp({
+                email: data.user.email,
+                token: data.magicLinkToken,
+                type: 'magiclink',
+              });
+
+              if (altError) {
+                console.error('Alternative verification also failed:', altError);
+                setError('Failed to establish session. Please try clicking your access link again.');
+                setIsValid(false);
+                localStorage.removeItem('beta_token');
+                localStorage.removeItem('beta_user');
+                setIsValidating(false);
+                hasValidated.current = true;
+                return;
+              }
+            }
+
+            console.log('User authenticated successfully!');
+          } else if (data.requiresSignIn) {
+            // Edge function couldn't generate session - user needs to sign in
+            console.log('Token valid but requires sign-in flow');
+            // The user is valid but we couldn't auto-authenticate
+            // They can still use the app with beta access, but may need to sign in
+          } else if (data.supabase_session) {
+            // Legacy: Handle direct session (backward compatibility)
+            console.log('Setting Supabase session from direct response...');
 
             const { error: sessionError } = await supabase.auth.setSession({
               access_token: data.supabase_session.access_token,
@@ -87,19 +125,12 @@ export const useTokenValidation = (): TokenValidationResult => {
               setIsValid(false);
               localStorage.removeItem('beta_token');
               localStorage.removeItem('beta_user');
+              setIsValidating(false);
+              hasValidated.current = true;
               return;
             }
             
-            setIsNewUser(data.is_new_user ?? true);
             console.log('User automatically logged in!');
-          } else {
-            // This should no longer happen - treat as error
-            console.error('Valid token but no session returned - unexpected state');
-            setError('Authentication failed. Please try clicking your access link again.');
-            setIsValid(false);
-            localStorage.removeItem('beta_token');
-            localStorage.removeItem('beta_user');
-            return;
           }
 
           // Clean up URL

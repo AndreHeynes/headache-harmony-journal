@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Eye, EyeOff, Save, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export function PersonalInfoCard() {
   const [name, setName] = useState("");
@@ -19,34 +20,52 @@ export function PersonalInfoCard() {
   const [isOver16, setIsOver16] = useState(false);
   const [showParentalConsent, setShowParentalConsent] = useState(false);
   const [parentalConsent, setParentalConsent] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const { user } = useAuth();
+
+  // Get user-scoped storage key
+  const getStorageKey = (key: string) => {
+    return user ? `user_${user.id}_${key}` : key;
+  };
 
   // Check if we have stored preferences
   useEffect(() => {
-    const savedConsent = localStorage.getItem('data-consent');
-    if (savedConsent) {
-      setHasConsented(JSON.parse(savedConsent));
-    }
-    
-    const savedName = localStorage.getItem('user-name');
-    if (savedName) {
-      setName(savedName);
-    }
-    
-    const savedGender = localStorage.getItem('user-gender');
-    if (savedGender) {
-      setGender(savedGender);
-    }
-    
-    const savedAge = localStorage.getItem('user-age');
-    if (savedAge) {
-      setAge(savedAge);
+    const loadUserData = async () => {
+      // Load from localStorage (user-scoped)
+      const savedConsent = localStorage.getItem(getStorageKey('data-consent'));
+      if (savedConsent) {
+        setHasConsented(JSON.parse(savedConsent));
+      }
       
-      // Check if over 16 for GDPR compliance
-      const ageNum = parseInt(savedAge, 10);
-      setIsOver16(ageNum >= 16);
-      setShowParentalConsent(!isOver16 && ageNum > 0);
-    }
-  }, []);
+      const savedGender = localStorage.getItem(getStorageKey('gender'));
+      if (savedGender) {
+        setGender(savedGender);
+      }
+      
+      const savedAge = localStorage.getItem(getStorageKey('age'));
+      if (savedAge) {
+        setAge(savedAge);
+        const ageNum = parseInt(savedAge, 10);
+        setIsOver16(ageNum >= 16);
+        setShowParentalConsent(ageNum > 0 && ageNum < 16);
+      }
+
+      // Load name from profile if user is authenticated
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setName(profile.full_name);
+        }
+      }
+    };
+
+    loadUserData();
+  }, [user]);
 
   const handleAgeChange = (value: string) => {
     setAge(value);
@@ -60,7 +79,7 @@ export function PersonalInfoCard() {
     }
   };
 
-  const handleSaveInfo = () => {
+  const handleSaveInfo = async () => {
     // Validate consent requirements
     if (!hasConsented) {
       toast.error("You must consent to data processing to save your information");
@@ -72,24 +91,47 @@ export function PersonalInfoCard() {
       toast.error("Parental consent is required for users under 16");
       return;
     }
+
+    setIsSaving(true);
     
-    // Save data to localStorage
-    localStorage.setItem('data-consent', JSON.stringify(hasConsented));
-    localStorage.setItem('user-name', name);
-    localStorage.setItem('user-gender', gender);
-    
-    if (age) {
-      localStorage.setItem('user-age', age);
-      localStorage.setItem('age-consent', JSON.stringify(ageConsent));
+    try {
+      // Save to localStorage (user-scoped)
+      localStorage.setItem(getStorageKey('data-consent'), JSON.stringify(hasConsented));
+      localStorage.setItem(getStorageKey('gender'), gender);
+      
+      if (age) {
+        localStorage.setItem(getStorageKey('age'), age);
+        localStorage.setItem(getStorageKey('age-consent'), JSON.stringify(ageConsent));
+      }
+      
+      if (showParentalConsent) {
+        localStorage.setItem(getStorageKey('parental-consent'), JSON.stringify(parentalConsent));
+      }
+
+      // Update profile in database if user is authenticated
+      if (user && name) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ full_name: name })
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Error updating profile:', error);
+          throw error;
+        }
+      }
+      
+      toast.success("Personal information saved", {
+        description: "Your information has been updated successfully"
+      });
+    } catch (error) {
+      console.error('Save error:', error);
+      toast.error("Failed to save", {
+        description: "Please try again"
+      });
+    } finally {
+      setIsSaving(false);
     }
-    
-    if (showParentalConsent) {
-      localStorage.setItem('parental-consent', JSON.stringify(parentalConsent));
-    }
-    
-    toast.success("Personal information saved", {
-      description: "Your information has been updated successfully"
-    });
   };
 
   return (
@@ -214,10 +256,10 @@ export function PersonalInfoCard() {
           <Button 
             onClick={handleSaveInfo} 
             className="w-full bg-primary hover:bg-primary/90 text-black"
-            disabled={!hasConsented}
+            disabled={!hasConsented || isSaving}
           >
             <Save className="mr-2 h-4 w-4" />
-            Save Information
+            {isSaving ? 'Saving...' : 'Save Information'}
           </Button>
         </div>
       </div>

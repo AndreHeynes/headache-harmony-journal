@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
@@ -11,9 +10,55 @@ import { NotesSection } from "./sections/NotesSection";
 import { TreatmentDetailsRenderer } from "./sections/treatment/TreatmentDetailsRenderer";
 import { TreatmentSection } from "./sections/treatment/TreatmentSection";
 import { SaveTreatmentButton } from "./sections/treatment/SaveTreatmentButton";
+import { useEpisode } from "@/contexts/EpisodeContext";
 
-export default function LogTreatment() {
+interface LogTreatmentProps {
+  episodeId?: string | null;
+}
+
+export default function LogTreatment({ episodeId }: LogTreatmentProps) {
   const [treatmentType, setTreatmentType] = useState<TreatmentType>("");
+  const [effectiveness, setEffectiveness] = useState<number>(0);
+  const [notes, setNotes] = useState<string>("");
+  const [treatmentData, setTreatmentData] = useState<any>({});
+  const { updateEpisode, activeEpisode } = useEpisode();
+
+  // Load existing treatment data
+  useEffect(() => {
+    if (activeEpisode?.treatment) {
+      const treatment = activeEpisode.treatment as any;
+      if (treatment.type) setTreatmentType(treatment.type);
+      if (treatment.effectiveness) setEffectiveness(treatment.effectiveness);
+      if (treatment.notes) setNotes(treatment.notes);
+      setTreatmentData(treatment);
+    }
+  }, [activeEpisode]);
+
+  const handleTreatmentTypeChange = async (type: TreatmentType) => {
+    setTreatmentType(type);
+    const updatedTreatment = { ...treatmentData, type };
+    setTreatmentData(updatedTreatment);
+    
+    if (episodeId) {
+      await updateEpisode(episodeId, { treatment: updatedTreatment });
+    }
+  };
+
+  const handleSaveTreatment = async () => {
+    if (episodeId) {
+      const fullTreatment = {
+        ...treatmentData,
+        type: treatmentType,
+        effectiveness,
+        notes,
+        savedAt: new Date().toISOString(),
+      };
+      await updateEpisode(episodeId, { 
+        treatment: fullTreatment,
+        notes: notes || activeEpisode?.notes 
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -24,7 +69,7 @@ export default function LogTreatment() {
           {/* Treatment Selection */}
           <TreatmentSelectionSection 
             selectedTreatment={treatmentType}
-            onTreatmentChange={setTreatmentType}
+            onTreatmentChange={handleTreatmentTypeChange}
           />
           
           {/* Treatment Details - conditional rendering based on treatment type */}
@@ -57,7 +102,7 @@ export default function LogTreatment() {
             <NotesSection />
           </TreatmentSection>
           
-          <SaveTreatmentButton />
+          <SaveTreatmentButton onSave={handleSaveTreatment} />
         </div>
       </Card>
     </div>

@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Download, Trash2, AlertCircle, Shield, History } from "lucide-react";
+import { Download, Trash2, Shield, History } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { 
@@ -15,60 +14,62 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { getUserSession, validateUserSession, getUserExportHistory, clearUserSession } from "@/utils/userSession";
-import { checkRateLimit } from "@/utils/rateLimiting";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function DataManagementCard() {
-  const [showExportHistory, setShowExportHistory] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const { user } = useAuth();
 
-  const handleExportData = () => {
-    // Validate user session first
-    if (!validateUserSession()) {
-      toast.error("Session validation failed", {
-        description: "Please refresh the page and try again"
-      });
+  const handleExportData = async () => {
+    if (!user) {
+      toast.error("Please sign in to export your data");
       return;
     }
 
-    const session = getUserSession();
-    
-    // Check rate limiting
-    const rateLimitCheck = checkRateLimit(session.id, 'download');
-    if (!rateLimitCheck.allowed) {
-      toast.error("Download limit reached", {
-        description: rateLimitCheck.message
-      });
-      return;
-    }
+    setIsExporting(true);
+    try {
+      // Fetch real headache episodes from database
+      const { data: episodes, error } = await supabase
+        .from('headache_episodes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-    toast.success("Redirecting to secure export", {
-      description: "Opening the secure data export page"
-    });
-    
-    // In a real app, this would navigate to the export page
-    setTimeout(() => {
-      const dummyData = {
+      if (error) throw error;
+
+      // Fetch user profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Prepare export data
+      const exportData = {
         exportInfo: {
-          userId: session.id,
-          timestamp: new Date().toISOString(),
-          sessionFingerprint: session.fingerprint.slice(0, 8)
+          userId: user.id,
+          email: user.email,
+          exportedAt: new Date().toISOString(),
+          totalEpisodes: episodes?.length || 0,
         },
-        headaches: [
-          { date: new Date().toISOString(), intensity: 7, location: "temple", duration: 120 }
-        ],
-        triggers: ["stress", "lack of sleep"],
-        treatments: ["ibuprofen"]
+        profile: profile || null,
+        headacheEpisodes: episodes || [],
+        exportMetadata: {
+          version: '1.0',
+          format: 'JSON',
+        }
       };
       
       // Create a downloadable file
-      const dataStr = JSON.stringify(dummyData, null, 2);
+      const dataStr = JSON.stringify(exportData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
       
-      // Create a link and trigger download with secure filename
+      // Create a link and trigger download
       const a = document.createElement('a');
       a.href = url;
-      a.download = `headache-data-${session.id.slice(-8)}-${Date.now()}.json`;
+      a.download = `headache-data-${user.id.slice(-8)}-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       
@@ -76,41 +77,81 @@ export function DataManagementCard() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      toast.success("Secure export complete", {
-        description: "Your data has been downloaded with security verification"
+      toast.success("Export complete", {
+        description: `Exported ${episodes?.length || 0} headache episodes`
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error("Export failed", {
+        description: "Failed to export your data. Please try again."
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
-  const handleViewExportHistory = () => {
-    const history = getUserExportHistory();
-    if (history.length === 0) {
-      toast.info("No export history found", {
-        description: "You haven't exported any data yet"
-      });
+  const handleViewExportHistory = async () => {
+    if (!user) {
+      toast.error("Please sign in to view export history");
       return;
     }
 
-    setShowExportHistory(true);
-    toast.success(`Found ${history.length} export records`, {
-      description: "Showing your recent export activity"
+    // Fetch episode count as a simple history indicator
+    const { count } = await supabase
+      .from('headache_episodes')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    toast.info(`You have ${count || 0} episodes logged`, {
+      description: "Export your data to get a full backup"
     });
   };
 
-  const handleDeleteAllData = () => {
-    // Clear user session and all associated data
-    clearUserSession();
-    localStorage.removeItem('export_logs');
-    localStorage.clear();
-    
-    toast.success("All data deleted", {
-      description: "Your data and session have been permanently removed. Page will reload."
-    });
-    
-    // Reload page to reset application state
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+  const handleDeleteAllData = async () => {
+    if (!user) {
+      toast.error("Please sign in to delete your data");
+      return;
+    }
+
+    try {
+      // Delete all headache episodes for this user
+      const { error: episodesError } = await supabase
+        .from('headache_episodes')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (episodesError) throw episodesError;
+
+      // Delete health data
+      const { error: healthError } = await supabase
+        .from('unified_health_data')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (healthError) console.error('Health data deletion error:', healthError);
+
+      // Clear local storage for this user
+      const keysToRemove = Object.keys(localStorage).filter(key => 
+        key.startsWith(`user_${user.id}_`) || 
+        key === 'beta_token' || 
+        key === 'beta_user'
+      );
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      toast.success("All data deleted", {
+        description: "Your headache data has been permanently removed."
+      });
+      
+      // Reload page to reset application state
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error("Delete failed", {
+        description: "Failed to delete your data. Please try again."
+      });
+    }
   };
 
   return (
@@ -121,7 +162,7 @@ export function DataManagementCard() {
         <Shield className="h-4 w-4 text-green-400" />
       </div>
       <p className="text-sm text-gray-400 mb-4">
-        Export or delete your headache tracking data with enhanced security features for beta testing.
+        Export or delete your headache tracking data. All exports include your complete episode history.
       </p>
       
       <div className="flex flex-col space-y-3">
@@ -129,18 +170,20 @@ export function DataManagementCard() {
           variant="outline" 
           className="bg-teal-500/10 border-teal-500/30 text-teal-300 hover:bg-teal-500/20"
           onClick={handleExportData}
+          disabled={isExporting || !user}
         >
           <Download className="h-4 w-4 mr-2" />
-          Secure Export Data
+          {isExporting ? 'Exporting...' : 'Export My Data'}
         </Button>
 
         <Button 
           variant="outline" 
           className="bg-blue-500/10 border-blue-500/30 text-blue-300 hover:bg-blue-500/20"
           onClick={handleViewExportHistory}
+          disabled={!user}
         >
           <History className="h-4 w-4 mr-2" />
-          View Export History
+          View Data Summary
         </Button>
         
         <AlertDialog>
@@ -148,6 +191,7 @@ export function DataManagementCard() {
             <Button 
               variant="outline" 
               className="bg-red-500/10 border-red-500/30 text-red-300 hover:bg-red-500/20"
+              disabled={!user}
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete All Data
@@ -158,7 +202,7 @@ export function DataManagementCard() {
               <AlertDialogTitle className="text-white">Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-400">
                 This action cannot be undone. This will permanently delete all your headache history, 
-                triggers, treatments, analysis data, user session, and export logs.
+                triggers, treatments, and analysis data from our servers.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -167,16 +211,22 @@ export function DataManagementCard() {
                 className="bg-red-500 hover:bg-red-600 text-white"
                 onClick={handleDeleteAllData}
               >
-                Delete All Data & Session
+                Delete All My Data
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
         
+        {!user && (
+          <p className="text-xs text-yellow-400 mt-2">
+            Please sign in to manage your data
+          </p>
+        )}
+        
         <div className="flex items-center mt-2 p-2 bg-green-500/10 rounded-md border border-green-500/20">
           <Shield className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
           <p className="text-xs text-green-300">
-            Enhanced with user verification, rate limiting, audit logging, and session security for beta testing.
+            Your data is encrypted and securely stored. Exports are verified against your account.
           </p>
         </div>
       </div>

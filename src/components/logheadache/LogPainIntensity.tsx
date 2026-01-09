@@ -1,14 +1,27 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Smile, Meh, Frown } from "lucide-react";
+import { useEpisode } from "@/contexts/EpisodeContext";
 
-export default function LogPainIntensity() {
+interface LogPainIntensityProps {
+  episodeId?: string | null;
+}
+
+export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
   const [painLevel, setPainLevel] = useState([5]);
   const [severity, setSeverity] = useState<'Mild' | 'Moderate' | 'Severe'>('Moderate');
+  const [selectedCharacteristics, setSelectedCharacteristics] = useState<string[]>([]);
+  const { updateEpisode, activeEpisode } = useEpisode();
   
+  // Load existing data if available
+  useEffect(() => {
+    if (activeEpisode?.pain_intensity) {
+      setPainLevel([activeEpisode.pain_intensity]);
+    }
+  }, [activeEpisode]);
+
   // Update severity based on pain level
   useEffect(() => {
     const level = painLevel[0];
@@ -16,6 +29,26 @@ export default function LogPainIntensity() {
     else if (level >= 4 && level <= 6) setSeverity('Moderate');
     else if (level >= 7 && level <= 10) setSeverity('Severe');
   }, [painLevel]);
+
+  // Save pain intensity when it changes
+  const handlePainLevelChange = async (value: number[]) => {
+    setPainLevel(value);
+    if (episodeId) {
+      await updateEpisode(episodeId, { pain_intensity: value[0] });
+    }
+  };
+
+  // Toggle characteristic selection
+  const handleCharacteristicToggle = (characteristic: string) => {
+    setSelectedCharacteristics(prev => {
+      const updated = prev.includes(characteristic)
+        ? prev.filter(c => c !== characteristic)
+        : [...prev, characteristic];
+      
+      // Store in notes or a custom field if needed
+      return updated;
+    });
+  };
 
   // Get color based on severity
   const getSeverityColor = () => {
@@ -49,6 +82,14 @@ export default function LogPainIntensity() {
   };
 
   const visuals = getSeverityVisuals();
+  const characteristics = [
+    "Sharp",
+    "Stabbing",
+    "Dull",
+    "Throbbing",
+    "Band of pressure",
+    "Tooth ache-like"
+  ];
 
   return (
     <div className="space-y-6">
@@ -102,7 +143,7 @@ export default function LogPainIntensity() {
             
             <Slider
               value={painLevel}
-              onValueChange={setPainLevel}
+              onValueChange={handlePainLevelChange}
               max={10}
               step={1}
               className="py-4"
@@ -121,18 +162,16 @@ export default function LogPainIntensity() {
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Pain Characteristics</h2>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              "Sharp",
-              "Stabbing",
-              "Dull",
-              "Throbbing",
-              "Band of pressure",
-              "Tooth ache-like"
-            ].map((characteristic) => (
+            {characteristics.map((characteristic) => (
               <Button
                 key={characteristic}
                 variant="secondary"
-                className="bg-gray-700/40 hover:bg-gray-700/60 text-white"
+                className={`${
+                  selectedCharacteristics.includes(characteristic)
+                    ? 'bg-primary/30 border-primary text-white'
+                    : 'bg-gray-700/40 hover:bg-gray-700/60 text-white'
+                }`}
+                onClick={() => handleCharacteristicToggle(characteristic)}
               >
                 {characteristic}
               </Button>
