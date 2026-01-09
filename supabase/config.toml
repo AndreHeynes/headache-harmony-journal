@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.oura-sync-sleep]
 verify_jwt = true
+
+[functions.validate-beta-token]
+verify_jwt = false
