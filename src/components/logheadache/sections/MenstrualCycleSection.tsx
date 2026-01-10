@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "lucide-react";
@@ -15,7 +14,11 @@ export interface MenstrualCycleData {
   currentDayOfCycle: number | undefined;
 }
 
-export function MenstrualCycleSection() {
+interface MenstrualCycleSectionProps {
+  onCycleDataCapture?: (cycleTrigger: string) => void;
+}
+
+export function MenstrualCycleSection({ onCycleDataCapture }: MenstrualCycleSectionProps) {
   const [lastPeriodStartDate, setLastPeriodStartDate] = useState<Date | undefined>(undefined);
   const [averageCycleLength, setAverageCycleLength] = useState<number>(28);
   const { premiumFeatures } = useTestContext();
@@ -49,6 +52,14 @@ export function MenstrualCycleSection() {
   };
   
   const { phase, dayOfCycle } = calculatePhase();
+
+  // Notify parent when cycle data changes
+  useEffect(() => {
+    if (lastPeriodStartDate && onCycleDataCapture && phase !== "unknown") {
+      const cycleTrigger = `Cycle Phase: ${phase} (Day ${dayOfCycle})`;
+      onCycleDataCapture(cycleTrigger);
+    }
+  }, [lastPeriodStartDate, averageCycleLength, phase, dayOfCycle, onCycleDataCapture]);
 
   // Next expected period date
   const getNextPeriodDate = (): string => {

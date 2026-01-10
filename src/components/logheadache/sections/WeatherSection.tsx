@@ -1,13 +1,15 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CloudRain, Sun, RefreshCw, ThermometerIcon } from "lucide-react";
 import { getCurrentWeather, WeatherData, isPotentialWeatherTrigger } from "@/utils/weatherApi";
-import { toast } from "sonner";
 import { useTestContext } from "@/contexts/TestContext";
 
-export function WeatherSection() {
+interface WeatherSectionProps {
+  onWeatherCapture?: (weatherTrigger: string) => void;
+}
+
+export function WeatherSection({ onWeatherCapture }: WeatherSectionProps) {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,12 @@ export function WeatherSection() {
     try {
       const data = await getCurrentWeather();
       setWeatherData(data);
+      
+      // Notify parent component of weather data for persistence
+      if (data && onWeatherCapture) {
+        const weatherTrigger = `Weather: ${data.condition}, ${data.temperature}°C, ${data.humidity}% humidity, ${data.pressure}hPa`;
+        onWeatherCapture(weatherTrigger);
+      }
     } catch (err) {
       setError("Failed to fetch weather data. Please try again.");
       console.error("Weather fetch error:", err);
