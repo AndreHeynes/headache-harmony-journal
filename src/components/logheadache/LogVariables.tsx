@@ -18,7 +18,11 @@ import { FinalReview } from './variables/FinalReview';
 import { CustomVariableForm } from './variables/CustomVariableForm';
 import { ActionButtons } from './variables/ActionButtons';
 
-export default function LogVariables() {
+interface LogVariablesProps {
+  episodeId?: string | null;
+}
+
+export default function LogVariables({ episodeId }: LogVariablesProps) {
   const navigate = useNavigate();
   const [selectedVariables, setSelectedVariables] = useState<VariableDefinition[]>([]);
   const [customVariableName, setCustomVariableName] = useState('');
