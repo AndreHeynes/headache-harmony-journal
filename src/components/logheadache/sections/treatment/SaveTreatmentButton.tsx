@@ -4,12 +4,14 @@ import { toast } from "sonner";
 
 interface SaveTreatmentButtonProps {
   onClick?: () => void;
+  onSave?: () => void;
 }
 
-export function SaveTreatmentButton({ onClick }: SaveTreatmentButtonProps) {
+export function SaveTreatmentButton({ onClick, onSave }: SaveTreatmentButtonProps) {
   const handleSave = () => {
     // Here you would save the treatment log data
     toast.success("Treatment log saved successfully");
+    if (onSave) onSave();
     if (onClick) onClick();
   };
 

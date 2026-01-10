@@ -6,7 +6,11 @@ import { ViewControls } from './skull-viewer/ViewControls';
 import { SelectionInfo } from './skull-viewer/SelectionInfo';
 import { SmartAnalysis } from './skull-viewer/SmartAnalysis';
 
-const SkullViewer = () => {
+interface SkullViewerProps {
+  onLocationSelect?: (location: string) => void;
+}
+
+const SkullViewer = ({ onLocationSelect }: SkullViewerProps) => {
   const [currentView, setCurrentView] = useState<SkullView>('front');
   const [selectedHotspots, setSelectedHotspots] = useState<string[]>([]);
   const [selectedSide, setSelectedSide] = useState<'left' | 'right'>('left');
@@ -17,14 +21,27 @@ const SkullViewer = () => {
   );
 
   const toggleHotspotSelection = (hotspotId: string) => {
-    setSelectedHotspots((prev) =>
-      prev.includes(hotspotId)
+    setSelectedHotspots((prev) => {
+      const newSelection = prev.includes(hotspotId)
         ? prev.filter((id) => id !== hotspotId)
-        : [...prev, hotspotId]
-    );
+        : [...prev, hotspotId];
+      
+      // Notify parent of the location change
+      if (onLocationSelect) {
+        const locationString = newSelection.join(', ');
+        onLocationSelect(locationString);
+      }
+      
+      return newSelection;
+    });
   };
 
-  const clearAllSelections = () => setSelectedHotspots([]);
+  const clearAllSelections = () => {
+    setSelectedHotspots([]);
+    if (onLocationSelect) {
+      onLocationSelect('');
+    }
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-6 py-4">
