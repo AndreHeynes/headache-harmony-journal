@@ -38,16 +38,22 @@ export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
     }
   };
 
-  // Toggle characteristic selection
-  const handleCharacteristicToggle = (characteristic: string) => {
-    setSelectedCharacteristics(prev => {
-      const updated = prev.includes(characteristic)
-        ? prev.filter(c => c !== characteristic)
-        : [...prev, characteristic];
-      
-      // Store in notes or a custom field if needed
-      return updated;
-    });
+  // Toggle characteristic selection and save to episode
+  const handleCharacteristicToggle = async (characteristic: string) => {
+    const updated = selectedCharacteristics.includes(characteristic)
+      ? selectedCharacteristics.filter(c => c !== characteristic)
+      : [...selectedCharacteristics, characteristic];
+    
+    setSelectedCharacteristics(updated);
+    
+    // Save pain characteristics to the episode's symptoms array
+    if (episodeId) {
+      const characteristicSymptoms = updated.map(c => `Pain: ${c}`);
+      const existingSymptoms = activeEpisode?.symptoms?.filter(s => !s.startsWith('Pain:')) || [];
+      await updateEpisode(episodeId, { 
+        symptoms: [...existingSymptoms, ...characteristicSymptoms] 
+      });
+    }
   };
 
   // Get color based on severity

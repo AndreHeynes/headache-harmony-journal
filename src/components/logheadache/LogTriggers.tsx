@@ -3,10 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
-import { FoodTriggersSection } from "./sections/FoodTriggersSection";
-import { BeveragesSection } from "./sections/BeveragesSection";
 import { StressTriggersSection } from "./sections/StressTriggersSection";
-import { ActivitiesSection } from "./sections/ActivitiesSection";
 import { PremiumVariablesSection } from "./sections/PremiumVariablesSection";
 import { WeatherSection } from "./sections/WeatherSection";
 import { MenstrualCycleSection } from "./sections/MenstrualCycleSection";
@@ -83,13 +80,31 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
     await saveTriggers([...otherTriggers, ...activityTriggers]);
   };
 
+  // Handle weather data capture
+  const handleWeatherCapture = async (weatherTrigger: string) => {
+    const otherTriggers = triggers.filter(t => !t.startsWith('Weather:'));
+    await saveTriggers([...otherTriggers, weatherTrigger]);
+  };
+
+  // Handle menstrual cycle data capture
+  const handleCycleDataCapture = async (cycleTrigger: string) => {
+    const otherTriggers = triggers.filter(t => !t.startsWith('Cycle Phase:'));
+    await saveTriggers([...otherTriggers, cycleTrigger]);
+  };
+
+  // Handle stress triggers change
+  const handleStressChange = async (stressTriggers: string[]) => {
+    const otherTriggers = triggers.filter(t => !t.startsWith('Stress:'));
+    await saveTriggers([...otherTriggers, ...stressTriggers]);
+  };
+
   return (
     <div className="space-y-6">
       {/* Weather integration - appears at the top as it's environmental data */}
-      <WeatherSection />
+      <WeatherSection onWeatherCapture={handleWeatherCapture} />
       
       {/* Menstrual cycle tracking - appears near the top as it's a potential primary trigger */}
-      <MenstrualCycleSection />
+      <MenstrualCycleSection onCycleDataCapture={handleCycleDataCapture} />
       
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
@@ -163,7 +178,10 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
         </div>
       </Card>
       
-      <StressTriggersSection />
+      <StressTriggersSection 
+        onStressChange={handleStressChange}
+        initialStress={triggers.filter(t => t.startsWith('Stress:'))}
+      />
       
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
