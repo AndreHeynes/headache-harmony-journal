@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChartLine, Search, Users } from "lucide-react";
+import { ChartLine, Search, Users, ArrowRight, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import { APP_CONFIG } from "@/config/appConfig";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -14,14 +15,6 @@ export default function Index() {
       navigate('/dashboard');
     }
   }, [user, loading, navigate]);
-  
-  const handleStart = () => {
-    navigate("/auth");
-  };
-  
-  const handleAccount = () => {
-    navigate("/auth");
-  };
   
   if (loading) {
     return (
@@ -52,7 +45,10 @@ export default function Index() {
             </h2>
           </div>
           <p className="text-gray-400">
-            Let's start the journey of developing a better understanding of your headache experience.
+            {APP_CONFIG.BETA_MODE 
+              ? "Access is currently limited to beta testers."
+              : "Let's start the journey of developing a better understanding of your headache experience."
+            }
           </p>
         </div>
 
@@ -65,11 +61,7 @@ export default function Index() {
           ].map((item, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
               <div className="w-16 h-16 rounded-full bg-gray-800/50 border border-gray-700 flex items-center justify-center">
-                {typeof item.icon === 'string' ? (
-                  <img src={item.icon} alt={item.label} className="w-8 h-8" />
-                ) : (
-                  <item.icon className="w-8 h-8 text-primary" />
-                )}
+                <item.icon className="w-8 h-8 text-primary" />
               </div>
               <span className="text-gray-400 text-sm">{item.label}</span>
             </div>
@@ -78,19 +70,49 @@ export default function Index() {
 
         {/* Action Buttons */}
         <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm p-6 space-y-4">
-          <Button 
-            className="w-full bg-primary hover:bg-primary-dark text-charcoal font-semibold h-12"
-            onClick={handleStart}
-          >
-            Let's Start
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full border-gray-600 text-white hover:bg-gray-700/50 h-12"
-            onClick={handleAccount}
-          >
-            My Account
-          </Button>
+          {APP_CONFIG.BETA_MODE ? (
+            // Beta Mode UI
+            user ? (
+              <Button 
+                className="w-full bg-primary hover:bg-primary-dark text-charcoal font-semibold h-12"
+                onClick={() => navigate('/dashboard')}
+              >
+                Go to Dashboard
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <>
+                <p className="text-sm text-center text-gray-400 mb-2">
+                  If you have a beta access link, please use it to access the app.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-gray-600 text-white hover:bg-gray-700/50 h-12"
+                  onClick={() => window.open(APP_CONFIG.BETA_SIGNUP_URL, '_blank')}
+                >
+                  Request Beta Access
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </Button>
+              </>
+            )
+          ) : (
+            // Normal Mode UI
+            <>
+              <Button 
+                className="w-full bg-primary hover:bg-primary-dark text-charcoal font-semibold h-12"
+                onClick={() => navigate("/auth")}
+              >
+                Let's Start
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full border-gray-600 text-white hover:bg-gray-700/50 h-12"
+                onClick={() => navigate("/auth")}
+              >
+                My Account
+              </Button>
+            </>
+          )}
         </Card>
       </div>
     </div>

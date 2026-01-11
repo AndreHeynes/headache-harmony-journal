@@ -35,6 +35,39 @@ export const useAuth = () => {
   return context;
 };
 
+// Verify profile exists and create if missing (fallback for trigger failure)
+const verifyAndCreateProfile = async (userId: string, email: string, fullName?: string) => {
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+    
+    if (error && error.code === 'PGRST116') {
+      // Profile doesn't exist, create it
+      console.log('[Auth] Profile not found, creating fallback profile...');
+      const { error: insertError } = await supabase.from('profiles').insert({
+        id: userId,
+        email: email || '',
+        full_name: fullName || ''
+      });
+      
+      if (insertError) {
+        console.error('[Auth] Failed to create fallback profile:', insertError);
+      } else {
+        console.log('[Auth] Fallback profile created successfully');
+      }
+    } else if (error) {
+      console.error('[Auth] Error checking profile:', error);
+    } else {
+      console.log('[Auth] Profile exists:', profile.id);
+    }
+  } catch (err) {
+    console.error('[Auth] verifyAndCreateProfile error:', err);
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -49,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         setBetaUser(JSON.parse(storedBetaUser));
       } catch (e) {
+        console.error('[Auth] Failed to parse beta user:', e);
         localStorage.removeItem('beta_user');
       }
     }
@@ -56,11 +90,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('[Auth] Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Handle navigation after state update
-        if (event === 'SIGNED_IN' && session) {
+        // Verify profile exists after sign in (deferred to avoid deadlock)
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(() => {
+            verifyAndCreateProfile(
+              session.user.id,
+              session.user.email || '',
+              session.user.user_metadata?.full_name || ''
+            );
+          }, 0);
+          
+          // Navigate to dashboard
           setTimeout(() => {
             navigate('/dashboard');
           }, 0);
@@ -74,6 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[Auth] Initial session check:', session?.user?.email || 'No session');
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
