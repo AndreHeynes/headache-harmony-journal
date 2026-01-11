@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,18 +11,50 @@ import { Mail, Lock, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { APP_CONFIG } from "@/config/appConfig";
 
+// Zod schema for sign-in validation
+const signInSchema = z.object({
+  email: z.string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address'),
+  password: z.string()
+    .min(1, 'Password is required')
+});
+
 const SignIn = () => {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  const validateForm = (): boolean => {
+    const result = signInSchema.safeParse({ email, password });
+    if (!result.success) {
+      const fieldErrors: { email?: string; password?: string } = {};
+      result.error.errors.forEach(err => {
+        if (err.path[0] === 'email') fieldErrors.email = err.message;
+        if (err.path[0] === 'password') fieldErrors.password = err.message;
+      });
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error("Please correct the errors in the form");
+      return;
+    }
+    
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(email.trim(), password);
     
     if (error) {
       console.error("Sign in error:", error);
@@ -65,13 +98,16 @@ const SignIn = () => {
                     id="email"
                     type="email"
                     placeholder="name@example.com"
-                    required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+                    }}
+                    className={`pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 ${errors.email ? 'border-destructive' : ''}`}
                   />
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
                 </div>
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -87,13 +123,16 @@ const SignIn = () => {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                    }}
+                    className={`pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 ${errors.password ? 'border-destructive' : ''}`}
                   />
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
                 </div>
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox 

@@ -5,17 +5,39 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+console.log('[validate-beta-token] Edge function loaded and ready');
+
 Deno.serve(async (req) => {
+  const startTime = Date.now();
+  const requestId = crypto.randomUUID().slice(0, 8);
+  
+  console.log(`[${requestId}] ========================================`);
+  console.log(`[${requestId}] Function invoked at ${new Date().toISOString()}`);
+  console.log(`[${requestId}] Request method: ${req.method}`);
+  console.log(`[${requestId}] Request URL: ${req.url}`);
+  
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
+    console.log(`[${requestId}] Handling CORS preflight request`);
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Generate request ID for tracing
-  const requestId = crypto.randomUUID().slice(0, 8);
-  
   try {
-    const { token } = await req.json();
+    const body = await req.text();
+    console.log(`[${requestId}] Request body length: ${body.length}`);
+    
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(body);
+    } catch (parseError) {
+      console.error(`[${requestId}] Failed to parse request body:`, parseError);
+      return new Response(
+        JSON.stringify({ valid: false, error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const { token } = parsedBody;
     
     if (!token) {
       console.error(`[${requestId}] No token provided`);
@@ -180,7 +202,9 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    const duration = Date.now() - startTime;
+    console.error(`[${requestId}] Unexpected error after ${duration}ms:`, error);
+    console.error(`[${requestId}] Error stack:`, error instanceof Error ? error.stack : 'No stack trace');
     return new Response(
       JSON.stringify({ valid: false, error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
