@@ -11,23 +11,26 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Generate request ID for tracing
+  const requestId = crypto.randomUUID().slice(0, 8);
+  
   try {
     const { token } = await req.json();
     
     if (!token) {
-      console.error('No token provided');
+      console.error(`[${requestId}] No token provided`);
       return new Response(
         JSON.stringify({ valid: false, error: 'No token provided' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Validating token with Landing Page backend...');
+    console.log(`[${requestId}] Validating token: ${token.slice(0, 8)}...`);
 
     // Get the Landing Page Supabase URL from secrets
     const landingPageUrl = Deno.env.get('LANDING_PAGE_SUPABASE_URL');
     if (!landingPageUrl) {
-      console.error('LANDING_PAGE_SUPABASE_URL not configured');
+      console.error(`[${requestId}] LANDING_PAGE_SUPABASE_URL not configured`);
       return new Response(
         JSON.stringify({ valid: false, error: 'Server configuration error' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -45,11 +48,16 @@ Deno.serve(async (req) => {
     );
 
     const validationResult = await validationResponse.json();
-    console.log('Validation result from Landing Page:', JSON.stringify(validationResult));
+    console.log(`[${requestId}] Landing Page response:`, JSON.stringify({
+      valid: validationResult.valid,
+      hasUser: !!validationResult.user,
+      product: validationResult.user?.product,
+      error: validationResult.error
+    }));
 
     // Check if token is valid and product is either "app" or "program"
     if (!validationResult.valid) {
-      console.log('Token validation failed');
+      console.log(`[${requestId}] Token validation failed`);
       return new Response(
         JSON.stringify({ valid: false, error: validationResult.error || 'Invalid token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -58,7 +66,7 @@ Deno.serve(async (req) => {
 
     const allowedProducts = ['app', 'program'];
     if (!allowedProducts.includes(validationResult.user?.product)) {
-      console.log('Product not authorized:', validationResult.user?.product);
+      console.log(`[${requestId}] Product not authorized: ${validationResult.user?.product}`);
       return new Response(
         JSON.stringify({ 
           valid: false, 
@@ -82,13 +90,13 @@ Deno.serve(async (req) => {
     const userEmail = validationResult.user.email;
     const userFullName = validationResult.user.full_name || '';
 
-    console.log('Processing user:', userEmail);
+    console.log(`[${requestId}] Processing user: ${userEmail}`);
 
     // Check if user already exists
     const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
     
     if (listError) {
-      console.error('Error listing users:', listError);
+      console.error(`[${requestId}] Error listing users:`, listError);
       return new Response(
         JSON.stringify({ valid: false, error: 'Failed to check user existence' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -97,9 +105,10 @@ Deno.serve(async (req) => {
 
     let userId: string;
     const existingUser = existingUsers.users.find(u => u.email === userEmail);
+    console.log(`[${requestId}] User lookup - exists: ${!!existingUser}, total users: ${existingUsers.users.length}`);
 
     if (existingUser) {
-      console.log('User already exists:', existingUser.id);
+      console.log(`[${requestId}] User already exists: ${existingUser.id}`);
       userId = existingUser.id;
     } else {
       // Create new user with a secure random password (they'll use token auth)
@@ -116,25 +125,25 @@ Deno.serve(async (req) => {
       });
 
       if (createError) {
-        console.error('Error creating user:', createError);
+        console.error(`[${requestId}] Error creating user:`, createError);
         return new Response(
           JSON.stringify({ valid: false, error: 'Failed to create user account' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log('Created new user:', newUser.user.id);
+      console.log(`[${requestId}] Created new user: ${newUser.user.id}`);
       userId = newUser.user.id;
     }
 
-    // Generate a session for the user using admin API
+    // Generate a magic link for the user
     const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: userEmail,
     });
 
     if (sessionError) {
-      console.error('Error generating session link:', sessionError);
+      console.error(`[${requestId}] Error generating magic link:`, sessionError);
       // Fallback: return user info without session, frontend will handle
       return new Response(
         JSON.stringify({
@@ -152,12 +161,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract the token from the magic link
-    const magicLinkUrl = new URL(sessionData.properties.action_link);
-    const accessToken = magicLinkUrl.searchParams.get('token');
+    console.log(`[${requestId}] Magic link generated successfully`);
 
-    console.log('Successfully processed beta token validation');
-
+    // Return the full action link for the frontend to redirect to
     return new Response(
       JSON.stringify({
         valid: true,
@@ -168,7 +174,7 @@ Deno.serve(async (req) => {
           product: validationResult.user.product,
         },
         isNewUser: !existingUser,
-        magicLinkToken: accessToken,
+        actionLink: sessionData.properties.action_link,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
