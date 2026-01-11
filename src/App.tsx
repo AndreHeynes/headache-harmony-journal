@@ -119,8 +119,8 @@ const App = () => {
                 }>
                   <main className="flex-1">
                     <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/auth" element={<Auth />} />
+                    <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<BetaModeRedirect><Auth /></BetaModeRedirect>} />
                       <Route path="/signin" element={<BetaModeRedirect><SignIn /></BetaModeRedirect>} />
                       <Route path="/signup" element={<BetaModeRedirect><SignUp /></BetaModeRedirect>} />
                       <Route path="/support" element={<SupportServices />} />

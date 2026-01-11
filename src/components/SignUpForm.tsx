@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { toast } from "sonner";
 import { Mail, Lock, User } from "lucide-react";
 import { AgeVerificationModal } from "./privacy/AgeVerificationModal";
-import { isValidEmail, isStrongPassword, getPasswordStrength, sanitizeInput } from "@/utils/validation";
 import { secureSetItem } from "@/utils/secureStorage";
 import { getCSRFToken } from "@/utils/csrfProtection";
 import { FormField } from "./signup/FormField";
@@ -11,6 +11,47 @@ import { PasswordStrengthIndicator } from "./signup/PasswordStrengthIndicator";
 import { ConsentSection } from "./signup/ConsentSection";
 import { SubmitButton } from "./signup/SubmitButton";
 import { useAuth } from "@/contexts/AuthContext";
+
+// Zod schema for sign-up validation
+const signUpSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must be less than 100 characters'),
+  email: z.string()
+    .trim()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address')
+    .max(255, 'Email must be less than 255 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+// Password strength calculation
+function getPasswordStrength(password: string): { score: number; feedback: string } {
+  let score = 0;
+  let feedback = '';
+
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  if (score <= 2) feedback = 'Weak password';
+  else if (score <= 4) feedback = 'Moderate password';
+  else feedback = 'Strong password';
+
+  return { score: Math.min(score, 5), feedback };
+}
 
 export function SignUpForm() {
   const { signUp } = useAuth();
@@ -74,45 +115,21 @@ export function SignUpForm() {
     }
   }, [password]);
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {};
-    let isValid = true;
-
-    // Validate name
-    if (!name.trim()) {
-      newErrors.name = "Name is required";
-      isValid = false;
-    } else if (name.length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
-      isValid = false;
+  const validateForm = (): boolean => {
+    const result = signUpSchema.safeParse({ name, email, password, confirmPassword });
+    if (!result.success) {
+      const fieldErrors: typeof errors = {};
+      result.error.errors.forEach(err => {
+        const field = err.path[0] as keyof typeof errors;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return false;
     }
-
-    // Validate email
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!isValidEmail(email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    // Validate password
-    if (!password) {
-      newErrors.password = "Password is required";
-      isValid = false;
-    } else if (!isStrongPassword(password)) {
-      newErrors.password = "Password must be at least 8 characters with uppercase, lowercase, and numbers";
-      isValid = false;
-    }
-
-    // Validate confirm password
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
+    setErrors({});
+    return true;
   };
 
   const handleAgeVerification = (isAdult: boolean) => {
@@ -129,7 +146,7 @@ export function SignUpForm() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
+    // Validate form with Zod
     if (!validateForm()) {
       toast.error("Please correct the errors in the form");
       return;
@@ -147,9 +164,9 @@ export function SignUpForm() {
     
     setIsLoading(true);
     
-    // Sanitize inputs before storing
-    const sanitizedName = sanitizeInput(name);
-    const sanitizedEmail = sanitizeInput(email);
+    // Sanitize inputs
+    const sanitizedName = name.trim();
+    const sanitizedEmail = email.trim().toLowerCase();
     
     // Store consent data securely
     const consentData = {
@@ -201,7 +218,10 @@ export function SignUpForm() {
           type="text"
           placeholder="John Doe"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (errors.name) setErrors(prev => ({ ...prev, name: undefined }));
+          }}
           error={errors.name}
           icon={<User />}
         />
@@ -212,7 +232,10 @@ export function SignUpForm() {
           type="email"
           placeholder="name@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+          }}
           error={errors.email}
           icon={<Mail />}
         />
@@ -223,7 +246,10 @@ export function SignUpForm() {
           type="password"
           placeholder="••••••••"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+          }}
           error={errors.password}
           icon={<Lock />}
           additionalContent={password && (
@@ -240,7 +266,10 @@ export function SignUpForm() {
           type="password"
           placeholder="••••••••"
           value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value);
+            if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+          }}
           error={errors.confirmPassword}
           icon={<Lock />}
         />
