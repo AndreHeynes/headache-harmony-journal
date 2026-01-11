@@ -30,11 +30,19 @@ export const useTokenValidation = (): TokenValidationResult => {
 
     const validateToken = async () => {
       try {
+        console.log('[TokenValidation] Starting validation...');
+        
         // Check URL for token first
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token') || localStorage.getItem('beta_token');
 
+        console.log('[TokenValidation] Token sources:', {
+          hasUrlToken: urlParams.has('token'),
+          hasStoredToken: !!localStorage.getItem('beta_token'),
+        });
+
         if (!token) {
+          console.log('[TokenValidation] No token found');
           setIsValidating(false);
           setError('No beta access token found');
           return;
@@ -42,10 +50,13 @@ export const useTokenValidation = (): TokenValidationResult => {
 
         // Check if already authenticated with Supabase
         const { data: { session: existingSession } } = await supabase.auth.getSession();
+        console.log('[TokenValidation] Existing session:', !!existingSession);
+        
         if (existingSession) {
           // Already logged in - validate they still have beta access
           const storedUser = localStorage.getItem('beta_user');
           if (storedUser) {
+            console.log('[TokenValidation] Using stored beta user info');
             setUser(JSON.parse(storedUser));
             setIsValid(true);
             setIsValidating(false);
@@ -54,7 +65,7 @@ export const useTokenValidation = (): TokenValidationResult => {
           }
         }
 
-        console.log('Validating token via endpoint...');
+        console.log('[TokenValidation] Calling validation endpoint...');
 
         // Call the validate-beta-token endpoint
         const response = await fetch(VALIDATION_ENDPOINT, {
@@ -65,72 +76,41 @@ export const useTokenValidation = (): TokenValidationResult => {
 
         const data = await response.json();
 
+        console.log('[TokenValidation] Response:', {
+          valid: data.valid,
+          hasUser: !!data.user,
+          hasActionLink: !!data.actionLink,
+          requiresSignIn: data.requiresSignIn,
+          error: data.error,
+        });
+
         if (data.valid && data.user) {
-          // Store beta user info
+          // Store beta user info before any redirects
           localStorage.setItem('beta_token', token);
           localStorage.setItem('beta_user', JSON.stringify(data.user));
           setUser(data.user);
           setIsValid(true);
           setIsNewUser(data.isNewUser ?? true);
 
-          // Handle magic link token authentication
-          if (data.magicLinkToken) {
-            console.log('Exchanging magic link token for session...');
-
-            // Use verifyOtp to exchange the magic link token for a session
-            const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
-              token_hash: data.magicLinkToken,
-              type: 'magiclink',
-            });
-
-            if (otpError) {
-              console.error('Failed to verify magic link token:', otpError);
-              // Try alternative: email + token
-              const { error: altError } = await supabase.auth.verifyOtp({
-                email: data.user.email,
-                token: data.magicLinkToken,
-                type: 'magiclink',
-              });
-
-              if (altError) {
-                console.error('Alternative verification also failed:', altError);
-                setError('Failed to establish session. Please try clicking your access link again.');
-                setIsValid(false);
-                localStorage.removeItem('beta_token');
-                localStorage.removeItem('beta_user');
-                setIsValidating(false);
-                hasValidated.current = true;
-                return;
-              }
-            }
-
-            console.log('User authenticated successfully!');
-          } else if (data.requiresSignIn) {
-            // Edge function couldn't generate session - user needs to sign in
-            console.log('Token valid but requires sign-in flow');
-            // The user is valid but we couldn't auto-authenticate
-            // They can still use the app with beta access, but may need to sign in
-          } else if (data.supabase_session) {
-            // Legacy: Handle direct session (backward compatibility)
-            console.log('Setting Supabase session from direct response...');
-
-            const { error: sessionError } = await supabase.auth.setSession({
-              access_token: data.supabase_session.access_token,
-              refresh_token: data.supabase_session.refresh_token,
-            });
-
-            if (sessionError) {
-              console.error('Failed to set session:', sessionError);
-              setError('Failed to establish session. Please try again.');
-              setIsValid(false);
-              localStorage.removeItem('beta_token');
-              localStorage.removeItem('beta_user');
-              setIsValidating(false);
-              hasValidated.current = true;
-              return;
+          // Handle magic link authentication via action link redirect
+          if (data.actionLink) {
+            console.log('[TokenValidation] Redirecting to action link for authentication...');
+            
+            // Clean up URL token before redirect
+            if (urlParams.has('token')) {
+              window.history.replaceState({}, '', window.location.pathname);
             }
             
-            console.log('User automatically logged in!');
+            // Redirect to Supabase auth endpoint to complete login
+            window.location.href = data.actionLink;
+            return; // Stop execution, page will redirect
+          }
+          
+          if (data.requiresSignIn) {
+            // Edge function couldn't generate session - user needs to sign in manually
+            console.log('[TokenValidation] Token valid but requires manual sign-in');
+            // The user is valid but we couldn't auto-authenticate
+            // They can still use the app with beta access
           }
 
           // Clean up URL
@@ -138,12 +118,13 @@ export const useTokenValidation = (): TokenValidationResult => {
             window.history.replaceState({}, '', window.location.pathname);
           }
         } else {
+          console.log('[TokenValidation] Validation failed:', data.error);
           setError(data.error || 'Invalid or expired token');
           localStorage.removeItem('beta_token');
           localStorage.removeItem('beta_user');
         }
       } catch (err) {
-        console.error('Token validation error:', err);
+        console.error('[TokenValidation] Error:', err);
         setError('Failed to validate token');
       } finally {
         setIsValidating(false);
