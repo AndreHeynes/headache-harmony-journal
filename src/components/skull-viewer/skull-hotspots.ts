@@ -21,7 +21,7 @@ export const SKULL_IMAGES = {
 
 export const SKULL_HOTSPOTS: Hotspot[] = [
   // FRONT
-  { id: 'side-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'A horizontal band across the forehead.', view: 'front' },
+  { id: 'front-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'A horizontal band across the forehead.', view: 'front' },
   { id: 'front-forehead-middle', x: 50, y: 40, size: 14, title: 'Middle of the Forehead', description: 'Central point above the eyebrows.', view: 'front' },
   { id: 'front-forehead-left', x: 32, y: 40, size: 12, title: 'Right Forehead', description: 'Right section of the forehead.', view: 'front' },
   { id: 'front-eye-left', x: 30, y: 50, size: 18, title: 'Right Eye', description: 'Right eye socket.', view: 'front' },
