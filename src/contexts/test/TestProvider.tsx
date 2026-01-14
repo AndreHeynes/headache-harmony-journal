@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { 
   TestContextType, 
@@ -13,6 +12,17 @@ import {
   loadTestEvents, 
   clearTestEvents as clearStoredEvents 
 } from "@/utils/testEventStorage";
+import { APP_CONFIG } from "@/config/appConfig";
+
+// All premium features enabled for beta mode
+const allPremiumEnabled: PremiumFeatures = {
+  insights: true,
+  variables: true,
+  neck_correlation: true,
+  export: true,
+  menstrual_tracking: true,
+  weather_tracking: true
+};
 
 // Create the context
 export const TestContext = createContext<TestContextType>({
@@ -41,7 +51,9 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
   const [isTestMode, setIsTestMode] = useState(false);
   const [isPremiumOverride, setIsPremiumOverride] = useState(false);
   const [testEvents, setTestEvents] = useState<TestEvent[]>([]);
-  const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatures>(defaultPremiumFeatures);
+  const [premiumFeatures, setPremiumFeatures] = useState<PremiumFeatures>(
+    APP_CONFIG.BETA_MODE ? allPremiumEnabled : defaultPremiumFeatures
+  );
   const [showTestGuide, setShowTestGuide] = useState(false);
   
   // Initialize session info
@@ -115,19 +127,13 @@ export const TestProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // This effect runs when isPremiumOverride changes
+  // Beta mode always has all premium features enabled
   React.useEffect(() => {
-    if (isPremiumOverride) {
-      // When premium override is enabled, enable all premium features
-      setPremiumFeatures({
-        insights: true,
-        variables: true,
-        neck_correlation: true,
-        export: true,
-        menstrual_tracking: true,
-        weather_tracking: true
-      });
+    if (APP_CONFIG.BETA_MODE || isPremiumOverride) {
+      // When in beta mode or premium override is enabled, enable all premium features
+      setPremiumFeatures(allPremiumEnabled);
     } else {
-      // When premium override is disabled, disable all premium features
+      // When premium override is disabled (and not in beta mode), disable all premium features
       setPremiumFeatures(defaultPremiumFeatures);
     }
   }, [isPremiumOverride]);
