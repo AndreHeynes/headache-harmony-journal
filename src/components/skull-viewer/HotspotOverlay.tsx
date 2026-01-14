@@ -36,20 +36,53 @@ export const HotspotOverlay = ({
 
   const dimensions = getHotspotDimensions(hotspot);
 
+  // Determine visual state colors
+  const getBackgroundStyle = () => {
+    if (isSelected) {
+      return 'rgba(59, 130, 246, 0.4)'; // More opaque blue when selected
+    }
+    if (showTooltip) {
+      return 'rgba(59, 130, 246, 0.25)'; // Semi-transparent blue on hover
+    }
+    return 'rgba(59, 130, 246, 0.08)'; // Very subtle hint when idle
+  };
+
+  const getBorderStyle = () => {
+    if (isSelected) {
+      return '2px solid rgba(59, 130, 246, 0.9)';
+    }
+    if (showTooltip) {
+      return '2px solid rgba(59, 130, 246, 0.5)';
+    }
+    return '1px dashed rgba(59, 130, 246, 0.3)';
+  };
+
+  const getBoxShadow = () => {
+    if (isSelected) {
+      return '0 0 12px rgba(59, 130, 246, 0.5), inset 0 0 8px rgba(59, 130, 246, 0.2)';
+    }
+    if (showTooltip) {
+      return '0 0 8px rgba(59, 130, 246, 0.3)';
+    }
+    return 'none';
+  };
+
   return (
     <>
       <div
-        className="absolute cursor-pointer transition-all duration-150 hover:scale-110"
+        className="absolute cursor-pointer transition-all duration-200"
         style={{
           left: `${hotspot.x}%`,
           top: `${hotspot.y}%`,
           width: dimensions.width,
           height: dimensions.height,
-          transform: 'translate(-50%, -50%)',
-          background: 'transparent',
-          border: 'none',
+          transform: `translate(-50%, -50%) ${showTooltip && !isSelected ? 'scale(1.05)' : 'scale(1)'}`,
+          background: getBackgroundStyle(),
+          border: getBorderStyle(),
+          boxShadow: getBoxShadow(),
           zIndex: getHotspotZIndex(hotspot),
           borderRadius: dimensions.borderRadius,
+          backdropFilter: isSelected || showTooltip ? 'blur(1px)' : 'none',
         }}
         onClick={(e) => {
           e.stopPropagation();
@@ -62,7 +95,7 @@ export const HotspotOverlay = ({
       />
       {isSelected && (
         <div
-          className="absolute pointer-events-none"
+          className="absolute pointer-events-none animate-pulse"
           style={{
             left: `${hotspot.x}%`,
             top: `${hotspot.y}%`,
@@ -70,7 +103,9 @@ export const HotspotOverlay = ({
             zIndex: getHotspotZIndex(hotspot) + 1,
           }}
         >
-          <div className="w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
+          <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full"></div>
+          </div>
         </div>
       )}
 
