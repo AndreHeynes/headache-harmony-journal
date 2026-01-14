@@ -36,25 +36,25 @@ export const HotspotOverlay = ({
 
   const dimensions = getHotspotDimensions(hotspot);
 
-  // Determine visual state colors
+  // Determine visual state colors - increased visibility
   const getBackgroundStyle = () => {
     if (isSelected) {
-      return 'rgba(59, 130, 246, 0.4)'; // More opaque blue when selected
+      return 'rgba(59, 130, 246, 0.5)'; // More opaque blue when selected
     }
     if (showTooltip) {
-      return 'rgba(59, 130, 246, 0.25)'; // Semi-transparent blue on hover
+      return 'rgba(59, 130, 246, 0.35)'; // Semi-transparent blue on hover
     }
-    return 'rgba(59, 130, 246, 0.08)'; // Very subtle hint when idle
+    return 'rgba(59, 130, 246, 0.18)'; // More visible when idle
   };
 
   const getBorderStyle = () => {
     if (isSelected) {
-      return '2px solid rgba(59, 130, 246, 0.9)';
+      return '3px solid rgba(59, 130, 246, 0.95)';
     }
     if (showTooltip) {
-      return '2px solid rgba(59, 130, 246, 0.5)';
+      return '2px solid rgba(59, 130, 246, 0.7)';
     }
-    return '1px dashed rgba(59, 130, 246, 0.3)';
+    return '2px solid rgba(59, 130, 246, 0.5)'; // Solid border, more visible
   };
 
   const getBoxShadow = () => {

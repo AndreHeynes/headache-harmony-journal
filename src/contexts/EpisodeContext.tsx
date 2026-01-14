@@ -15,12 +15,13 @@ export const useEpisode = () => {
 };
 
 export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [activeEpisode, setActiveEpisode] = useState<HeadacheEpisode | null>(null);
   const [loadingEpisode, setLoadingEpisode] = useState(false);
 
   const checkForActiveEpisode = useCallback(async () => {
-    if (!user) return;
+    // Don't check if auth is still loading or no user
+    if (authLoading || !user) return;
 
     setLoadingEpisode(true);
     try {
@@ -35,11 +36,15 @@ export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
       setActiveEpisode(data as HeadacheEpisode | null);
     } catch (error) {
       console.error('Error checking for active episode:', error);
-      toast.error('Failed to check for active episodes');
+      // Only show toast for non-auth related errors
+      const errorMessage = error instanceof Error ? error.message : '';
+      if (!errorMessage.includes('JWT') && !errorMessage.includes('token')) {
+        toast.error('Failed to check for active episodes');
+      }
     } finally {
       setLoadingEpisode(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const startNewEpisode = useCallback(async (): Promise<string | null> => {
     if (!user) return null;
