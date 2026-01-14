@@ -75,24 +75,24 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-charcoal flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2">My Headache Experience Journal!™</h1>
-          <p className="text-gray-400">Participate, understand, and recognize your headaches.</p>
+          <p className="text-muted-foreground">Participate, understand, and recognize your headaches.</p>
         </div>
 
-        <Card className="w-full bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <Card className="w-full">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
-            <CardDescription className="text-center text-gray-400">
+            <CardDescription className="text-center">
               Enter your email and password to access your account
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">Email</Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Input
                     id="email"
@@ -103,15 +103,15 @@ const SignIn = () => {
                       setEmail(e.target.value);
                       if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
                     }}
-                    className={`pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 ${errors.email ? 'border-destructive' : ''}`}
+                    className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
                   />
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 </div>
                 {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-gray-300">Password</Label>
+                  <Label htmlFor="password">Password</Label>
                   {!APP_CONFIG.BETA_MODE && (
                     <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                       Forgot password?
@@ -128,9 +128,9 @@ const SignIn = () => {
                       setPassword(e.target.value);
                       if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
                     }}
-                    className={`pl-10 bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 ${errors.password ? 'border-destructive' : ''}`}
+                    className={`pl-10 ${errors.password ? 'border-destructive' : ''}`}
                   />
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 </div>
                 {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
@@ -142,7 +142,7 @@ const SignIn = () => {
                 />
                 <label
                   htmlFor="remember"
-                  className="text-sm text-gray-300 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Remember me
                 </label>
@@ -174,23 +174,23 @@ const SignIn = () => {
               <>
                 <div className="relative w-full">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-700"></span>
+                    <span className="w-full border-t border-border"></span>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-gray-800 px-2 text-gray-400">Or continue with</span>
+                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                  <Button variant="outline">
                     Google
                   </Button>
-                  <Button variant="outline" className="bg-transparent text-white border-gray-700 hover:bg-gray-700">
+                  <Button variant="outline">
                     Apple
                   </Button>
                 </div>
               </>
             )}
-            <p className="text-center text-sm text-gray-400 mt-4">
+            <p className="text-center text-sm text-muted-foreground mt-4">
               Don't have an account?{" "}
               <Link to="/auth" className="text-primary hover:underline">
                 Sign Up

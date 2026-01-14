@@ -11,6 +11,7 @@ import LogVariables from "@/components/logheadache/LogVariables";
 import LogTreatment from "@/components/logheadache/LogTreatment";
 import { useEpisode } from "@/contexts/EpisodeContext";
 import { ActiveEpisodeModal } from "@/components/logheadache/ActiveEpisodeModal";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const steps = [
@@ -29,16 +30,17 @@ export default function LogHeadache() {
   const [showEpisodeModal, setShowEpisodeModal] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   
   const CurrentStepComponent = steps[currentStep].component;
 
+  // Only check for active episode after auth is ready
   useEffect(() => {
-    const init = async () => {
-      await checkForActiveEpisode();
-    };
-    init();
-  }, [checkForActiveEpisode]);
+    if (!authLoading && user) {
+      checkForActiveEpisode();
+    }
+  }, [checkForActiveEpisode, authLoading, user]);
 
   useEffect(() => {
     if (activeEpisode && !currentEpisodeId) {

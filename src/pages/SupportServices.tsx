@@ -31,7 +31,7 @@ const SupportServices = () => {
       description: 'Common questions',
       icon: <HelpCircle className="h-6 w-6" />,
       iconBgColor: 'bg-blue-500/20',
-      iconColor: 'text-blue-400'
+      iconColor: 'text-blue-600'
     },
     {
       id: 'guide',
@@ -39,7 +39,7 @@ const SupportServices = () => {
       description: 'How-to guides',
       icon: <BookOpen className="h-6 w-6" />,
       iconBgColor: 'bg-green-500/20',
-      iconColor: 'text-green-400'
+      iconColor: 'text-green-600'
     },
     {
       id: 'contact',
@@ -47,7 +47,7 @@ const SupportServices = () => {
       description: 'Get help',
       icon: <Headphones className="h-6 w-6" />,
       iconBgColor: 'bg-purple-500/20',
-      iconColor: 'text-purple-400'
+      iconColor: 'text-purple-600'
     },
     {
       id: 'report',
@@ -55,12 +55,12 @@ const SupportServices = () => {
       description: 'Report an issue',
       icon: <Flag className="h-6 w-6" />,
       iconBgColor: 'bg-red-500/20',
-      iconColor: 'text-red-400'
+      iconColor: 'text-red-600'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-charcoal pb-20">
+    <div className="min-h-screen bg-background pb-20">
       <SupportHeader 
         onBack={handleGoBack} 
         searchQuery={searchQuery} 
@@ -85,10 +85,10 @@ const SupportServices = () => {
       </section>
 
       {activeSection && (
-        <section className="px-4 py-6 bg-gray-800/30">
+        <section className="px-4 py-6 bg-muted/50">
           {activeSection === 'guide' && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-white mb-4">User Guide</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">User Guide</h2>
               <UserGuideContent />
             </div>
           )}
