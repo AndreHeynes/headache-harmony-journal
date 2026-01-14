@@ -27,13 +27,13 @@ export default function DataExport() {
   };
 
   return (
-    <div className="bg-charcoal text-white p-4 min-h-screen pb-20">
+    <div className="bg-background text-foreground p-4 min-h-screen pb-20">
       <div className="flex items-center space-x-3 mb-6">
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={handleGoBack}
-          className="text-gray-400 hover:text-white hover:bg-gray-800"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted"
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
@@ -41,7 +41,7 @@ export default function DataExport() {
       </div>
       
       <div className="space-y-6">
-        <p className="text-gray-300">
+        <p className="text-muted-foreground">
           Generate a report of your headache data to share with your healthcare provider. 
           This helps them better understand your headache patterns and make more informed treatment decisions.
         </p>
@@ -49,7 +49,7 @@ export default function DataExport() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-gray-400">Loading your headache data...</span>
+            <span className="ml-2 text-muted-foreground">Loading your headache data...</span>
           </div>
         ) : (
           <HeadacheDataExport 
@@ -58,9 +58,9 @@ export default function DataExport() {
           />
         )}
         
-        <div className="bg-gray-800/50 border-gray-700 p-4 rounded-lg">
-          <h3 className="text-white font-medium mb-2">Sharing Tips</h3>
-          <ul className="list-disc list-inside text-gray-300 space-y-1 text-sm">
+        <div className="bg-card border border-border p-4 rounded-lg">
+          <h3 className="text-foreground font-medium mb-2">Sharing Tips</h3>
+          <ul className="list-disc list-inside text-muted-foreground space-y-1 text-sm">
             <li>Export your data before medical appointments</li>
             <li>Include at least 2-4 weeks of entries for meaningful patterns</li>
             <li>Highlight any significant triggers or treatments you've identified</li>

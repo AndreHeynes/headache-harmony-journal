@@ -16,22 +16,22 @@ export const ActiveEpisodeModal = ({ episode, onContinue, onStartNew, open }: Ac
 
   return (
     <Dialog open={open}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-xl">Active Episode Detected</DialogTitle>
-          <DialogDescription className="text-white/70">
+          <DialogDescription>
             You have an ongoing headache episode. Would you like to continue logging it or start a new one?
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="bg-gray-900/50 rounded-lg p-4 space-y-2">
-            <div className="flex items-center gap-2 text-sm text-white/70">
+          <div className="bg-muted rounded-lg p-4 space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
               <span>Started {duration}</span>
             </div>
             {episode.pain_intensity && (
-              <div className="flex items-center gap-2 text-sm text-white/70">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
                 <span>Pain Intensity: {episode.pain_intensity}/10</span>
               </div>
@@ -41,14 +41,14 @@ export const ActiveEpisodeModal = ({ episode, onContinue, onStartNew, open }: Ac
           <div className="space-y-2">
             <Button 
               onClick={onContinue}
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full"
             >
               Continue Current Episode
             </Button>
             <Button 
               onClick={onStartNew}
               variant="outline"
-              className="w-full border-gray-600 hover:bg-gray-700"
+              className="w-full"
             >
               Start New Episode
             </Button>

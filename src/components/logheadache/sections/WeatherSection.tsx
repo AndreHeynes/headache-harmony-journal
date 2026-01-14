@@ -47,18 +47,18 @@ export function WeatherSection({ onWeatherCapture }: WeatherSectionProps) {
 
   // Get appropriate icon based on weather condition
   const getWeatherIcon = () => {
-    if (!weatherData) return <CloudRain className="h-8 w-8 text-blue-400" />;
+    if (!weatherData) return <CloudRain className="h-8 w-8 text-blue-500" />;
     
     switch (weatherData.condition.toLowerCase()) {
       case "sunny":
       case "partly cloudy":
-        return <Sun className="h-8 w-8 text-yellow-400" />;
+        return <Sun className="h-8 w-8 text-yellow-500" />;
       case "rainy":
       case "stormy":
       case "snowy":
-        return <CloudRain className="h-8 w-8 text-blue-400" />;
+        return <CloudRain className="h-8 w-8 text-blue-500" />;
       default:
-        return <CloudRain className="h-8 w-8 text-gray-400" />;
+        return <CloudRain className="h-8 w-8 text-muted-foreground" />;
     }
   };
 
@@ -67,16 +67,16 @@ export function WeatherSection({ onWeatherCapture }: WeatherSectionProps) {
   }
 
   return (
-    <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm mb-4">
+    <Card className="mb-4">
       <div className="p-4 space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-medium text-white">Current Weather</h2>
+          <h2 className="text-lg font-medium text-foreground">Current Weather</h2>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={fetchWeatherData}
             disabled={isLoading}
-            className="text-gray-400 hover:text-gray-300"
+            className="text-muted-foreground hover:text-foreground"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
@@ -84,52 +84,52 @@ export function WeatherSection({ onWeatherCapture }: WeatherSectionProps) {
         
         {error ? (
           <div className="text-center py-4">
-            <p className="text-red-400">{error}</p>
+            <p className="text-destructive">{error}</p>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={fetchWeatherData}
-              className="mt-2 border-gray-600"
+              className="mt-2"
             >
               Try Again
             </Button>
           </div>
         ) : weatherData ? (
-          <div className="rounded-lg bg-gray-700/30 p-4 border border-gray-600">
+          <div className="rounded-lg bg-muted/50 p-4 border border-border">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 {getWeatherIcon()}
                 <div>
-                  <p className="text-lg font-medium text-white capitalize">{weatherData.condition}</p>
-                  <p className="text-sm text-gray-400">{weatherData.location || "Current Location"}</p>
+                  <p className="text-lg font-medium text-foreground capitalize">{weatherData.condition}</p>
+                  <p className="text-sm text-muted-foreground">{weatherData.location || "Current Location"}</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <span className="text-2xl font-semibold text-white">{weatherData.temperature}°</span>
-                <span className="text-gray-400 text-sm">C</span>
+                <span className="text-2xl font-semibold text-foreground">{weatherData.temperature}°</span>
+                <span className="text-muted-foreground text-sm">C</span>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex items-center space-x-2 text-gray-300">
-                <ThermometerIcon className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center space-x-2 text-muted-foreground">
+                <ThermometerIcon className="h-4 w-4" />
                 <span>Humidity: {weatherData.humidity}%</span>
               </div>
-              <div className="flex items-center space-x-2 text-gray-300">
-                <CloudRain className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center space-x-2 text-muted-foreground">
+                <CloudRain className="h-4 w-4" />
                 <span>Pressure: {weatherData.pressure} hPa</span>
               </div>
             </div>
             
             {isPotentialWeatherTrigger(weatherData) && (
-              <div className="mt-3 py-2 px-3 bg-yellow-500/20 border border-yellow-500/30 rounded text-sm text-yellow-200">
+              <div className="mt-3 py-2 px-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-700">
                 This weather pattern may trigger headaches based on common triggers.
               </div>
             )}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-400">
-            <CloudRain className="h-10 w-10 mx-auto mb-2 text-gray-500" />
+          <div className="text-center py-8 text-muted-foreground">
+            <CloudRain className="h-10 w-10 mx-auto mb-2" />
             <p>Loading weather data...</p>
           </div>
         )}

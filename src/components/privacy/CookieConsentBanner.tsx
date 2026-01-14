@@ -78,14 +78,14 @@ export function CookieConsentBanner() {
     <>
       {/* Main Cookie Banner */}
       {showBanner && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-800/95 backdrop-blur-sm border-t border-gray-700 z-50 animate-fade-in">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur-sm border-t border-border z-50 animate-fade-in">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <Cookie className="h-5 w-5 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-medium text-white mb-1">We Value Your Privacy</h3>
-                  <p className="text-sm text-gray-300">
+                  <h3 className="font-medium text-foreground mb-1">We Value Your Privacy</h3>
+                  <p className="text-sm text-muted-foreground">
                     This site uses cookies to enhance your experience, analyze site usage, and assist with our marketing efforts. 
                     By clicking "Accept All", you consent to our use of cookies or click "Cookie Settings" to choose your preferences.
                   </p>
@@ -96,7 +96,7 @@ export function CookieConsentBanner() {
                   variant="outline" 
                   size="sm" 
                   onClick={handleOpenSettings}
-                  className="whitespace-nowrap bg-transparent border-gray-600 hover:bg-gray-700 text-white"
+                  className="whitespace-nowrap"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Cookie Settings
@@ -104,7 +104,7 @@ export function CookieConsentBanner() {
                 <Button 
                   size="sm" 
                   onClick={handleAcceptAll}
-                  className="whitespace-nowrap bg-primary hover:bg-primary/90 text-black"
+                  className="whitespace-nowrap"
                 >
                   <Check className="h-4 w-4 mr-2" />
                   Accept All
@@ -117,44 +117,44 @@ export function CookieConsentBanner() {
 
       {/* Cookie Settings Dialog */}
       <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent className="sm:max-w-[600px] bg-gray-900 border-gray-700 text-white">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
+            <DialogTitle className="flex items-center gap-2">
               <Cookie className="h-5 w-5" />
               Cookie Preferences
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription>
               Manage your cookie preferences for this site
             </DialogDescription>
           </DialogHeader>
           
           <Tabs defaultValue="necessary" className="mt-4">
-            <TabsList className="bg-gray-800 border border-gray-700">
+            <TabsList>
               <TabsTrigger value="necessary">Necessary</TabsTrigger>
               <TabsTrigger value="preferences">Preferences</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="marketing">Marketing</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="necessary" className="border border-gray-700 rounded-md p-4 mt-2">
+            <TabsContent value="necessary" className="border rounded-md p-4 mt-2">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h4 className="text-white font-medium">Necessary Cookies</h4>
-                  <p className="text-gray-400 text-sm">Required for the website to function properly</p>
+                  <h4 className="font-medium">Necessary Cookies</h4>
+                  <p className="text-muted-foreground text-sm">Required for the website to function properly</p>
                 </div>
                 <Switch disabled checked id="necessary" />
               </div>
-              <p className="text-sm text-gray-300 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 These cookies are essential for the website to function properly and cannot be disabled.
                 They include cookies for security, authentication, and remembering your preferences.
               </p>
             </TabsContent>
             
-            <TabsContent value="preferences" className="border border-gray-700 rounded-md p-4 mt-2">
+            <TabsContent value="preferences" className="border rounded-md p-4 mt-2">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h4 className="text-white font-medium">Preference Cookies</h4>
-                  <p className="text-gray-400 text-sm">Remember your settings and preferences</p>
+                  <h4 className="font-medium">Preference Cookies</h4>
+                  <p className="text-muted-foreground text-sm">Remember your settings and preferences</p>
                 </div>
                 <Switch 
                   id="preferences" 
@@ -163,17 +163,17 @@ export function CookieConsentBanner() {
                     setCookieSettings({...cookieSettings, preferences: checked})}
                 />
               </div>
-              <p className="text-sm text-gray-300 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 These cookies allow the website to remember choices you make and provide enhanced, 
                 personalized features, such as your language preferences and display settings.
               </p>
             </TabsContent>
             
-            <TabsContent value="analytics" className="border border-gray-700 rounded-md p-4 mt-2">
+            <TabsContent value="analytics" className="border rounded-md p-4 mt-2">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h4 className="text-white font-medium">Analytics Cookies</h4>
-                  <p className="text-gray-400 text-sm">Help us understand how you use our site</p>
+                  <h4 className="font-medium">Analytics Cookies</h4>
+                  <p className="text-muted-foreground text-sm">Help us understand how you use our site</p>
                 </div>
                 <Switch 
                   id="analytics" 
@@ -182,18 +182,18 @@ export function CookieConsentBanner() {
                     setCookieSettings({...cookieSettings, analytics: checked})}
                 />
               </div>
-              <p className="text-sm text-gray-300 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 These cookies collect information about how you use our website, which pages you 
                 visited and which links you clicked on. All of the data is anonymized and cannot 
                 be used to identify you.
               </p>
             </TabsContent>
             
-            <TabsContent value="marketing" className="border border-gray-700 rounded-md p-4 mt-2">
+            <TabsContent value="marketing" className="border rounded-md p-4 mt-2">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h4 className="text-white font-medium">Marketing Cookies</h4>
-                  <p className="text-gray-400 text-sm">Used for advertising and personalized content</p>
+                  <h4 className="font-medium">Marketing Cookies</h4>
+                  <p className="text-muted-foreground text-sm">Used for advertising and personalized content</p>
                 </div>
                 <Switch 
                   id="marketing" 
@@ -202,7 +202,7 @@ export function CookieConsentBanner() {
                     setCookieSettings({...cookieSettings, marketing: checked})}
                 />
               </div>
-              <p className="text-sm text-gray-300 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 These cookies may be set through our site by our advertising partners. They may 
                 be used by those companies to build a profile of your interests and show you 
                 relevant ads on other sites.
@@ -214,21 +214,19 @@ export function CookieConsentBanner() {
             <Button 
               variant="outline" 
               onClick={() => setShowSettingsDialog(false)}
-              className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
             >
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
             <Button 
               onClick={handleAcceptSelected}
-              className="bg-primary hover:bg-primary/90 text-black"
             >
               <Shield className="h-4 w-4 mr-2" />
               Save Preferences
             </Button>
             <Button 
               onClick={handleAcceptAll}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              variant="secondary"
             >
               <Check className="h-4 w-4 mr-2" />
               Accept All
@@ -244,7 +242,7 @@ export function CookieConsentBanner() {
             size="sm"
             variant="outline"
             onClick={() => setShowSettingsDialog(true)}
-            className="rounded-full h-10 w-10 p-0 bg-gray-800/80 backdrop-blur-sm border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700"
+            className="rounded-full h-10 w-10 p-0 bg-card/80 backdrop-blur-sm"
             title="Privacy Settings"
           >
             <Cookie className="h-5 w-5" />
