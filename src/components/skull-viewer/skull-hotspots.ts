@@ -87,5 +87,5 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   { id: 'back-base', x: 50, y: 95, size: 18, title: 'Base of Head', description: 'Base of the skull (nape area).', view: 'back' },
   { id: 'back-occiput-left', x: 28, y: 57, size: 13, title: 'Left Occipital Area', description: 'Left side of the occiput.', view: 'back' },
   { id: 'back-occiput-right', x: 72, y: 57, size: 13, title: 'Right Occipital Area', description: 'Right side of the occiput.', view: 'back' },
-  { id: 'back-pressure-band', x: 50, y: 80, size: 75, title: 'Pressure Band', description: 'Horizontal pressure band from the back view.', view: 'back' },
+  { id: 'back-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'Horizontal pressure band from the back view.', view: 'back' },
 ];
