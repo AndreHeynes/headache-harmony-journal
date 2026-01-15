@@ -13,10 +13,16 @@ interface LogTriggersProps {
   episodeId?: string | null;
 }
 
+interface Activity {
+  type: string;
+  duration: string;
+  hoursBefore: string;
+}
+
 export default function LogTriggers({ episodeId }: LogTriggersProps) {
   const [foodItems, setFoodItems] = useState([{ food: "", hours: "" }]);
   const [beverages, setBeverages] = useState([{ beverage: "", hours: "" }]);
-  const [activities, setActivities] = useState([{ type: "", duration: "" }]);
+  const [activities, setActivities] = useState<Activity[]>([{ type: "", duration: "", hoursBefore: "" }]);
   const [triggers, setTriggers] = useState<string[]>([]);
   const { updateEpisode, activeEpisode } = useEpisode();
 
@@ -27,8 +33,16 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
     }
   }, [activeEpisode]);
 
-  const addNewItem = (list: any[], setList: (items: any[]) => void) => {
-    setList([...list, { food: "", hours: "", beverage: "", type: "", duration: "" }]);
+  const addNewFoodItem = () => {
+    setFoodItems([...foodItems, { food: "", hours: "" }]);
+  };
+
+  const addNewBeverage = () => {
+    setBeverages([...beverages, { beverage: "", hours: "" }]);
+  };
+
+  const addNewActivity = () => {
+    setActivities([...activities, { type: "", duration: "", hoursBefore: "" }]);
   };
 
   const saveTriggers = async (newTriggers: string[]) => {
@@ -66,15 +80,24 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
     await saveTriggers([...otherTriggers, ...beverageTriggers]);
   };
 
-  const handleActivityChange = async (index: number, field: 'type' | 'duration', value: string) => {
+  const handleActivityChange = async (index: number, field: 'type' | 'duration' | 'hoursBefore', value: string) => {
     const updated = [...activities];
     updated[index][field] = value;
     setActivities(updated);
     
-    // Update triggers with activities
+    // Update triggers with activities - include both duration and hours before
     const activityTriggers = updated
       .filter(item => item.type.trim())
-      .map(item => `Activity: ${item.type}${item.duration ? ` (${item.duration})` : ''}`);
+      .map(item => {
+        let triggerStr = `Activity: ${item.type}`;
+        if (item.hoursBefore) {
+          triggerStr += ` (${item.hoursBefore}h before)`;
+        }
+        if (item.duration) {
+          triggerStr += ` [${item.duration} min]`;
+        }
+        return triggerStr;
+      });
     
     const otherTriggers = triggers.filter(t => !t.startsWith('Activity:'));
     await saveTriggers([...otherTriggers, ...activityTriggers]);
@@ -106,16 +129,16 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
       {/* Menstrual cycle tracking - appears near the top as it's a potential primary trigger */}
       <MenstrualCycleSection onCycleDataCapture={handleCycleDataCapture} />
       
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-card border-border">
         <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Food Triggers</h2>
+          <h2 className="text-lg font-medium text-foreground">Food Triggers</h2>
           <div className="space-y-3">
             {foodItems.map((item, index) => (
               <div key={index} className="grid grid-cols-2 gap-3">
                 <div>
                   <Input 
                     placeholder="Food item" 
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                     value={item.food}
                     onChange={(e) => handleFoodChange(index, 'food', e.target.value)}
                   />
@@ -124,7 +147,7 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
                   <Input 
                     placeholder="Hours before"
                     type="number"
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                     value={item.hours}
                     onChange={(e) => handleFoodChange(index, 'hours', e.target.value)}
                   />
@@ -133,8 +156,8 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
             ))}
             <Button 
               variant="ghost" 
-              className="w-full border border-dashed border-gray-700 hover:bg-gray-700/20 text-gray-400"
-              onClick={() => addNewItem(foodItems, setFoodItems)}
+              className="w-full border border-dashed border-border hover:bg-muted/50 text-muted-foreground"
+              onClick={addNewFoodItem}
             >
               <Plus className="mr-2 h-4 w-4" /> Add Food Item
             </Button>
@@ -142,16 +165,16 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
         </div>
       </Card>
       
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-card border-border">
         <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Beverages</h2>
+          <h2 className="text-lg font-medium text-foreground">Beverages</h2>
           <div className="space-y-3">
             {beverages.map((item, index) => (
               <div key={index} className="grid grid-cols-2 gap-3">
                 <div>
                   <Input 
                     placeholder="Beverage" 
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                     value={item.beverage}
                     onChange={(e) => handleBeverageChange(index, 'beverage', e.target.value)}
                   />
@@ -160,7 +183,7 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
                   <Input 
                     placeholder="Hours before"
                     type="number"
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
                     value={item.hours}
                     onChange={(e) => handleBeverageChange(index, 'hours', e.target.value)}
                   />
@@ -169,8 +192,8 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
             ))}
             <Button 
               variant="ghost" 
-              className="w-full border border-dashed border-gray-700 hover:bg-gray-700/20 text-gray-400"
-              onClick={() => addNewItem(beverages, setBeverages)}
+              className="w-full border border-dashed border-border hover:bg-muted/50 text-muted-foreground"
+              onClick={addNewBeverage}
             >
               <Plus className="mr-2 h-4 w-4" /> Add Beverage
             </Button>
@@ -183,34 +206,47 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
         initialStress={triggers.filter(t => t.startsWith('Stress:'))}
       />
       
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-card border-border">
         <div className="p-4 space-y-4">
-          <h2 className="text-lg font-medium text-white">Activities</h2>
+          <h2 className="text-lg font-medium text-foreground">Activities</h2>
           <div className="space-y-3">
             {activities.map((item, index) => (
-              <div key={index} className="grid grid-cols-2 gap-3">
-                <div>
-                  <Input 
-                    placeholder="Activity type" 
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
-                    value={item.type}
-                    onChange={(e) => handleActivityChange(index, 'type', e.target.value)}
-                  />
+              <div key={index} className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Input 
+                      placeholder="Activity type" 
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                      value={item.type}
+                      onChange={(e) => handleActivityChange(index, 'type', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Input 
+                      placeholder="Hours before"
+                      type="number"
+                      className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                      value={item.hoursBefore}
+                      onChange={(e) => handleActivityChange(index, 'hoursBefore', e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div>
+                <div className="relative">
                   <Input 
-                    placeholder="Duration" 
-                    className="bg-gray-700/40 border-gray-700 text-white placeholder:text-gray-500"
+                    placeholder="Duration (optional)" 
+                    type="number"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground pr-12"
                     value={item.duration}
                     onChange={(e) => handleActivityChange(index, 'duration', e.target.value)}
                   />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">min</span>
                 </div>
               </div>
             ))}
             <Button 
               variant="ghost" 
-              className="w-full border border-dashed border-gray-700 hover:bg-gray-700/20 text-gray-400"
-              onClick={() => addNewItem(activities, setActivities)}
+              className="w-full border border-dashed border-border hover:bg-muted/50 text-muted-foreground"
+              onClick={addNewActivity}
             >
               <Plus className="mr-2 h-4 w-4" /> Add Activity
             </Button>
