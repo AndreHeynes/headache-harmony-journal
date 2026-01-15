@@ -37,8 +37,8 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-600">Loading dashboard...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading dashboard...</div>
       </div>
     );
   }
@@ -49,13 +49,13 @@ export default function Dashboard() {
         <Helmet>
           <title>Dashboard - Headache Journal™</title>
         </Helmet>
-        <div className="min-h-screen bg-gray-50 text-gray-900">
-          <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+        <div className="min-h-screen bg-background text-foreground">
+          <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-sm border-b border-border p-4">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold text-gray-900">Headache Journal™</h1>
+              <h1 className="text-xl font-bold text-foreground">Headache Journal™</h1>
               <Link to="/profile">
                 <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                  <AvatarFallback className="bg-primary text-white">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
                     {user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -76,13 +76,13 @@ export default function Dashboard() {
       <Helmet>
         <title>Dashboard - Headache Journal™</title>
       </Helmet>
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-sm border-b border-border p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Headache Journal™</h1>
+            <h1 className="text-xl font-bold text-foreground">Headache Journal™</h1>
             <Link to="/profile">
               <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
-                <AvatarFallback className="bg-primary text-white">
+                <AvatarFallback className="bg-primary text-primary-foreground">
                   {user?.email?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -93,27 +93,27 @@ export default function Dashboard() {
         <main className="p-4 pb-20 space-y-6">
           {/* Active Episode Indicator */}
           {activeEpisode && (
-            <Card className="bg-gradient-to-r from-red-100 to-orange-100 border-red-200">
+            <Card className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border-red-700">
               <CardHeader>
-                <CardTitle className="text-gray-900 flex items-center gap-2">
-                  <Activity className="h-5 w-5 animate-pulse text-red-500" />
+                <CardTitle className="text-foreground flex items-center gap-2">
+                  <Activity className="h-5 w-5 animate-pulse text-red-400" />
                   <span>Active Episode</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Started</span>
-                  <span className="text-gray-900">{formatDistanceToNow(new Date(activeEpisode.start_time), { addSuffix: true })}</span>
+                  <span className="text-muted-foreground">Started</span>
+                  <span className="text-foreground">{formatDistanceToNow(new Date(activeEpisode.start_time), { addSuffix: true })}</span>
                 </div>
                 {activeEpisode.pain_intensity && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Intensity</span>
+                    <span className="text-muted-foreground">Intensity</span>
                     <span className="text-primary font-semibold">{activeEpisode.pain_intensity}/10</span>
                   </div>
                 )}
                 <Button 
                   onClick={() => navigate('/log')}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Continue Logging
                 </Button>
@@ -123,11 +123,11 @@ export default function Dashboard() {
 
           {/* Last Headache Summary */}
           {data.lastEpisode && (
-            <Card className="bg-white border-gray-200 shadow-sm">
+            <Card className="bg-card border-border shadow-lg">
               <CardHeader>
-                <CardTitle className="text-gray-900 flex items-center justify-between">
+                <CardTitle className="text-foreground flex items-center justify-between">
                   <span>Last Headache</span>
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-sm font-normal text-muted-foreground">
                     {formatDistanceToNow(new Date(data.lastEpisode.start_time), { addSuffix: true })}
                   </span>
                 </CardTitle>
@@ -135,22 +135,22 @@ export default function Dashboard() {
               <CardContent className="space-y-3">
                 {data.lastEpisode.pain_intensity && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Intensity</span>
+                    <span className="text-muted-foreground">Intensity</span>
                     <span className="text-primary font-semibold">{data.lastEpisode.pain_intensity}/10</span>
                   </div>
                 )}
                 {data.lastEpisode.duration_minutes && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Duration</span>
-                    <span className="text-gray-900">
+                    <span className="text-muted-foreground">Duration</span>
+                    <span className="text-foreground">
                       {Math.floor(data.lastEpisode.duration_minutes / 60)}h {data.lastEpisode.duration_minutes % 60}m
                     </span>
                   </div>
                 )}
                 {data.lastEpisode.pain_location && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Location</span>
-                    <span className="text-gray-900">{data.lastEpisode.pain_location}</span>
+                    <span className="text-muted-foreground">Location</span>
+                    <span className="text-foreground">{data.lastEpisode.pain_location}</span>
                   </div>
                 )}
               </CardContent>
@@ -158,36 +158,36 @@ export default function Dashboard() {
           )}
 
           {/* Weekly Overview */}
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border shadow-lg">
             <CardHeader>
-              <CardTitle className="text-gray-900">Weekly Overview</CardTitle>
+              <CardTitle className="text-foreground">Weekly Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-7 gap-2">
                 {data.weeklyChartData.map((day) => (
                   <div key={day.date} className="text-center">
-                    <div className="text-xs text-gray-500 mb-1">{day.date}</div>
+                    <div className="text-xs text-muted-foreground mb-1">{day.date}</div>
                     <div className={`h-12 rounded ${
-                      day.count > 0 ? "bg-red-100 border border-red-200" : "bg-gray-100"
-                    } flex items-center justify-center text-sm text-gray-900`}>
+                      day.count > 0 ? "bg-red-900/50 border border-red-700" : "bg-muted"
+                    } flex items-center justify-center text-sm text-foreground`}>
                       {day.count}
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="pt-2 border-t border-gray-200">
+              <div className="pt-2 border-t border-border">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Total this week</span>
-                  <span className="text-gray-900 font-semibold">{data.weeklyCount} episodes</span>
+                  <span className="text-muted-foreground">Total this week</span>
+                  <span className="text-foreground font-semibold">{data.weeklyCount} episodes</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Recent Entries */}
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border shadow-lg">
             <CardHeader>
-              <CardTitle className="text-gray-900 flex items-center justify-between">
+              <CardTitle className="text-foreground flex items-center justify-between">
                 <span>Recent Entries</span>
                 <Button 
                   variant="ghost" 
@@ -204,17 +204,17 @@ export default function Dashboard() {
                 {data.recentEpisodes.map((episode) => (
                   <div 
                     key={episode.id} 
-                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                    className="p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors cursor-pointer border border-border"
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-foreground">
                         {episode.pain_location || 'Headache'}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {format(new Date(episode.start_time), 'MMM d')}
                       </span>
                     </div>
-                    <div className="flex gap-4 text-sm text-gray-600">
+                    <div className="flex gap-4 text-sm text-muted-foreground">
                       {episode.pain_intensity && (
                         <span>Intensity: {episode.pain_intensity}/10</span>
                       )}
@@ -223,7 +223,7 @@ export default function Dashboard() {
                       )}
                     </div>
                     {episode.status === 'active' && (
-                      <div className="mt-2 text-xs text-red-500 flex items-center gap-1">
+                      <div className="mt-2 text-xs text-red-400 flex items-center gap-1">
                         <Activity className="h-3 w-3" />
                         <span>Ongoing</span>
                       </div>
@@ -235,9 +235,9 @@ export default function Dashboard() {
           </Card>
 
           {/* Quick Insights */}
-          <Card className="bg-white border-gray-200 shadow-sm">
+          <Card className="bg-card border-border shadow-lg">
             <CardHeader>
-              <CardTitle className="text-gray-900 flex items-center justify-between">
+              <CardTitle className="text-foreground flex items-center justify-between">
                 <span>Quick Insights</span>
                 {!isPremium && (
                   <Button 
@@ -257,10 +257,10 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
+                    <p className="text-foreground text-sm">
                       Average intensity: <span className="font-semibold">{data.avgPainIntensity}/10</span>
                     </p>
-                    <p className="text-gray-500 text-xs mt-1">Based on your recent episodes</p>
+                    <p className="text-muted-foreground text-xs mt-1">Based on your recent episodes</p>
                   </div>
                 </div>
               )}
@@ -269,10 +269,10 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <Calendar className="h-5 w-5 text-primary mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
+                    <p className="text-foreground text-sm">
                       Most common trigger: <span className="font-semibold">{data.mostCommonTrigger}</span>
                     </p>
-                    <p className="text-gray-500 text-xs mt-1">Track patterns to manage triggers</p>
+                    <p className="text-muted-foreground text-xs mt-1">Track patterns to manage triggers</p>
                   </div>
                 </div>
               )}
@@ -281,12 +281,12 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <Clock className="h-5 w-5 text-primary mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
+                    <p className="text-foreground text-sm">
                       Average duration: <span className="font-semibold">
                         {Math.floor(data.avgDuration / 60)}h {data.avgDuration % 60}m
                       </span>
                     </p>
-                    <p className="text-gray-500 text-xs mt-1">Based on completed episodes</p>
+                    <p className="text-muted-foreground text-xs mt-1">Based on completed episodes</p>
                   </div>
                 </div>
               )}

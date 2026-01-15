@@ -120,19 +120,19 @@ export default function LogHeadache() {
         />
       )}
       
-      <div className="min-h-screen bg-gray-50 pb-24">
-        <header className="fixed top-0 w-full bg-white/90 backdrop-blur-sm border-b border-gray-200 z-50">
+      <div className="min-h-screen bg-background pb-24">
+        <header className="fixed top-0 w-full bg-card/90 backdrop-blur-sm border-b border-border z-50">
           <div className="flex items-center px-4 h-16">
             <Button variant="ghost" size="icon" onClick={handleBack}>
-              <ChevronLeft className="h-6 w-6 text-gray-500" />
+              <ChevronLeft className="h-6 w-6 text-muted-foreground" />
             </Button>
-            <span className="ml-2 font-semibold text-gray-900">{steps[currentStep].title}</span>
-            <div className="ml-auto text-sm text-gray-500">
+            <span className="ml-2 font-semibold text-foreground">{steps[currentStep].title}</span>
+            <div className="ml-auto text-sm text-muted-foreground">
               Step {currentStep + 1} of {steps.length}
             </div>
           </div>
           {/* Progress bar */}
-          <div className="h-1 bg-gray-200">
+          <div className="h-1 bg-muted">
             <div 
               className="h-full bg-primary transition-all duration-300" 
               style={{ width: `${progressPercentage}%` }}
@@ -148,10 +148,10 @@ export default function LogHeadache() {
                 key={step.id}
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
                   completedSteps.has(step.id) 
-                    ? 'bg-primary text-white' 
+                    ? 'bg-primary text-primary-foreground' 
                     : index === currentStep 
-                      ? 'bg-primary/20 text-gray-900 border border-primary' 
-                      : 'bg-gray-200 text-gray-500'
+                      ? 'bg-primary/20 text-foreground border border-primary' 
+                      : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {completedSteps.has(step.id) ? (
@@ -166,9 +166,9 @@ export default function LogHeadache() {
           <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
-        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-sm border-t border-gray-200">
+        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border">
           <Button 
-            className="w-full bg-primary hover:bg-primary/90 text-white font-medium"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
             onClick={handleNext}
           >
             {currentStep === steps.length - 1 ? 'Complete' : 'Continue'}
