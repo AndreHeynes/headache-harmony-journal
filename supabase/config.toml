@@ -20,3 +20,6 @@ verify_jwt = true
 
 [functions.validate-beta-token]
 verify_jwt = false
+
+[functions.send-beta-magic-link]
+verify_jwt = false

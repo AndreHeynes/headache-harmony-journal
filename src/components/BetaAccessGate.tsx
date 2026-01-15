@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
 import { useTokenValidation } from '@/hooks/useTokenValidation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, ShieldX } from 'lucide-react';
+import { Loader2, ShieldX, Mail, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_CONFIG } from '@/config/appConfig';
+import { Link } from 'react-router-dom';
 
 interface BetaAccessGateProps {
   children: ReactNode;
@@ -45,11 +46,38 @@ const BetaGateContent = ({ children }: BetaAccessGateProps) => {
           <p className="text-muted-foreground">
             {error || 'You need a valid beta access token to use this app.'}
           </p>
-          <Button asChild size="lg">
-            <a href={SIGNUP_URL}>Request Beta Access</a>
-          </Button>
-          <p className="text-sm text-muted-foreground">
-            Already have access? Check your email for the access link.
+          
+          <div className="space-y-3 pt-4">
+            {/* New beta tester */}
+            <Button asChild size="lg" className="w-full">
+              <a href={SIGNUP_URL}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                Request Beta Access
+              </a>
+            </Button>
+            
+            {/* Returning beta tester */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Already have access?
+                </span>
+              </div>
+            </div>
+            
+            <Button asChild variant="outline" size="lg" className="w-full">
+              <Link to="/auth?mode=signin">
+                <Mail className="mr-2 h-4 w-4" />
+                Sign In with Email
+              </Link>
+            </Button>
+          </div>
+          
+          <p className="text-sm text-muted-foreground pt-2">
+            Check your email for the access link, or sign in with the email you used to register.
           </p>
         </div>
       </div>

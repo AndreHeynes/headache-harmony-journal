@@ -23,6 +23,13 @@ export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
     // Don't check if auth is still loading or no user
     if (authLoading || !user) return;
 
+    // Verify session is actually synchronized before querying
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) {
+      console.log('[Episode] Session not synchronized, skipping check');
+      return;
+    }
+
     setLoadingEpisode(true);
     try {
       const { data, error } = await supabase
@@ -35,23 +42,9 @@ export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       setActiveEpisode(data as HeadacheEpisode | null);
     } catch (error) {
+      // Silently suppress - this is a background check, not user-initiated
+      // If there's truly a problem, it will surface when user tries to log
       console.error('Error checking for active episode:', error);
-      // Suppress toasts for auth-related and permission errors
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isAuthError = 
-        errorMessage.includes('JWT') || 
-        errorMessage.includes('token') ||
-        errorMessage.includes('permission') ||
-        errorMessage.includes('not authenticated') ||
-        errorMessage.includes('auth') ||
-        errorMessage.includes('PGRST301') ||
-        errorMessage.includes('401') ||
-        errorMessage.includes('403') ||
-        errorMessage.toLowerCase().includes('unauthorized');
-      
-      if (!isAuthError) {
-        toast.error('Failed to check for active episodes');
-      }
     } finally {
       setLoadingEpisode(false);
     }
