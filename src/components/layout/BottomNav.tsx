@@ -13,14 +13,14 @@ export default function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 w-full bg-white/90 backdrop-blur-sm border-t border-gray-200">
+    <nav className="fixed bottom-0 w-full bg-card/90 backdrop-blur-sm border-t border-border">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item) => (
           <Link
             key={item.label}
             to={item.href}
             className={`flex flex-col items-center justify-center flex-1 py-1 text-xs ${
-              location.pathname === item.href ? "text-primary" : "text-gray-500 hover:text-gray-700"
+              location.pathname === item.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {item.icon === "logo" ? (

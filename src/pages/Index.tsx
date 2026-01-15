@@ -18,14 +18,14 @@ export default function Index() {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-pulse text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto p-6 space-y-8 animate-fade-in">
         {/* Logo and Welcome Section */}
         <div className="text-center space-y-6">
@@ -37,14 +37,14 @@ export default function Index() {
             />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-foreground">
               Welcome
             </h1>
-            <h2 className="text-xl text-gray-700">
+            <h2 className="text-xl text-muted-foreground">
               My Headache Experience Journal!™
             </h2>
           </div>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             {APP_CONFIG.BETA_MODE 
               ? "Access is currently limited to beta testers."
               : "Let's start the journey of developing a better understanding of your headache experience."
@@ -60,21 +60,21 @@ export default function Index() {
             { icon: ChartLine, label: "Recognize" }
           ].map((item, index) => (
             <div key={index} className="flex flex-col items-center gap-2">
-              <div className="w-16 h-16 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-card border border-border shadow-lg flex items-center justify-center">
                 <item.icon className="w-8 h-8 text-primary" />
               </div>
-              <span className="text-gray-600 text-sm">{item.label}</span>
+              <span className="text-muted-foreground text-sm">{item.label}</span>
             </div>
           ))}
         </div>
 
         {/* Action Buttons */}
-        <Card className="bg-white border-gray-200 shadow-sm p-6 space-y-4">
+        <Card className="bg-card border-border shadow-lg p-6 space-y-4">
           {APP_CONFIG.BETA_MODE ? (
             // Beta Mode UI
             user ? (
               <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold h-12"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
                 onClick={() => navigate('/dashboard')}
               >
                 Go to Dashboard
@@ -82,12 +82,12 @@ export default function Index() {
               </Button>
             ) : (
               <>
-                <p className="text-sm text-center text-gray-500 mb-2">
+                <p className="text-sm text-center text-muted-foreground mb-2">
                   If you have a beta access link, please use it to access the app.
                 </p>
                 <Button 
                   variant="outline" 
-                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 h-12"
+                  className="w-full border-border text-foreground hover:bg-muted h-12"
                   onClick={() => window.open(APP_CONFIG.BETA_SIGNUP_URL, '_blank')}
                 >
                   Request Beta Access
@@ -99,14 +99,14 @@ export default function Index() {
             // Normal Mode UI
             <>
               <Button 
-                className="w-full bg-primary hover:bg-primary/90 text-white font-semibold h-12"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-12"
                 onClick={() => navigate("/auth")}
               >
                 Let's Start
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 h-12"
+                className="w-full border-border text-foreground hover:bg-muted h-12"
                 onClick={() => navigate("/auth")}
               >
                 My Account

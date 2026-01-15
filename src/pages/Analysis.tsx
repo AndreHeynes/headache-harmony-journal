@@ -88,21 +88,21 @@ export default function Analysis() {
   const showNeckPainInsights = premiumFeatures.neck_correlation;
 
   return (
-    <div className="bg-gray-50 text-gray-900 p-4 pb-20 min-h-screen">
+    <div className="bg-background text-foreground p-4 pb-20 min-h-screen">
       <header className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={handleGoBack}
-            className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <BarChart2 className="h-6 w-6 text-indigo-500" />
-          <h1 className="text-xl font-semibold text-gray-900">Analysis Dashboard</h1>
+          <BarChart2 className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-semibold text-foreground">Analysis Dashboard</h1>
         </div>
-        <Button variant="ghost" size="icon" className="text-gray-500">
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
           <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
         </Button>
       </header>
@@ -136,7 +136,7 @@ export default function Analysis() {
       <div className="fixed bottom-20 right-6">
         <Button 
           size="icon" 
-          className="h-12 w-12 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg"
+          className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
           onClick={() => {
             logTestEvent({
               type: "navigation",

@@ -57,12 +57,12 @@ export default function Profile() {
                           localStorage.getItem('enableTesting') === 'true';
 
   return (
-    <div className="bg-gray-50 text-gray-900 p-4 pb-20 min-h-screen">
+    <div className="bg-background text-foreground p-4 pb-20 min-h-screen">
       <Button 
         variant="ghost" 
         size="icon" 
         onClick={handleGoBack}
-        className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 mb-4"
+        className="text-muted-foreground hover:text-foreground hover:bg-muted mb-4"
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
