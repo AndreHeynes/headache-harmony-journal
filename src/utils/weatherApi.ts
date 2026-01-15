@@ -16,14 +16,48 @@ export interface WeatherData {
   timestamp: string;
 }
 
+export type LocationPermissionStatus = 'prompt' | 'granted' | 'denied' | 'unsupported';
+
 // This would be replaced with a real API key in a production app
 // For a real app, this would be stored in Supabase secrets
 const DEMO_API_KEY = 'demo_weather_api_key';
 
 /**
+ * Check the current location permission status
+ */
+export const checkLocationPermission = async (): Promise<LocationPermissionStatus> => {
+  if (!navigator.geolocation) {
+    return 'unsupported';
+  }
+  
+  try {
+    if (navigator.permissions) {
+      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+      return permissionStatus.state as LocationPermissionStatus;
+    }
+    // Fallback if permissions API is not supported
+    return 'prompt';
+  } catch {
+    // Some browsers don't support permissions.query for geolocation
+    return 'prompt';
+  }
+};
+
+/**
  * Get current weather based on user location
  */
 export const getCurrentWeather = async (): Promise<WeatherData> => {
+  // First check permission status
+  const permissionStatus = await checkLocationPermission();
+  
+  if (permissionStatus === 'denied') {
+    throw new Error('LOCATION_DENIED');
+  }
+  
+  if (permissionStatus === 'unsupported') {
+    throw new Error('LOCATION_UNSUPPORTED');
+  }
+  
   try {
     // Get user location
     const position = await getUserLocation();
@@ -46,14 +80,13 @@ export const getCurrentWeather = async (): Promise<WeatherData> => {
       timestamp: new Date().toISOString()
     };
   } catch (error) {
-    console.error("Failed to get weather data:", error);
-    return {
-      condition: "unknown",
-      temperature: 20,
-      humidity: 50,
-      pressure: 1013,
-      timestamp: new Date().toISOString()
-    };
+    // Re-throw location-specific errors
+    if (error instanceof GeolocationPositionError) {
+      if (error.code === error.PERMISSION_DENIED) {
+        throw new Error('LOCATION_DENIED');
+      }
+    }
+    throw error;
   }
 };
 
@@ -63,14 +96,14 @@ export const getCurrentWeather = async (): Promise<WeatherData> => {
 const getUserLocation = (): Promise<GeolocationPosition> => {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Geolocation is not supported by this browser."));
+      reject(new Error("LOCATION_UNSUPPORTED"));
       return;
     }
     
     navigator.geolocation.getCurrentPosition(resolve, reject, {
       enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
+      timeout: 10000,
+      maximumAge: 300000 // Cache for 5 minutes
     });
   });
 };

@@ -36,9 +36,20 @@ export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
       setActiveEpisode(data as HeadacheEpisode | null);
     } catch (error) {
       console.error('Error checking for active episode:', error);
-      // Only show toast for non-auth related errors
-      const errorMessage = error instanceof Error ? error.message : '';
-      if (!errorMessage.includes('JWT') && !errorMessage.includes('token')) {
+      // Suppress toasts for auth-related and permission errors
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isAuthError = 
+        errorMessage.includes('JWT') || 
+        errorMessage.includes('token') ||
+        errorMessage.includes('permission') ||
+        errorMessage.includes('not authenticated') ||
+        errorMessage.includes('auth') ||
+        errorMessage.includes('PGRST301') ||
+        errorMessage.includes('401') ||
+        errorMessage.includes('403') ||
+        errorMessage.toLowerCase().includes('unauthorized');
+      
+      if (!isAuthError) {
         toast.error('Failed to check for active episodes');
       }
     } finally {
