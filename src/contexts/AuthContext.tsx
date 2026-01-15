@@ -19,9 +19,13 @@ interface AuthContextType {
   betaUser: BetaUser | null;
   hasBetaAccess: boolean;
   
+  // Auth status
+  justAuthenticated: boolean;
+  
   // Actions
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -73,6 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [betaUser, setBetaUser] = useState<BetaUser | null>(null);
+  const [justAuthenticated, setJustAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,6 +101,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         // Verify profile exists after sign in (deferred to avoid deadlock)
         if (event === 'SIGNED_IN' && session?.user) {
+          // Set justAuthenticated flag for 4 seconds
+          setJustAuthenticated(true);
+          setTimeout(() => setJustAuthenticated(false), 4000);
+          
           setTimeout(() => {
             verifyAndCreateProfile(
               session.user.id,
@@ -153,11 +162,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { error };
   };
 
+  const signInWithMagicLink = async (email: string): Promise<{ error: string | null }> => {
+    try {
+      // Call the edge function to send a magic link for beta users
+      const { data, error } = await supabase.functions.invoke('send-beta-magic-link', {
+        body: { email }
+      });
+
+      if (error) {
+        console.error('[Auth] Magic link error:', error);
+        return { error: error.message || 'Failed to send magic link' };
+      }
+
+      if (!data?.success) {
+        return { error: data?.error || 'Failed to send magic link' };
+      }
+
+      return { error: null };
+    } catch (err) {
+      console.error('[Auth] Magic link exception:', err);
+      return { error: 'An unexpected error occurred' };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem('beta_token');
     localStorage.removeItem('beta_user');
     setBetaUser(null);
+    setJustAuthenticated(false);
   };
 
   const hasBetaAccess = !!betaUser && !!localStorage.getItem('beta_token');
@@ -169,8 +202,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loading, 
       betaUser,
       hasBetaAccess,
+      justAuthenticated,
       signUp, 
       signIn, 
+      signInWithMagicLink,
       signOut 
     }}>
       {children}
