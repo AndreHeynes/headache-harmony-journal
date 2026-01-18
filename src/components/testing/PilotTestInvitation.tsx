@@ -30,7 +30,7 @@ Purpose of Testing:
 The main objective of this pilot testing is to gather valuable feedback on the usability, functionality, and effectiveness of our application before its official launch. Your insights will directly influence the final product and help us ensure it genuinely addresses the needs of people who experience headaches.
 
 Duration of Testing:
-The pilot testing period will run for six weeks, from ${startDate} to ${endDate}. During this time, we ask that you use the application as you normally would to track your headache experiences, explore the analysis features, and test various functionalities.
+The pilot testing period will run for eight weeks, from ${startDate} to ${endDate}. During this time, we ask that you use the application as you normally would to track your headache experiences, explore the analysis features, and test various functionalities.
 
 What's Involved:
 - Use the app to log your headache experiences and related factors
@@ -103,7 +103,7 @@ The Headache Experience Journal Team
         <div className="space-y-2">
           <h3 className="text-lg font-medium text-indigo-700">Duration of Testing:</h3>
           <p className="text-gray-800">
-            The pilot testing period will run for six weeks, from {startDate} to {endDate}. 
+            The pilot testing period will run for eight weeks, from {startDate} to {endDate}. 
             During this time, we ask that you use the application as you normally would to track your 
             headache experiences, explore the analysis features, and test various functionalities.
           </p>

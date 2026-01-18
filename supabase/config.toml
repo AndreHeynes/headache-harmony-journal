@@ -23,3 +23,15 @@ verify_jwt = false
 
 [functions.send-beta-magic-link]
 verify_jwt = false
+
+[functions.send-beta-email]
+verify_jwt = false
+
+[functions.process-email-queue]
+verify_jwt = false
+
+[functions.schedule-beta-emails]
+verify_jwt = false
+
+[functions.unsubscribe-beta-email]
+verify_jwt = false
