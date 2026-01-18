@@ -7,6 +7,51 @@ const corsHeaders = {
 
 console.log('[validate-beta-token] Edge function loaded and ready');
 
+// Persistent rate limiting using Supabase
+async function checkRateLimit(
+  supabase: ReturnType<typeof createClient>,
+  identifier: string,
+  maxRequests: number = 5,
+  windowMs: number = 60000
+): Promise<{ allowed: boolean; retryAfter?: number }> {
+  const now = Date.now();
+  const windowStart = new Date(now - windowMs).toISOString();
+  
+  try {
+    // Count recent attempts from this identifier
+    const { count, error } = await supabase
+      .from('test_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('event_type', 'rate_limit_check')
+      .eq('session_id', `beta_validation:${identifier}`)
+      .gte('created_at', windowStart);
+    
+    if (error) {
+      console.log('Rate limit check error, allowing request:', error);
+      return { allowed: true };
+    }
+    
+    if ((count || 0) >= maxRequests) {
+      return { 
+        allowed: false, 
+        retryAfter: Math.ceil(windowMs / 1000) 
+      };
+    }
+    
+    // Log this attempt
+    await supabase.from('test_events').insert({
+      event_type: 'rate_limit_check',
+      session_id: `beta_validation:${identifier}`,
+      event_details: 'Beta token validation attempt',
+      metadata: { timestamp: now },
+    });
+    
+    return { allowed: true };
+  } catch {
+    return { allowed: true };
+  }
+}
+
 Deno.serve(async (req) => {
   const startTime = Date.now();
   const requestId = crypto.randomUUID().slice(0, 8);
@@ -48,6 +93,36 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[${requestId}] Validating token: ${token.slice(0, 8)}...`);
+
+    // Initialize Supabase client for rate limiting
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+
+    // Check rate limit using persistent storage
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+    const rateLimit = await checkRateLimit(supabaseAdmin, `${clientIp}:${token.slice(0, 8)}`);
+    
+    if (!rateLimit.allowed) {
+      console.log(`[${requestId}] Rate limit exceeded for ${clientIp}`);
+      return new Response(
+        JSON.stringify({ valid: false, error: 'Too many requests. Please try again later.' }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': String(rateLimit.retryAfter || 60)
+          } 
+        }
+      );
+    }
 
     // Get the Landing Page Supabase URL from secrets
     const landingPageUrl = Deno.env.get('LANDING_PAGE_SUPABASE_URL');
@@ -97,17 +172,6 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Token is valid - create/retrieve user in this App's Auth
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
 
     const userEmail = validationResult.user.email;
     const userFullName = validationResult.user.full_name || '';

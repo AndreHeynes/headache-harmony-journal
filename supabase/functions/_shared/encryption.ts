@@ -1,43 +1,109 @@
-// Simple token encryption using AES-like approach with environment secret
-// In production, consider using Supabase Vault for more robust encryption
+// AES-256-GCM encryption for tokens using Web Crypto API
+// Uses a dedicated encryption key derived from the service role key
 
 const ENCRYPTION_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
-export function encryptToken(token: string): string {
-  if (!token) return '';
+// Derive a proper 256-bit key from the service role key using PBKDF2
+async function deriveKey(): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(ENCRYPTION_KEY),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
   
-  // Create a simple XOR-based encryption with base64 encoding
-  const keyBytes = new TextEncoder().encode(ENCRYPTION_KEY);
-  const tokenBytes = new TextEncoder().encode(token);
-  const encrypted = new Uint8Array(tokenBytes.length);
+  // Use a fixed salt - in production, consider storing a random salt per-token
+  const salt = encoder.encode('lovable-token-encryption-salt-v1');
   
-  for (let i = 0; i < tokenBytes.length; i++) {
-    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
-  }
-  
-  // Convert to base64 for storage
-  return btoa(String.fromCharCode(...encrypted));
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
 }
 
-export function decryptToken(encryptedToken: string): string {
-  if (!encryptedToken) return '';
+export async function encryptToken(token: string): Promise<string> {
+  if (!token || !ENCRYPTION_KEY) return '';
+  
+  try {
+    const encoder = new TextEncoder();
+    const key = await deriveKey();
+    
+    // Generate a random 12-byte IV for each encryption
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encoder.encode(token)
+    );
+    
+    // Combine IV + ciphertext and encode as base64
+    const combined = new Uint8Array(iv.length + new Uint8Array(encrypted).length);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    
+    return btoa(String.fromCharCode(...combined));
+  } catch (error) {
+    console.error('Token encryption failed:', error);
+    return '';
+  }
+}
+
+export async function decryptToken(encryptedToken: string): Promise<string> {
+  if (!encryptedToken || !ENCRYPTION_KEY) return '';
   
   try {
     // Decode from base64
-    const encrypted = new Uint8Array(
+    const combined = new Uint8Array(
       atob(encryptedToken).split('').map(c => c.charCodeAt(0))
     );
     
-    const keyBytes = new TextEncoder().encode(ENCRYPTION_KEY);
-    const decrypted = new Uint8Array(encrypted.length);
+    // Extract IV (first 12 bytes) and ciphertext
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
     
-    for (let i = 0; i < encrypted.length; i++) {
-      decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
-    }
+    const key = await deriveKey();
+    
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
     
     return new TextDecoder().decode(decrypted);
   } catch (error) {
-    console.error('Token decryption failed:', error);
-    return '';
+    // Try legacy XOR decryption for backward compatibility
+    try {
+      return decryptLegacyToken(encryptedToken);
+    } catch {
+      console.error('Token decryption failed:', error);
+      return '';
+    }
   }
+}
+
+// Legacy XOR decryption for backward compatibility with existing tokens
+function decryptLegacyToken(encryptedToken: string): string {
+  const encrypted = new Uint8Array(
+    atob(encryptedToken).split('').map(c => c.charCodeAt(0))
+  );
+  
+  const keyBytes = new TextEncoder().encode(ENCRYPTION_KEY);
+  const decrypted = new Uint8Array(encrypted.length);
+  
+  for (let i = 0; i < encrypted.length; i++) {
+    decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  return new TextDecoder().decode(decrypted);
 }

@@ -6,19 +6,56 @@ const OURA_CLIENT_SECRET = Deno.env.get('OURA_CLIENT_SECRET');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-// Simple XOR encryption for tokens
-function encryptToken(token: string): string {
+// AES-256-GCM encryption for tokens
+async function deriveKey(): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(SUPABASE_SERVICE_ROLE_KEY || ''),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  
+  const salt = encoder.encode('lovable-token-encryption-salt-v1');
+  
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptToken(token: string): Promise<string> {
   if (!token || !SUPABASE_SERVICE_ROLE_KEY) return token;
   
-  const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
-  const tokenBytes = new TextEncoder().encode(token);
-  const encrypted = new Uint8Array(tokenBytes.length);
-  
-  for (let i = 0; i < tokenBytes.length; i++) {
-    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
+  try {
+    const encoder = new TextEncoder();
+    const key = await deriveKey();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encoder.encode(token)
+    );
+    
+    const combined = new Uint8Array(iv.length + new Uint8Array(encrypted).length);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    
+    return btoa(String.fromCharCode(...combined));
+  } catch (error) {
+    console.error('Token encryption failed:', error);
+    return token;
   }
-  
-  return btoa(String.fromCharCode(...encrypted));
 }
 
 // Standardized OAuth result HTML with page refresh
@@ -167,12 +204,12 @@ serve(async (req) => {
     const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
-    // Store ENCRYPTED tokens
+    // Store ENCRYPTED tokens using AES-GCM
     const connectionData = {
       user_id: state,
       provider: 'oura',
-      access_token_encrypted: encryptToken(tokenData.access_token),
-      refresh_token_encrypted: encryptToken(tokenData.refresh_token),
+      access_token_encrypted: await encryptToken(tokenData.access_token),
+      refresh_token_encrypted: await encryptToken(tokenData.refresh_token),
       token_expires_at: expiresAt.toISOString(),
       is_connected: true,
       sync_enabled: true,

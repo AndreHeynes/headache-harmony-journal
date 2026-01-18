@@ -47,39 +47,95 @@ function checkRateLimit(userId: string): { allowed: boolean; retryAfter?: number
   return { allowed: true };
 }
 
-// Token encryption/decryption
-function decryptToken(encryptedToken: string): string {
+// AES-256-GCM encryption/decryption for tokens
+async function deriveKey(): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(SUPABASE_SERVICE_ROLE_KEY),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+  
+  const salt = encoder.encode('lovable-token-encryption-salt-v1');
+  
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function decryptToken(encryptedToken: string): Promise<string> {
   if (!encryptedToken || !SUPABASE_SERVICE_ROLE_KEY) return encryptedToken;
   
   try {
-    const encrypted = new Uint8Array(
+    const combined = new Uint8Array(
       atob(encryptedToken).split('').map(c => c.charCodeAt(0))
     );
-    const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
-    const decrypted = new Uint8Array(encrypted.length);
     
-    for (let i = 0; i < encrypted.length; i++) {
-      decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
-    }
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+    
+    const key = await deriveKey();
+    
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
     
     return new TextDecoder().decode(decrypted);
   } catch {
-    return encryptedToken; // Fallback for unencrypted tokens
+    // Try legacy XOR decryption for backward compatibility
+    try {
+      const encrypted = new Uint8Array(
+        atob(encryptedToken).split('').map(c => c.charCodeAt(0))
+      );
+      const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
+      const decrypted = new Uint8Array(encrypted.length);
+      
+      for (let i = 0; i < encrypted.length; i++) {
+        decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
+      }
+      
+      return new TextDecoder().decode(decrypted);
+    } catch {
+      return encryptedToken;
+    }
   }
 }
 
-function encryptToken(token: string): string {
+async function encryptToken(token: string): Promise<string> {
   if (!token || !SUPABASE_SERVICE_ROLE_KEY) return token;
   
-  const keyBytes = new TextEncoder().encode(SUPABASE_SERVICE_ROLE_KEY);
-  const tokenBytes = new TextEncoder().encode(token);
-  const encrypted = new Uint8Array(tokenBytes.length);
-  
-  for (let i = 0; i < tokenBytes.length; i++) {
-    encrypted[i] = tokenBytes[i] ^ keyBytes[i % keyBytes.length];
+  try {
+    const encoder = new TextEncoder();
+    const key = await deriveKey();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encoder.encode(token)
+    );
+    
+    const combined = new Uint8Array(iv.length + new Uint8Array(encrypted).length);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    
+    return btoa(String.fromCharCode(...combined));
+  } catch {
+    return token;
   }
-  
-  return btoa(String.fromCharCode(...encrypted));
 }
 
 serve(async (req) => {
@@ -124,8 +180,8 @@ serve(async (req) => {
     }
 
     // Decrypt tokens
-    let accessToken = decryptToken(connection.access_token_encrypted);
-    const refreshToken = decryptToken(connection.refresh_token_encrypted);
+    let accessToken = await decryptToken(connection.access_token_encrypted);
+    const refreshToken = await decryptToken(connection.refresh_token_encrypted);
     const tokenExpiresAt = new Date(connection.token_expires_at);
 
     // Check if token needs refresh (buffer of 5 minutes)
@@ -157,8 +213,8 @@ serve(async (req) => {
       await supabase
         .from('health_tracker_connections')
         .update({
-          access_token_encrypted: encryptToken(tokenData.access_token),
-          refresh_token_encrypted: encryptToken(tokenData.refresh_token),
+          access_token_encrypted: await encryptToken(tokenData.access_token),
+          refresh_token_encrypted: await encryptToken(tokenData.refresh_token),
           token_expires_at: newExpiresAt.toISOString(),
           updated_at: new Date().toISOString(),
         })
