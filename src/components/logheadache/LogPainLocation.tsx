@@ -45,6 +45,26 @@ export default function LogPainLocation({ episodeId }: LogPainLocationProps) {
 
   return (
     <div className="space-y-6">
+      {/* Phase 1 Introduction Video */}
+      <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm overflow-hidden">
+        <div className="p-4 space-y-3">
+          <h2 className="text-lg font-medium text-white">Phase 1: Pain Location Tracking</h2>
+          <p className="text-sm text-white/70">
+            Watch this quick introduction to understand how to log your headache locations effectively.
+          </p>
+          <div className="relative aspect-video rounded-lg overflow-hidden bg-black/50">
+            <video 
+              controls 
+              className="w-full h-full object-contain"
+              poster="/videos/phase1-intro-poster.jpg"
+            >
+              <source src="/videos/phase1-intro.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </Card>
+
       <Card className="bg-[#0a192f]/90 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Select Pain Location</h2>
