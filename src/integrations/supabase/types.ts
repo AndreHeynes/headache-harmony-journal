@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      beta_email_queue: {
+        Row: {
+          created_at: string | null
+          email: string
+          email_type: string
+          error_message: string | null
+          full_name: string | null
+          id: string
+          retry_count: number | null
+          scheduled_for: string
+          sent_at: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          email_type: string
+          error_message?: string | null
+          full_name?: string | null
+          id?: string
+          retry_count?: number | null
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          email_type?: string
+          error_message?: string | null
+          full_name?: string | null
+          id?: string
+          retry_count?: number | null
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       headache_episodes: {
         Row: {
           created_at: string | null
