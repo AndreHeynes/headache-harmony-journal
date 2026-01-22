@@ -58,6 +58,48 @@ async function encryptToken(token: string): Promise<string> {
   }
 }
 
+// Validate CSRF token from state parameter
+async function validateCsrfToken(
+  supabase: ReturnType<typeof createClient>,
+  stateParam: string
+): Promise<{ valid: boolean; userId?: string; error?: string }> {
+  try {
+    // Decode state parameter
+    const stateData = JSON.parse(atob(stateParam));
+    const { user_id, csrf_token } = stateData;
+    
+    if (!user_id || !csrf_token) {
+      return { valid: false, error: 'Invalid state format' };
+    }
+    
+    // Verify token exists in database and belongs to this user
+    const { data: tokenRecord, error } = await supabase
+      .from('oauth_state_tokens')
+      .select('*')
+      .eq('token', csrf_token)
+      .eq('user_id', user_id)
+      .eq('provider', 'oura')
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !tokenRecord) {
+      console.error('CSRF token validation failed:', error);
+      return { valid: false, error: 'Invalid or expired state token' };
+    }
+    
+    // Delete used token to prevent replay attacks
+    await supabase
+      .from('oauth_state_tokens')
+      .delete()
+      .eq('token', csrf_token);
+    
+    return { valid: true, userId: user_id };
+  } catch (e) {
+    console.error('Error parsing state:', e);
+    return { valid: false, error: 'Failed to parse state parameter' };
+  }
+}
+
 // Standardized OAuth result HTML with page refresh
 function generateOAuthResultHtml(status: 'success' | 'error', message: string): string {
   const bgColor = status === 'success' ? '#10B981' : '#EF4444';
@@ -155,7 +197,7 @@ serve(async (req) => {
     const error = url.searchParams.get('error');
     const errorDescription = url.searchParams.get('error_description');
 
-    console.log('Oura OAuth callback received:', { code: !!code, state, error });
+    console.log('Oura OAuth callback received:', { code: !!code, state: !!state, error });
 
     if (error) {
       console.error('Oura OAuth error:', error, errorDescription);
@@ -175,6 +217,21 @@ serve(async (req) => {
     if (!OURA_CLIENT_ID || !OURA_CLIENT_SECRET) {
       throw new Error('Oura credentials not configured');
     }
+
+    // Validate CSRF token from state parameter
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    const csrfValidation = await validateCsrfToken(supabase, state);
+    
+    if (!csrfValidation.valid) {
+      console.error('CSRF validation failed:', csrfValidation.error);
+      return new Response(
+        generateOAuthResultHtml('error', 'Security validation failed. Please try again.'),
+        { headers: { 'Content-Type': 'text/html' } }
+      );
+    }
+    
+    const userId = csrfValidation.userId!;
+    console.log('CSRF validation passed for user:', userId);
 
     const redirectUri = `${SUPABASE_URL}/functions/v1/oura-oauth-callback`;
 
@@ -202,11 +259,10 @@ serve(async (req) => {
     console.log('Token exchange successful, expires_in:', tokenData.expires_in);
 
     const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
     // Store ENCRYPTED tokens using AES-GCM
     const connectionData = {
-      user_id: state,
+      user_id: userId,
       provider: 'oura',
       access_token_encrypted: await encryptToken(tokenData.access_token),
       refresh_token_encrypted: await encryptToken(tokenData.refresh_token),
@@ -220,7 +276,7 @@ serve(async (req) => {
     const { data: existing } = await supabase
       .from('health_tracker_connections')
       .select('id')
-      .eq('user_id', state)
+      .eq('user_id', userId)
       .eq('provider', 'oura')
       .single();
 
@@ -245,7 +301,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('Oura connection saved successfully for user:', state);
+    console.log('Oura connection saved successfully for user:', userId);
 
     return new Response(
       generateOAuthResultHtml('success', 'Oura Ring connected successfully! Your sleep data will now sync automatically.'),
