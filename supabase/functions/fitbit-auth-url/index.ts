@@ -4,8 +4,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const FITBIT_CLIENT_ID = Deno.env.get('FITBIT_CLIENT_ID');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-// Import shared modules inline (Deno doesn't support relative imports in edge functions easily)
+// Restricted CORS origins
 const ALLOWED_ORIGINS = [
   'https://vbutzblgbexuwedzayjv.lovable.app',
   'https://lovable.dev',
@@ -95,18 +96,49 @@ serve(async (req) => {
       );
     }
 
+    // Generate CSRF token for OAuth state validation
+    const csrfToken = crypto.randomUUID();
+    
+    // Create state with user_id and CSRF token
+    const stateData = {
+      user_id: user.id,
+      csrf_token: csrfToken,
+    };
+    const state = btoa(JSON.stringify(stateData));
+    
+    // Store CSRF token in database with 5-minute expiry
+    const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+    
+    const { error: insertError } = await supabaseAdmin
+      .from('oauth_state_tokens')
+      .insert({
+        token: csrfToken,
+        user_id: user.id,
+        provider: 'fitbit',
+        expires_at: expiresAt.toISOString(),
+      });
+    
+    if (insertError) {
+      console.error('Error storing OAuth state token:', insertError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to initialize OAuth flow' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const redirectUri = `${SUPABASE_URL}/functions/v1/fitbit-oauth-callback`;
     const scopes = ['sleep', 'profile'].join(' ');
     
-    // Use user.id from JWT as state parameter
+    // Use encoded state with CSRF token
     const authUrl = `https://www.fitbit.com/oauth2/authorize?` +
       `response_type=code&` +
       `client_id=${FITBIT_CLIENT_ID}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `scope=${encodeURIComponent(scopes)}&` +
-      `state=${user.id}`;
+      `state=${encodeURIComponent(state)}`;
 
-    console.log('Generated Fitbit auth URL for user:', user.id);
+    console.log('Generated Fitbit auth URL for user:', user.id, 'with CSRF protection');
 
     return new Response(
       JSON.stringify({ auth_url: authUrl }),

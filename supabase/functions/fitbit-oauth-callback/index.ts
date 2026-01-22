@@ -60,6 +60,48 @@ async function encryptToken(token: string): Promise<string> {
   }
 }
 
+// Validate CSRF token from state parameter
+async function validateCsrfToken(
+  supabase: ReturnType<typeof createClient>,
+  stateParam: string
+): Promise<{ valid: boolean; userId?: string; error?: string }> {
+  try {
+    // Decode state parameter
+    const stateData = JSON.parse(atob(stateParam));
+    const { user_id, csrf_token } = stateData;
+    
+    if (!user_id || !csrf_token) {
+      return { valid: false, error: 'Invalid state format' };
+    }
+    
+    // Verify token exists in database and belongs to this user
+    const { data: tokenRecord, error } = await supabase
+      .from('oauth_state_tokens')
+      .select('*')
+      .eq('token', csrf_token)
+      .eq('user_id', user_id)
+      .eq('provider', 'fitbit')
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !tokenRecord) {
+      console.error('CSRF token validation failed:', error);
+      return { valid: false, error: 'Invalid or expired state token' };
+    }
+    
+    // Delete used token to prevent replay attacks
+    await supabase
+      .from('oauth_state_tokens')
+      .delete()
+      .eq('token', csrf_token);
+    
+    return { valid: true, userId: user_id };
+  } catch (e) {
+    console.error('Error parsing state:', e);
+    return { valid: false, error: 'Failed to parse state parameter' };
+  }
+}
+
 // Standardized OAuth result HTML
 function generateOAuthResultHtml(status: 'success' | 'error', message: string): string {
   const bgColor = status === 'success' ? '#10B981' : '#EF4444';
@@ -157,7 +199,7 @@ serve(async (req) => {
     const state = url.searchParams.get('state');
     const error = url.searchParams.get('error');
 
-    console.log('Fitbit OAuth callback received:', { code: !!code, state, error });
+    console.log('Fitbit OAuth callback received:', { code: !!code, state: !!state, error });
 
     if (error) {
       console.error('Fitbit OAuth error:', error);
@@ -180,6 +222,21 @@ serve(async (req) => {
         { headers: { 'Content-Type': 'text/html' } }
       );
     }
+
+    // Validate CSRF token from state parameter
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    const csrfValidation = await validateCsrfToken(supabase, state);
+    
+    if (!csrfValidation.valid) {
+      console.error('CSRF validation failed:', csrfValidation.error);
+      return new Response(
+        generateOAuthResultHtml('error', 'Security validation failed. Please try again.'),
+        { headers: { 'Content-Type': 'text/html' } }
+      );
+    }
+    
+    const userId = csrfValidation.userId!;
+    console.log('CSRF validation passed for user:', userId);
 
     // Exchange authorization code for access token
     const redirectUri = `${SUPABASE_URL}/functions/v1/fitbit-oauth-callback`;
@@ -209,14 +266,13 @@ serve(async (req) => {
     const { access_token, refresh_token, expires_in, scope } = tokenData;
     console.log('Fitbit token obtained, scopes:', scope);
 
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     const tokenExpiresAt = new Date(Date.now() + expires_in * 1000).toISOString();
 
     // Store ENCRYPTED tokens using AES-GCM
     const { error: dbError } = await supabase
       .from('health_tracker_connections')
       .upsert({
-        user_id: state,
+        user_id: userId,
         provider: 'fitbit',
         is_connected: true,
         access_token_encrypted: await encryptToken(access_token),
@@ -237,7 +293,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fitbit connection saved successfully for user:', state);
+    console.log('Fitbit connection saved successfully for user:', userId);
 
     return new Response(
       generateOAuthResultHtml('success', 'Fitbit connected successfully! Your sleep data will now sync automatically.'),

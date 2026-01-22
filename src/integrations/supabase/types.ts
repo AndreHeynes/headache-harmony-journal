@@ -155,6 +155,33 @@ export type Database = {
         }
         Relationships: []
       }
+      oauth_state_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          provider: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          provider: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          provider?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -179,6 +206,36 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          attempt_count: number | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          identifier: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          attempt_count?: number | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          identifier: string
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          attempt_count?: number | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          identifier?: string
+          window_end?: string
+          window_start?: string
         }
         Relationships: []
       }

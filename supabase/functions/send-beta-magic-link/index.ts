@@ -7,24 +7,26 @@ const corsHeaders = {
 
 console.log('[send-beta-magic-link] Edge function loaded');
 
-// Persistent rate limiting using Supabase
+// Persistent rate limiting using dedicated rate_limits table
 async function checkRateLimit(
   supabase: ReturnType<typeof createClient>,
   identifier: string,
+  endpoint: string,
   maxRequests: number = 5,
   windowMs: number = 60000
 ): Promise<{ allowed: boolean; retryAfter?: number }> {
   const now = Date.now();
-  const windowStart = new Date(now - windowMs).toISOString();
+  const windowStart = new Date(now);
+  const windowEnd = new Date(now + windowMs);
   
   try {
-    // Count recent attempts from this identifier
+    // Count recent attempts from this identifier within active windows
     const { count, error } = await supabase
-      .from('test_events')
+      .from('rate_limits')
       .select('*', { count: 'exact', head: true })
-      .eq('event_type', 'rate_limit_check')
-      .eq('session_id', `magic_link:${identifier}`)
-      .gte('created_at', windowStart);
+      .eq('identifier', identifier)
+      .eq('endpoint', endpoint)
+      .gte('window_end', new Date().toISOString());
     
     if (error) {
       console.log('Rate limit check error, allowing request:', error);
@@ -38,12 +40,12 @@ async function checkRateLimit(
       };
     }
     
-    // Log this attempt
-    await supabase.from('test_events').insert({
-      event_type: 'rate_limit_check',
-      session_id: `magic_link:${identifier}`,
-      event_details: 'Magic link request attempt',
-      metadata: { timestamp: now },
+    // Log this attempt in the rate_limits table
+    await supabase.from('rate_limits').insert({
+      identifier,
+      endpoint,
+      window_start: windowStart.toISOString(),
+      window_end: windowEnd.toISOString(),
     });
     
     return { allowed: true };
@@ -140,9 +142,13 @@ Deno.serve(async (req) => {
       },
     });
 
-    // Check rate limit using persistent storage
+    // Check rate limit using dedicated rate_limits table
     const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-    const rateLimit = await checkRateLimit(supabaseAdmin, `${clientIp}:${email.toLowerCase()}`);
+    const rateLimit = await checkRateLimit(
+      supabaseAdmin, 
+      `${clientIp}:${email.toLowerCase()}`,
+      'send-beta-magic-link'
+    );
     
     if (!rateLimit.allowed) {
       console.log(`[${requestId}] Rate limit exceeded for ${clientIp}`);

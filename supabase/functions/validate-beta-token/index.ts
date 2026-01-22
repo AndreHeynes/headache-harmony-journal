@@ -7,24 +7,27 @@ const corsHeaders = {
 
 console.log('[validate-beta-token] Edge function loaded and ready');
 
-// Persistent rate limiting using Supabase
+// Persistent rate limiting using dedicated rate_limits table
 async function checkRateLimit(
   supabase: ReturnType<typeof createClient>,
   identifier: string,
+  endpoint: string,
   maxRequests: number = 5,
   windowMs: number = 60000
 ): Promise<{ allowed: boolean; retryAfter?: number }> {
   const now = Date.now();
-  const windowStart = new Date(now - windowMs).toISOString();
+  const windowStart = new Date(now);
+  const windowEnd = new Date(now + windowMs);
+  const windowStartIso = new Date(now - windowMs).toISOString();
   
   try {
-    // Count recent attempts from this identifier
+    // Count recent attempts from this identifier within the current window
     const { count, error } = await supabase
-      .from('test_events')
+      .from('rate_limits')
       .select('*', { count: 'exact', head: true })
-      .eq('event_type', 'rate_limit_check')
-      .eq('session_id', `beta_validation:${identifier}`)
-      .gte('created_at', windowStart);
+      .eq('identifier', identifier)
+      .eq('endpoint', endpoint)
+      .gte('window_end', new Date().toISOString());
     
     if (error) {
       console.log('Rate limit check error, allowing request:', error);
@@ -38,17 +41,29 @@ async function checkRateLimit(
       };
     }
     
-    // Log this attempt
-    await supabase.from('test_events').insert({
-      event_type: 'rate_limit_check',
-      session_id: `beta_validation:${identifier}`,
-      event_details: 'Beta token validation attempt',
-      metadata: { timestamp: now },
+    // Log this attempt in the rate_limits table
+    await supabase.from('rate_limits').insert({
+      identifier,
+      endpoint,
+      window_start: windowStart.toISOString(),
+      window_end: windowEnd.toISOString(),
     });
     
     return { allowed: true };
   } catch {
     return { allowed: true };
+  }
+}
+
+// Cleanup old rate limit entries (call periodically)
+async function cleanupRateLimits(supabase: ReturnType<typeof createClient>) {
+  try {
+    await supabase
+      .from('rate_limits')
+      .delete()
+      .lt('window_end', new Date().toISOString());
+  } catch (e) {
+    console.log('Rate limit cleanup error:', e);
   }
 }
 
@@ -105,9 +120,18 @@ Deno.serve(async (req) => {
       },
     });
 
-    // Check rate limit using persistent storage
+    // Periodically cleanup old rate limit entries
+    if (Math.random() < 0.1) { // 10% chance to cleanup
+      cleanupRateLimits(supabaseAdmin);
+    }
+
+    // Check rate limit using dedicated rate_limits table
     const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-    const rateLimit = await checkRateLimit(supabaseAdmin, `${clientIp}:${token.slice(0, 8)}`);
+    const rateLimit = await checkRateLimit(
+      supabaseAdmin, 
+      `${clientIp}:${token.slice(0, 8)}`,
+      'validate-beta-token'
+    );
     
     if (!rateLimit.allowed) {
       console.log(`[${requestId}] Rate limit exceeded for ${clientIp}`);
