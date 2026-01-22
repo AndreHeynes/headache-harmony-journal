@@ -420,7 +420,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email via Resend
     const { data, error } = await resend.emails.send({
-      from: "My Headache Experience Journal <onboarding@resend.dev>",
+      from: "Headache Experience Journal <noreply@headacherecovery.org>",
       to: [email],
       subject: template.subject,
       html: template.html,
