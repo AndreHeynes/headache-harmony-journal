@@ -6,121 +6,244 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useEpisode } from "@/contexts/EpisodeContext";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface LogSymptomsProps {
   episodeId?: string | null;
 }
 
+type SymptomTiming = 'Before headache' | 'During headache' | 'After headache started';
+
+interface SymptomWithTiming {
+  name: string;
+  timing?: SymptomTiming;
+}
+
+const TIMING_OPTIONS: SymptomTiming[] = ['Before headache', 'During headache', 'After headache started'];
+
+// Helper to parse symptom string back to object
+const parseSymptom = (symptomStr: string): SymptomWithTiming => {
+  const match = symptomStr.match(/^(.+?)\s*\(([^)]+)\)$/);
+  if (match) {
+    return { name: match[1], timing: match[2] as SymptomTiming };
+  }
+  return { name: symptomStr };
+};
+
+// Helper to format symptom with timing
+const formatSymptom = (symptom: SymptomWithTiming): string => {
+  if (symptom.timing) {
+    return `${symptom.name} (${symptom.timing})`;
+  }
+  return symptom.name;
+};
+
 export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
   const [selectedSide, setSelectedSide] = useState<string>("");
   const [customSymptom, setCustomSymptom] = useState("");
-  const [hasNeckPain, setHasNeckPain] = useState(false);
-  const [neckPainTiming, setNeckPainTiming] = useState("");
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [symptomsWithTiming, setSymptomsWithTiming] = useState<Map<string, SymptomTiming | undefined>>(new Map());
+  const [expandedSymptoms, setExpandedSymptoms] = useState<Set<string>>(new Set());
   const { updateEpisode, activeEpisode } = useEpisode();
+
+  // Common symptoms that should have timing options
+  const commonSymptoms = ['Nausea', 'Vomiting', 'Dizziness', 'Pins & Needles'];
+  const functionalDifficulties = ['Speech Difficulty', 'Swallowing Difficulty'];
+  const visualDisturbances = ['Seeing Stars', 'Dark Spots', 'Line Patterns'];
+  const sensorySymptoms = ['Sound Sensitivity', 'Light Sensitivity'];
 
   // Load existing symptoms
   useEffect(() => {
     if (activeEpisode?.symptoms) {
-      setSelectedSymptoms(activeEpisode.symptoms);
-      // Check for neck pain in symptoms
-      if (activeEpisode.symptoms.some(s => s.toLowerCase().includes('neck'))) {
-        setHasNeckPain(true);
-      }
+      const timingMap = new Map<string, SymptomTiming | undefined>();
+      
+      activeEpisode.symptoms.forEach(symptomStr => {
+        const parsed = parseSymptom(symptomStr);
+        // Handle neck pain specially
+        if (parsed.name.startsWith('Neck Pain')) {
+          timingMap.set('Neck Pain', parsed.timing);
+        } else if (parsed.name.startsWith('Body Weakness')) {
+          // Extract side from body weakness
+          const sideMatch = parsed.name.match(/Body Weakness - (.+)/);
+          if (sideMatch) {
+            setSelectedSide(sideMatch[1]);
+          }
+        } else {
+          timingMap.set(parsed.name, parsed.timing);
+        }
+      });
+      
+      setSymptomsWithTiming(timingMap);
     }
   }, [activeEpisode]);
 
+  const getFormattedSymptoms = (timingMap: Map<string, SymptomTiming | undefined>): string[] => {
+    const symptoms: string[] = [];
+    
+    timingMap.forEach((timing, name) => {
+      if (name === 'Neck Pain') {
+        symptoms.push(timing ? `Neck Pain (${timing})` : 'Neck Pain');
+      } else {
+        symptoms.push(timing ? `${name} (${timing})` : name);
+      }
+    });
+    
+    if (selectedSide) {
+      symptoms.push(`Body Weakness - ${selectedSide}`);
+    }
+    
+    return symptoms;
+  };
+
   const handleSymptomToggle = async (symptom: string, checked: boolean) => {
-    let updatedSymptoms: string[];
+    const newMap = new Map(symptomsWithTiming);
+    
     if (checked) {
-      updatedSymptoms = [...selectedSymptoms, symptom];
+      newMap.set(symptom, undefined);
+      // Auto-expand to show timing options
+      setExpandedSymptoms(prev => new Set([...prev, symptom]));
     } else {
-      updatedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+      newMap.delete(symptom);
+      setExpandedSymptoms(prev => {
+        const next = new Set(prev);
+        next.delete(symptom);
+        return next;
+      });
     }
-    setSelectedSymptoms(updatedSymptoms);
+    
+    setSymptomsWithTiming(newMap);
     
     if (episodeId) {
-      await updateEpisode(episodeId, { symptoms: updatedSymptoms });
+      await updateEpisode(episodeId, { symptoms: getFormattedSymptoms(newMap) });
     }
   };
 
-  const handleNeckPainChange = async (checked: boolean) => {
-    setHasNeckPain(checked);
-    const symptom = 'Neck Pain';
+  const handleTimingChange = async (symptom: string, timing: SymptomTiming) => {
+    const newMap = new Map(symptomsWithTiming);
+    newMap.set(symptom, timing);
+    setSymptomsWithTiming(newMap);
     
-    if (checked && !selectedSymptoms.includes(symptom)) {
-      const updatedSymptoms = [...selectedSymptoms, symptom];
-      setSelectedSymptoms(updatedSymptoms);
-      if (episodeId) {
-        await updateEpisode(episodeId, { symptoms: updatedSymptoms });
-      }
-    } else if (!checked) {
-      const updatedSymptoms = selectedSymptoms.filter(s => s !== symptom);
-      setSelectedSymptoms(updatedSymptoms);
-      setNeckPainTiming("");
-      if (episodeId) {
-        await updateEpisode(episodeId, { symptoms: updatedSymptoms });
-      }
+    if (episodeId) {
+      await updateEpisode(episodeId, { symptoms: getFormattedSymptoms(newMap) });
     }
   };
 
-  const handleNeckPainTimingChange = async (timing: string) => {
-    setNeckPainTiming(timing);
-    // Update symptoms to include timing info
-    const neckSymptom = `Neck Pain (${timing})`;
-    const updatedSymptoms = selectedSymptoms
-      .filter(s => !s.startsWith('Neck Pain'))
-      .concat([neckSymptom]);
-    setSelectedSymptoms(updatedSymptoms);
-    
-    if (episodeId) {
-      await updateEpisode(episodeId, { symptoms: updatedSymptoms });
-    }
+  const toggleExpanded = (symptom: string) => {
+    setExpandedSymptoms(prev => {
+      const next = new Set(prev);
+      if (next.has(symptom)) {
+        next.delete(symptom);
+      } else {
+        next.add(symptom);
+      }
+      return next;
+    });
   };
 
   const handleSideChange = async (side: string) => {
     setSelectedSide(side);
-    const weaknessSymptom = `Body Weakness - ${side}`;
-    const updatedSymptoms = selectedSymptoms
-      .filter(s => !s.startsWith('Body Weakness'))
-      .concat([weaknessSymptom]);
-    setSelectedSymptoms(updatedSymptoms);
     
     if (episodeId) {
-      await updateEpisode(episodeId, { symptoms: updatedSymptoms });
+      const symptoms = getFormattedSymptoms(symptomsWithTiming);
+      // Remove old body weakness and add new
+      const filtered = symptoms.filter(s => !s.startsWith('Body Weakness'));
+      filtered.push(`Body Weakness - ${side}`);
+      await updateEpisode(episodeId, { symptoms: filtered });
     }
   };
 
   const handleAddCustomSymptom = async () => {
-    if (customSymptom.trim() && !selectedSymptoms.includes(customSymptom.trim())) {
-      const updatedSymptoms = [...selectedSymptoms, customSymptom.trim()];
-      setSelectedSymptoms(updatedSymptoms);
+    if (customSymptom.trim() && !symptomsWithTiming.has(customSymptom.trim())) {
+      const newMap = new Map(symptomsWithTiming);
+      newMap.set(customSymptom.trim(), undefined);
+      setSymptomsWithTiming(newMap);
+      setExpandedSymptoms(prev => new Set([...prev, customSymptom.trim()]));
       setCustomSymptom("");
       
       if (episodeId) {
-        await updateEpisode(episodeId, { symptoms: updatedSymptoms });
+        await updateEpisode(episodeId, { symptoms: getFormattedSymptoms(newMap) });
       }
     }
   };
 
-  const isSymptomSelected = (symptom: string) => selectedSymptoms.includes(symptom);
+  const isSymptomSelected = (symptom: string) => symptomsWithTiming.has(symptom);
+  const getSymptomTiming = (symptom: string) => symptomsWithTiming.get(symptom);
+
+  const renderSymptomWithTiming = (symptom: string) => {
+    const isSelected = isSymptomSelected(symptom);
+    const isExpanded = expandedSymptoms.has(symptom);
+    const currentTiming = getSymptomTiming(symptom);
+
+    return (
+      <div key={symptom} className="space-y-2">
+        <Label 
+          className="flex items-center justify-between p-3 rounded-lg bg-gray-700/40 border border-gray-700 cursor-pointer"
+        >
+          <div className="flex items-center space-x-3">
+            <Checkbox 
+              className="border-gray-600" 
+              checked={isSelected}
+              onCheckedChange={(checked) => handleSymptomToggle(symptom, checked as boolean)}
+            />
+            <span className="text-white">{symptom}</span>
+            {currentTiming && (
+              <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded-full">
+                {currentTiming}
+              </span>
+            )}
+          </div>
+          {isSelected && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleExpanded(symptom);
+              }}
+            >
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          )}
+        </Label>
+
+        {isSelected && isExpanded && (
+          <div className="ml-8 space-y-2 animate-in slide-in-from-top-2 duration-200">
+            <div className="text-sm text-gray-400 mb-2">When did this symptom occur?</div>
+            <RadioGroup 
+              value={currentTiming || ''} 
+              onValueChange={(value) => handleTimingChange(symptom, value as SymptomTiming)} 
+              className="space-y-2"
+            >
+              {TIMING_OPTIONS.map((timing) => (
+                <Label 
+                  key={timing} 
+                  className="flex items-center space-x-3 p-2 rounded-lg bg-gray-700/30 border border-gray-600 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                >
+                  <RadioGroupItem value={timing} className="text-primary" />
+                  <span className="text-white text-sm">{timing}</span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Get custom symptoms (those not in predefined lists)
+  const predefinedSymptoms = [...commonSymptoms, ...functionalDifficulties, ...visualDisturbances, ...sensorySymptoms, 'Neck Pain'];
+  const customSymptoms = Array.from(symptomsWithTiming.keys()).filter(
+    s => !predefinedSymptoms.includes(s) && !s.startsWith('Body Weakness')
+  );
 
   return (
     <div className="space-y-6">
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Common Symptoms</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {['Nausea', 'Vomiting', 'Dizziness', 'Pins & Needles'].map((symptom) => (
-              <Label key={symptom} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-                <Checkbox 
-                  className="border-gray-600" 
-                  checked={isSymptomSelected(symptom)}
-                  onCheckedChange={(checked) => handleSymptomToggle(symptom, checked as boolean)}
-                />
-                <span className="text-white">{symptom}</span>
-              </Label>
-            ))}
+          <p className="text-sm text-gray-400">Select symptoms and specify when they occurred</p>
+          <div className="space-y-3">
+            {commonSymptoms.map(symptom => renderSymptomWithTiming(symptom))}
           </div>
         </div>
       </Card>
@@ -128,51 +251,15 @@ export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Neck Pain</h2>
-          <div className="space-y-4">
-            <Label className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-              <Checkbox 
-                checked={hasNeckPain}
-                onCheckedChange={(checked) => handleNeckPainChange(checked as boolean)}
-                className="border-gray-600" 
-              />
-              <span className="text-white">Experiencing Neck Pain</span>
-            </Label>
-
-            {hasNeckPain && (
-              <div className="space-y-3 ml-4">
-                <div className="text-sm text-gray-400 mb-2">When did the neck pain start?</div>
-                <RadioGroup 
-                  value={neckPainTiming} 
-                  onValueChange={handleNeckPainTimingChange} 
-                  className="space-y-3"
-                >
-                  {['Before headache started', 'During headache', 'After headache started'].map((timing) => (
-                    <Label key={timing} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-                      <RadioGroupItem value={timing} className="text-primary" />
-                      <span className="text-white ml-3">{timing}</span>
-                    </Label>
-                  ))}
-                </RadioGroup>
-              </div>
-            )}
-          </div>
+          {renderSymptomWithTiming('Neck Pain')}
         </div>
       </Card>
 
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Functional Difficulties</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {['Speech Difficulty', 'Swallowing Difficulty'].map((difficulty) => (
-              <Label key={difficulty} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-                <Checkbox 
-                  className="border-gray-600"
-                  checked={isSymptomSelected(difficulty)}
-                  onCheckedChange={(checked) => handleSymptomToggle(difficulty, checked as boolean)}
-                />
-                <span className="text-white">{difficulty}</span>
-              </Label>
-            ))}
+          <div className="space-y-3">
+            {functionalDifficulties.map(symptom => renderSymptomWithTiming(symptom))}
           </div>
         </div>
       </Card>
@@ -180,17 +267,8 @@ export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Visual Disturbances</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {['Seeing Stars', 'Dark Spots', 'Line Patterns'].map((disturbance) => (
-              <Label key={disturbance} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-                <Checkbox 
-                  className="border-gray-600"
-                  checked={isSymptomSelected(disturbance)}
-                  onCheckedChange={(checked) => handleSymptomToggle(disturbance, checked as boolean)}
-                />
-                <span className="text-white">{disturbance}</span>
-              </Label>
-            ))}
+          <div className="space-y-3">
+            {visualDisturbances.map(symptom => renderSymptomWithTiming(symptom))}
           </div>
         </div>
       </Card>
@@ -198,17 +276,8 @@ export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-white">Sensory Sensitivity</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {['Sound Sensitivity', 'Light Sensitivity'].map((sensitivity) => (
-              <Label key={sensitivity} className="flex items-center space-x-3 p-3 rounded-lg bg-gray-700/40 border border-gray-700">
-                <Checkbox 
-                  className="border-gray-600"
-                  checked={isSymptomSelected(sensitivity)}
-                  onCheckedChange={(checked) => handleSymptomToggle(sensitivity, checked as boolean)}
-                />
-                <span className="text-white">{sensitivity}</span>
-              </Label>
-            ))}
+          <div className="space-y-3">
+            {sensorySymptoms.map(symptom => renderSymptomWithTiming(symptom))}
           </div>
         </div>
       </Card>
@@ -248,27 +317,11 @@ export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
               Add
             </Button>
           </div>
-          {/* Display custom symptoms */}
-          {selectedSymptoms.filter(s => 
-            !['Nausea', 'Vomiting', 'Dizziness', 'Pins & Needles', 'Speech Difficulty', 
-              'Swallowing Difficulty', 'Seeing Stars', 'Dark Spots', 'Line Patterns',
-              'Sound Sensitivity', 'Light Sensitivity'].includes(s) && 
-            !s.startsWith('Neck Pain') && !s.startsWith('Body Weakness')
-          ).length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {selectedSymptoms.filter(s => 
-                !['Nausea', 'Vomiting', 'Dizziness', 'Pins & Needles', 'Speech Difficulty', 
-                  'Swallowing Difficulty', 'Seeing Stars', 'Dark Spots', 'Line Patterns',
-                  'Sound Sensitivity', 'Light Sensitivity'].includes(s) && 
-                !s.startsWith('Neck Pain') && !s.startsWith('Body Weakness')
-              ).map(symptom => (
-                <span 
-                  key={symptom} 
-                  className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
-                >
-                  {symptom}
-                </span>
-              ))}
+          
+          {/* Display custom symptoms with timing */}
+          {customSymptoms.length > 0 && (
+            <div className="space-y-3 mt-4">
+              {customSymptoms.map(symptom => renderSymptomWithTiming(symptom))}
             </div>
           )}
         </div>
