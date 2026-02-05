@@ -136,6 +136,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  // Trigger Landing Page email sequence after signup
+  const triggerEmailSequence = async (email: string, name: string) => {
+    try {
+      const response = await fetch(
+        "https://plgarmijuqynxeyymkco.supabase.co/functions/v1/queue-email-sequence",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsZ2FybWlqdXF5bnhleXlta2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NDg4NDMsImV4cCI6MjA4MDUyNDg0M30.Mmp7C2efUazxM2poJlB44aob-c3CQce-wzU8a_0ExxQ"
+          },
+          body: JSON.stringify({
+            email: email,
+            name: name,
+            sequence_name: "beta_app",
+            source: "app_signup"
+          })
+        }
+      );
+      const result = await response.json();
+      console.log('[Auth] Email sequence triggered:', result);
+      return result;
+    } catch (err) {
+      console.error('[Auth] Failed to trigger email sequence:', err);
+      // Don't throw - email failure shouldn't block signup
+    }
+  };
+
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
@@ -149,6 +177,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     });
+    
+    // Trigger email sequence on successful signup (fire-and-forget)
+    if (!error) {
+      triggerEmailSequence(email, fullName);
+    }
     
     return { error };
   };
