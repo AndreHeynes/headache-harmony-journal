@@ -140,7 +140,7 @@ function getHtmlPage(title: string, message: string): string {
     <div class="icon">${title.includes("Error") ? "❌" : "✅"}</div>
     <h1>${title}</h1>
     <p>${message}</p>
-    <a href="https://headache-harmony-journal.lovable.app">Return to App</a>
+    <a href="https://headacherecovery.org">Return to App</a>
   </div>
 </body>
 </html>`;

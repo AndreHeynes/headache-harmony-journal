@@ -411,7 +411,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`[${requestId}] Processing email - queue_id: ${queue_id}, type: ${email_type}`);
 
     // Get the app URL from environment or use default
-    const appUrl = Deno.env.get("APP_URL") || "https://headache-harmony-journal.lovable.app";
+    const appUrl = Deno.env.get("APP_URL") || "https://headacherecovery.org";
     
     // Get email template
     const template = getEmailTemplate(email_type, full_name || "Beta Tester", appUrl);
