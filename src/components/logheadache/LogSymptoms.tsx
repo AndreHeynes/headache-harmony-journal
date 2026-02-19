@@ -9,6 +9,7 @@ import { useEpisode } from "@/contexts/EpisodeContext";
 import { useLocations } from "@/contexts/LocationContext";
 import { LocationTabs } from "./LocationTabs";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { NeurologicalScreening } from "./screening/NeurologicalScreening";
 
 interface LogSymptomsProps {
   episodeId?: string | null;
@@ -187,6 +188,8 @@ export default function LogSymptoms({ episodeId }: LogSymptomsProps) {
   return (
     <div className="space-y-6">
       <LocationTabs />
+
+      <NeurologicalScreening />
 
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">

@@ -13,6 +13,7 @@ import { SaveTreatmentButton } from "./sections/treatment/SaveTreatmentButton";
 import { useEpisode } from "@/contexts/EpisodeContext";
 import { useLocations } from "@/contexts/LocationContext";
 import { LocationTabs } from "./LocationTabs";
+import { PositionalScreening } from "./screening/PositionalScreening";
 
 interface LogTreatmentProps {
   episodeId?: string | null;
@@ -122,6 +123,8 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
   return (
     <div className="space-y-6">
       <LocationTabs />
+
+      <PositionalScreening />
 
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-6">

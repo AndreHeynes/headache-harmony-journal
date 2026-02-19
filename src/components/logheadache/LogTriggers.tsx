@@ -10,6 +10,7 @@ import { MenstrualCycleSection } from "./sections/MenstrualCycleSection";
 import { useEpisode } from "@/contexts/EpisodeContext";
 import { useLocations } from "@/contexts/LocationContext";
 import { LocationTabs } from "./LocationTabs";
+import { PatternScreening } from "./screening/PatternScreening";
 
 interface LogTriggersProps {
   episodeId?: string | null;
@@ -105,6 +106,8 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
   return (
     <div className="space-y-6">
       <LocationTabs />
+
+      <PatternScreening />
 
       <WeatherSection onWeatherCapture={handleWeatherCapture} />
       <MenstrualCycleSection onCycleDataCapture={handleCycleDataCapture} />

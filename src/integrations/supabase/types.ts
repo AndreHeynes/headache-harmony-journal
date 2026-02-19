@@ -325,6 +325,8 @@ export type Database = {
           flag_details: Json | null
           flag_type: string
           id: string
+          priority_level: string | null
+          screening_responses: Json | null
           user_id: string
         }
         Insert: {
@@ -335,6 +337,8 @@ export type Database = {
           flag_details?: Json | null
           flag_type: string
           id?: string
+          priority_level?: string | null
+          screening_responses?: Json | null
           user_id: string
         }
         Update: {
@@ -345,6 +349,8 @@ export type Database = {
           flag_details?: Json | null
           flag_type?: string
           id?: string
+          priority_level?: string | null
+          screening_responses?: Json | null
           user_id?: string
         }
         Relationships: [

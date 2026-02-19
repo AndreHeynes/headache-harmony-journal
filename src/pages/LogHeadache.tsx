@@ -16,6 +16,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRedFlagCheck } from "@/hooks/useRedFlagCheck";
 import { FirstHeadacheCheck } from "@/components/logheadache/FirstHeadacheCheck";
+import { RedFlagScreeningProvider, useScreening } from "@/contexts/RedFlagScreeningContext";
+import { RedFlagAlertDialog } from "@/components/logheadache/screening/RedFlagAlertDialog";
 
 const steps = [
   { id: 'location', title: 'Pain Location', component: LogPainLocation },
@@ -27,18 +29,26 @@ const steps = [
   { id: 'treatment', title: 'Treatment Log', component: LogTreatment }
 ];
 
-export default function LogHeadache() {
+function LogHeadacheInner() {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentEpisodeId, setCurrentEpisodeId] = useState<string | null>(null);
   const [showEpisodeModal, setShowEpisodeModal] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+  const [showRedFlagAlert, setShowRedFlagAlert] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   const { locations, loadLocations, clearLocations } = useLocations();
   const { shouldAskFirstHeadache, userAge, submitFirstHeadacheFlag } = useRedFlagCheck();
+  const { flags, highestPriority, priorityMessage, saveScreeningResults, hasAnyFlags, responses, updateResponse } = useScreening();
   
   const CurrentStepComponent = steps[currentStep].component;
+
+  // Sync the "first after 50" answer from useRedFlagCheck into screening context
+  const handleFirstHeadacheSubmit = async (episodeId: string, isFirstEver: boolean) => {
+    await submitFirstHeadacheFlag(episodeId, isFirstEver);
+    updateResponse('isFirstAfter50', isFirstEver);
+  };
 
   // Only check for active episode after auth is ready
   useEffect(() => {
@@ -97,20 +107,35 @@ export default function LogHeadache() {
     setCompletedSteps(prev => new Set([...prev, stepId]));
   };
 
+  const handleFinalComplete = async () => {
+    if (currentEpisodeId) {
+      // Save screening results to DB
+      await saveScreeningResults(currentEpisodeId);
+      await completeEpisode(currentEpisodeId);
+    }
+    clearLocations();
+    toast.success('Episode logged successfully!');
+    navigate('/dashboard');
+  };
+
   const handleNext = async () => {
-    // Mark current step as complete
     markStepComplete(steps[currentStep].id);
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(current => current + 1);
     } else {
-      if (currentEpisodeId) {
-        await completeEpisode(currentEpisodeId);
+      // Last step — show red flag alert if any flags detected, otherwise complete
+      if (hasAnyFlags) {
+        setShowRedFlagAlert(true);
+      } else {
+        await handleFinalComplete();
       }
-      clearLocations();
-      toast.success('Episode logged successfully!');
-      navigate('/dashboard');
     }
+  };
+
+  const handleRedFlagAlertClose = async () => {
+    setShowRedFlagAlert(false);
+    await handleFinalComplete();
   };
 
   const handleBack = () => {
@@ -133,6 +158,14 @@ export default function LogHeadache() {
           open={showEpisodeModal}
         />
       )}
+
+      <RedFlagAlertDialog
+        open={showRedFlagAlert}
+        onClose={handleRedFlagAlertClose}
+        priority={highestPriority}
+        message={priorityMessage}
+        flags={flags}
+      />
       
       <div className="min-h-screen bg-background pb-24">
         <header className="fixed top-0 w-full bg-card/90 backdrop-blur-sm border-b border-border z-50">
@@ -181,7 +214,7 @@ export default function LogHeadache() {
             <FirstHeadacheCheck
               userAge={userAge}
               episodeId={currentEpisodeId}
-              onSubmit={submitFirstHeadacheFlag}
+              onSubmit={handleFirstHeadacheSubmit}
             />
           )}
           <CurrentStepComponent episodeId={currentEpisodeId} />
@@ -197,5 +230,13 @@ export default function LogHeadache() {
         </footer>
       </div>
     </>
+  );
+}
+
+export default function LogHeadache() {
+  return (
+    <RedFlagScreeningProvider>
+      <LogHeadacheInner />
+    </RedFlagScreeningProvider>
   );
 }

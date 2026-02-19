@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { useEpisode } from "@/contexts/EpisodeContext";
+import { OnsetScreening } from "./screening/OnsetScreening";
 
 interface LogPainDurationProps {
   episodeId?: string | null;
@@ -99,6 +100,7 @@ export default function LogPainDuration({ episodeId }: LogPainDurationProps) {
 
   return (
     <div className="space-y-6">
+      <OnsetScreening />
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-4">
           <div className="flex justify-between items-center">
