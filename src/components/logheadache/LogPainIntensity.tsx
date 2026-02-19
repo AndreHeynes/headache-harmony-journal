@@ -4,6 +4,8 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Smile, Meh, Frown } from "lucide-react";
 import { useEpisode } from "@/contexts/EpisodeContext";
+import { useLocations } from "@/contexts/LocationContext";
+import { LocationTabs } from "./LocationTabs";
 
 interface LogPainIntensityProps {
   episodeId?: string | null;
@@ -14,13 +16,23 @@ export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
   const [severity, setSeverity] = useState<'Mild' | 'Moderate' | 'Severe'>('Moderate');
   const [selectedCharacteristics, setSelectedCharacteristics] = useState<string[]>([]);
   const { updateEpisode, activeEpisode } = useEpisode();
+  const { locations, activeLocationId, activeLocation, updateLocation } = useLocations();
   
-  // Load existing data if available
+  const hasMultipleLocations = locations.length > 1;
+
+  // Load data from active location or episode
   useEffect(() => {
-    if (activeEpisode?.pain_intensity) {
+    if (hasMultipleLocations && activeLocation) {
+      setPainLevel([activeLocation.pain_intensity || 5]);
+      // Load characteristics from location symptoms
+      const chars = (activeLocation.symptoms || [])
+        .filter((s: string) => s.startsWith('Pain:'))
+        .map((s: string) => s.replace('Pain: ', ''));
+      setSelectedCharacteristics(chars);
+    } else if (activeEpisode?.pain_intensity) {
       setPainLevel([activeEpisode.pain_intensity]);
     }
-  }, [activeEpisode]);
+  }, [activeEpisode, activeLocation, activeLocationId, hasMultipleLocations]);
 
   // Update severity based on pain level
   useEffect(() => {
@@ -30,25 +42,29 @@ export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
     else if (level >= 7 && level <= 10) setSeverity('Severe');
   }, [painLevel]);
 
-  // Save pain intensity when it changes
   const handlePainLevelChange = async (value: number[]) => {
     setPainLevel(value);
-    if (episodeId) {
+    if (hasMultipleLocations && activeLocationId) {
+      await updateLocation(activeLocationId, { pain_intensity: value[0] });
+    } else if (episodeId) {
       await updateEpisode(episodeId, { pain_intensity: value[0] });
     }
   };
 
-  // Toggle characteristic selection and save to episode
   const handleCharacteristicToggle = async (characteristic: string) => {
     const updated = selectedCharacteristics.includes(characteristic)
       ? selectedCharacteristics.filter(c => c !== characteristic)
       : [...selectedCharacteristics, characteristic];
     
     setSelectedCharacteristics(updated);
+    const characteristicSymptoms = updated.map(c => `Pain: ${c}`);
     
-    // Save pain characteristics to the episode's symptoms array
-    if (episodeId) {
-      const characteristicSymptoms = updated.map(c => `Pain: ${c}`);
+    if (hasMultipleLocations && activeLocationId) {
+      const existingSymptoms = (activeLocation?.symptoms || []).filter((s: string) => !s.startsWith('Pain:'));
+      await updateLocation(activeLocationId, { 
+        symptoms: [...existingSymptoms, ...characteristicSymptoms] 
+      });
+    } else if (episodeId) {
       const existingSymptoms = activeEpisode?.symptoms?.filter(s => !s.startsWith('Pain:')) || [];
       await updateEpisode(episodeId, { 
         symptoms: [...existingSymptoms, ...characteristicSymptoms] 
@@ -56,17 +72,15 @@ export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
     }
   };
 
-  // Get color based on severity
   const getSeverityColor = () => {
     switch (severity) {
       case 'Mild': return 'text-green-400';
       case 'Moderate': return 'text-orange-400';
       case 'Severe': return 'text-red-400';
-      default: return 'text-white';
+      default: return 'text-foreground';
     }
   };
 
-  // Get icon and background based on severity
   const getSeverityVisuals = () => {
     switch (severity) {
       case 'Mild':
@@ -89,19 +103,21 @@ export default function LogPainIntensity({ episodeId }: LogPainIntensityProps) {
 
   const visuals = getSeverityVisuals();
   const characteristics = [
-    "Sharp",
-    "Stabbing",
-    "Dull",
-    "Throbbing",
-    "Band of pressure",
-    "Tooth ache-like"
+    "Sharp", "Stabbing", "Dull", "Throbbing", "Band of pressure", "Tooth ache-like"
   ];
 
   return (
     <div className="space-y-6">
+      <LocationTabs />
+      
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-6">
-          <h2 className="text-lg font-medium text-white">Pain Intensity Scale</h2>
+          <h2 className="text-lg font-medium text-white">
+            Pain Intensity Scale
+            {hasMultipleLocations && activeLocation && (
+              <span className="text-sm font-normal text-primary ml-2">— {activeLocation.location_name}</span>
+            )}
+          </h2>
           
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">

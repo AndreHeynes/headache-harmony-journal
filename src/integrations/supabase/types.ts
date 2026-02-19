@@ -59,6 +59,59 @@ export type Database = {
         }
         Relationships: []
       }
+      episode_locations: {
+        Row: {
+          created_at: string
+          episode_id: string
+          id: string
+          location_name: string
+          notes: string | null
+          pain_intensity: number | null
+          symptoms: string[] | null
+          treatment: Json | null
+          triggers: string[] | null
+          updated_at: string
+          user_id: string
+          variables: Json | null
+        }
+        Insert: {
+          created_at?: string
+          episode_id: string
+          id?: string
+          location_name: string
+          notes?: string | null
+          pain_intensity?: number | null
+          symptoms?: string[] | null
+          treatment?: Json | null
+          triggers?: string[] | null
+          updated_at?: string
+          user_id: string
+          variables?: Json | null
+        }
+        Update: {
+          created_at?: string
+          episode_id?: string
+          id?: string
+          location_name?: string
+          notes?: string | null
+          pain_intensity?: number | null
+          symptoms?: string[] | null
+          treatment?: Json | null
+          triggers?: string[] | null
+          updated_at?: string
+          user_id?: string
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "episode_locations_episode_id_fkey"
+            columns: ["episode_id"]
+            isOneToOne: false
+            referencedRelation: "headache_episodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       headache_episodes: {
         Row: {
           created_at: string | null

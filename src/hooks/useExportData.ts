@@ -2,6 +2,15 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface LocationRecord {
+  location_name: string;
+  pain_intensity: number | null;
+  symptoms: string[] | null;
+  triggers: string[] | null;
+  treatment: any | null;
+  notes: string | null;
+}
+
 interface HeadacheRecord {
   id: string;
   date: string;
@@ -12,46 +21,60 @@ interface HeadacheRecord {
   triggers?: string[];
   treatments?: string[];
   notes?: string;
+  locations?: LocationRecord[];
 }
 
 export function useExportData() {
   const { user } = useAuth();
   const [episodes, setEpisodes] = useState<any[]>([]);
+  const [locationsByEpisode, setLocationsByEpisode] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEpisodes = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    const fetchData = async () => {
+      if (!user) { setLoading(false); return; }
 
       try {
-        const { data, error } = await supabase
+        const { data: episodeData, error: epError } = await supabase
           .from('headache_episodes')
           .select('*')
           .eq('user_id', user.id)
           .eq('status', 'completed')
           .order('start_time', { ascending: false });
 
-        if (error) {
-          console.error('Error fetching episodes for export:', error);
-        } else {
-          setEpisodes(data || []);
+        if (epError) { console.error('Error fetching episodes:', epError); }
+        const eps = episodeData || [];
+        setEpisodes(eps);
+
+        // Fetch locations for all episodes
+        if (eps.length > 0) {
+          const episodeIds = eps.map((e: any) => e.id);
+          const { data: locData, error: locError } = await supabase
+            .from('episode_locations')
+            .select('*')
+            .in('episode_id', episodeIds);
+
+          if (!locError && locData) {
+            const grouped: Record<string, any[]> = {};
+            locData.forEach((loc: any) => {
+              if (!grouped[loc.episode_id]) grouped[loc.episode_id] = [];
+              grouped[loc.episode_id].push(loc);
+            });
+            setLocationsByEpisode(grouped);
+          }
         }
       } catch (error) {
-        console.error('Error fetching episodes for export:', error);
+        console.error('Error fetching export data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEpisodes();
+    fetchData();
   }, [user]);
 
   const data = useMemo<HeadacheRecord[]>(() => {
     return episodes.map((episode) => {
-      // Extract treatment names from treatment JSONB
       const treatmentNames: string[] = [];
       if (episode.treatment) {
         const treatment = episode.treatment;
@@ -63,6 +86,16 @@ export function useExportData() {
         }
       }
 
+      const locs = locationsByEpisode[episode.id] || [];
+      const locationRecords: LocationRecord[] = locs.map((loc: any) => ({
+        location_name: loc.location_name,
+        pain_intensity: loc.pain_intensity,
+        symptoms: loc.symptoms,
+        triggers: loc.triggers,
+        treatment: loc.treatment,
+        notes: loc.notes,
+      }));
+
       return {
         id: episode.id,
         date: episode.start_time,
@@ -72,14 +105,11 @@ export function useExportData() {
         symptoms: episode.symptoms || [],
         triggers: episode.triggers || [],
         treatments: treatmentNames.length > 0 ? treatmentNames : undefined,
-        notes: episode.notes || undefined
+        notes: episode.notes || undefined,
+        locations: locationRecords.length > 0 ? locationRecords : undefined,
       };
     });
-  }, [episodes]);
+  }, [episodes, locationsByEpisode]);
 
-  return {
-    data,
-    loading,
-    hasData: episodes.length > 0
-  };
+  return { data, loading, hasData: episodes.length > 0 };
 }

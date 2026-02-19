@@ -10,6 +10,7 @@ import LogTriggers from "@/components/logheadache/LogTriggers";
 import LogVariables from "@/components/logheadache/LogVariables";
 import LogTreatment from "@/components/logheadache/LogTreatment";
 import { useEpisode } from "@/contexts/EpisodeContext";
+import { useLocations } from "@/contexts/LocationContext";
 import { ActiveEpisodeModal } from "@/components/logheadache/ActiveEpisodeModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ export default function LogHeadache() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
+  const { locations, loadLocations, clearLocations } = useLocations();
   
   const CurrentStepComponent = steps[currentStep].component;
 
@@ -61,6 +63,13 @@ export default function LogHeadache() {
     autoStartEpisode();
   }, [currentEpisodeId, activeEpisode, showEpisodeModal, startNewEpisode]);
 
+  // Load locations when episode is set
+  useEffect(() => {
+    if (currentEpisodeId) {
+      loadLocations(currentEpisodeId);
+    }
+  }, [currentEpisodeId, loadLocations]);
+
   const handleContinueEpisode = () => {
     if (activeEpisode) {
       setCurrentEpisodeId(activeEpisode.id);
@@ -73,6 +82,7 @@ export default function LogHeadache() {
     if (activeEpisode) {
       await completeEpisode(activeEpisode.id);
     }
+    clearLocations();
     const episodeId = await startNewEpisode();
     if (episodeId) {
       setCurrentEpisodeId(episodeId);
@@ -94,6 +104,7 @@ export default function LogHeadache() {
       if (currentEpisodeId) {
         await completeEpisode(currentEpisodeId);
       }
+      clearLocations();
       toast.success('Episode logged successfully!');
       navigate('/dashboard');
     }
