@@ -259,6 +259,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          date_of_birth: string | null
           email: string | null
           export_preferences: Json | null
           full_name: string | null
@@ -267,6 +268,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           export_preferences?: Json | null
           full_name?: string | null
@@ -275,6 +277,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string | null
           export_preferences?: Json | null
           full_name?: string | null
@@ -312,6 +315,47 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      red_flags: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_at: string | null
+          created_at: string
+          episode_id: string | null
+          flag_details: Json | null
+          flag_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          created_at?: string
+          episode_id?: string | null
+          flag_details?: Json | null
+          flag_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          created_at?: string
+          episode_id?: string | null
+          flag_details?: Json | null
+          flag_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "red_flags_episode_id_fkey"
+            columns: ["episode_id"]
+            isOneToOne: false
+            referencedRelation: "headache_episodes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       test_events: {
         Row: {

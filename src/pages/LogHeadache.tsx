@@ -14,6 +14,8 @@ import { useLocations } from "@/contexts/LocationContext";
 import { ActiveEpisodeModal } from "@/components/logheadache/ActiveEpisodeModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useRedFlagCheck } from "@/hooks/useRedFlagCheck";
+import { FirstHeadacheCheck } from "@/components/logheadache/FirstHeadacheCheck";
 
 const steps = [
   { id: 'location', title: 'Pain Location', component: LogPainLocation },
@@ -34,6 +36,7 @@ export default function LogHeadache() {
   const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   const { locations, loadLocations, clearLocations } = useLocations();
+  const { shouldAskFirstHeadache, userAge, submitFirstHeadacheFlag } = useRedFlagCheck();
   
   const CurrentStepComponent = steps[currentStep].component;
 
@@ -174,6 +177,13 @@ export default function LogHeadache() {
             ))}
           </div>
           
+          {currentStep === 0 && shouldAskFirstHeadache && (
+            <FirstHeadacheCheck
+              userAge={userAge}
+              episodeId={currentEpisodeId}
+              onSubmit={submitFirstHeadacheFlag}
+            />
+          )}
           <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
