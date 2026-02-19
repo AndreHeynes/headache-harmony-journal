@@ -245,7 +245,7 @@ export function useHealthTrackerConnections() {
         toast.info('Syncing Fitbit sleep data...');
         
         const { data, error } = await supabase.functions.invoke('fitbit-sync-sleep', {
-          body: { user_id: user.id, days }
+          body: { days }
         });
 
         if (error) {
@@ -268,7 +268,7 @@ export function useHealthTrackerConnections() {
         toast.info('Syncing Oura sleep data...');
         
         const { data, error } = await supabase.functions.invoke('oura-sync-sleep', {
-          body: { user_id: user.id, days }
+          body: { days }
         });
 
         if (error) {
