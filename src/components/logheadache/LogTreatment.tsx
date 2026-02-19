@@ -11,6 +11,8 @@ import { TreatmentDetailsRenderer } from "./sections/treatment/TreatmentDetailsR
 import { TreatmentSection } from "./sections/treatment/TreatmentSection";
 import { SaveTreatmentButton } from "./sections/treatment/SaveTreatmentButton";
 import { useEpisode } from "@/contexts/EpisodeContext";
+import { useLocations } from "@/contexts/LocationContext";
+import { LocationTabs } from "./LocationTabs";
 
 interface LogTreatmentProps {
   episodeId?: string | null;
@@ -22,37 +24,57 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
   const [notes, setNotes] = useState<string>("");
   const [treatmentData, setTreatmentData] = useState<any>({});
   const { updateEpisode, activeEpisode } = useEpisode();
+  const { locations, activeLocationId, activeLocation, updateLocation } = useLocations();
 
-  // Load existing treatment data
+  const hasMultipleLocations = locations.length > 1;
+
+  // Load existing treatment data from location or episode
   useEffect(() => {
-    if (activeEpisode?.treatment) {
-      const treatment = activeEpisode.treatment as any;
+    const source = hasMultipleLocations && activeLocation
+      ? activeLocation.treatment
+      : activeEpisode?.treatment;
+
+    if (source) {
+      const treatment = source as any;
       if (treatment.type) setTreatmentType(treatment.type);
       if (treatment.effectiveness) setEffectiveness(treatment.effectiveness);
       if (treatment.notes) setNotes(treatment.notes);
       setTreatmentData(treatment);
+    } else {
+      setTreatmentType("");
+      setEffectiveness(0);
+      setNotes("");
+      setTreatmentData({});
     }
-  }, [activeEpisode]);
+  }, [activeEpisode, activeLocation, activeLocationId, hasMultipleLocations]);
 
   const handleTreatmentTypeChange = async (type: TreatmentType) => {
     setTreatmentType(type);
     const updatedTreatment = { ...treatmentData, type };
     setTreatmentData(updatedTreatment);
     
-    if (episodeId) {
+    if (hasMultipleLocations && activeLocationId) {
+      await updateLocation(activeLocationId, { treatment: updatedTreatment });
+    } else if (episodeId) {
       await updateEpisode(episodeId, { treatment: updatedTreatment });
     }
   };
 
   const handleSaveTreatment = async () => {
-    if (episodeId) {
-      const fullTreatment = {
-        ...treatmentData,
-        type: treatmentType,
-        effectiveness,
-        notes,
-        savedAt: new Date().toISOString(),
-      };
+    const fullTreatment = {
+      ...treatmentData,
+      type: treatmentType,
+      effectiveness,
+      notes,
+      savedAt: new Date().toISOString(),
+    };
+
+    if (hasMultipleLocations && activeLocationId) {
+      await updateLocation(activeLocationId, { 
+        treatment: fullTreatment,
+        notes: notes || activeLocation?.notes 
+      });
+    } else if (episodeId) {
       await updateEpisode(episodeId, { 
         treatment: fullTreatment,
         notes: notes || activeEpisode?.notes 
@@ -62,17 +84,22 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
 
   return (
     <div className="space-y-6">
+      <LocationTabs />
+
       <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
         <div className="p-4 space-y-6">
-          <h2 className="text-lg font-medium text-white">Treatment Log</h2>
+          <h2 className="text-lg font-medium text-white">
+            Treatment Log
+            {hasMultipleLocations && activeLocation && (
+              <span className="text-sm font-normal text-primary ml-2">— {activeLocation.location_name}</span>
+            )}
+          </h2>
           
-          {/* Treatment Selection */}
           <TreatmentSelectionSection 
             selectedTreatment={treatmentType}
             onTreatmentChange={handleTreatmentTypeChange}
           />
           
-          {/* Treatment Details - conditional rendering based on treatment type */}
           {treatmentType && (
             <>
               <Separator className="my-6 bg-gray-700" />
@@ -82,22 +109,18 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
             </>
           )}
           
-          {/* Treatment Timing */}
           <TreatmentSection title="Treatment Timing">
             <TreatmentTimingSection />
           </TreatmentSection>
           
-          {/* Effectiveness */}
           <TreatmentSection title="Effectiveness">
             <EffectivenessSection />
           </TreatmentSection>
           
-          {/* Classification */}
           <TreatmentSection title="Treatment Classification">
             <ClassificationSection />
           </TreatmentSection>
           
-          {/* Notes */}
           <TreatmentSection title="Additional Notes" isLast={true}>
             <NotesSection />
           </TreatmentSection>
