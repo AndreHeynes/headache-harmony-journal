@@ -23,6 +23,9 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
   const [effectiveness, setEffectiveness] = useState<number>(0);
   const [notes, setNotes] = useState<string>("");
   const [treatmentData, setTreatmentData] = useState<any>({});
+  const [treatmentTiming, setTreatmentTiming] = useState<string>("");
+  const [reliefTiming, setReliefTiming] = useState<string>("");
+  const [treatmentOutcome, setTreatmentOutcome] = useState<string>("");
   const { updateEpisode, activeEpisode } = useEpisode();
   const { locations, activeLocationId, activeLocation, updateLocation } = useLocations();
 
@@ -31,33 +34,68 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
   // Load existing treatment data from location or episode
   useEffect(() => {
     const source = hasMultipleLocations && activeLocation
-      ? activeLocation.treatment
-      : activeEpisode?.treatment;
+      ? activeLocation
+      : activeEpisode;
 
     if (source) {
-      const treatment = source as any;
-      if (treatment.type) setTreatmentType(treatment.type);
-      if (treatment.effectiveness) setEffectiveness(treatment.effectiveness);
-      if (treatment.notes) setNotes(treatment.notes);
-      setTreatmentData(treatment);
-    } else {
-      setTreatmentType("");
-      setEffectiveness(0);
-      setNotes("");
-      setTreatmentData({});
+      const treatment = (hasMultipleLocations && activeLocation 
+        ? activeLocation.treatment 
+        : activeEpisode?.treatment) as any;
+      
+      if (treatment) {
+        if (treatment.type) setTreatmentType(treatment.type);
+        if (treatment.effectiveness) setEffectiveness(treatment.effectiveness);
+        if (treatment.notes) setNotes(treatment.notes);
+        setTreatmentData(treatment);
+      } else {
+        setTreatmentType("");
+        setEffectiveness(0);
+        setNotes("");
+        setTreatmentData({});
+      }
+
+      // Load structured timing fields
+      const src = source as any;
+      setTreatmentTiming(src?.treatment_timing || treatment?.treatment_timing || "");
+      setReliefTiming(src?.relief_timing || treatment?.relief_timing || "");
+      setTreatmentOutcome(src?.treatment_outcome || treatment?.treatment_outcome || "");
     }
   }, [activeEpisode, activeLocation, activeLocationId, hasMultipleLocations]);
+
+  const persistUpdate = async (updates: Record<string, any>) => {
+    if (hasMultipleLocations && activeLocationId) {
+      await updateLocation(activeLocationId, updates);
+    } else if (episodeId) {
+      await updateEpisode(episodeId, updates);
+    }
+  };
 
   const handleTreatmentTypeChange = async (type: TreatmentType) => {
     setTreatmentType(type);
     const updatedTreatment = { ...treatmentData, type };
     setTreatmentData(updatedTreatment);
-    
-    if (hasMultipleLocations && activeLocationId) {
-      await updateLocation(activeLocationId, { treatment: updatedTreatment });
-    } else if (episodeId) {
-      await updateEpisode(episodeId, { treatment: updatedTreatment });
-    }
+    await persistUpdate({ treatment: updatedTreatment });
+  };
+
+  const handleTreatmentTimingChange = async (timing: string) => {
+    setTreatmentTiming(timing);
+    const updatedTreatment = { ...treatmentData, treatment_timing: timing };
+    setTreatmentData(updatedTreatment);
+    await persistUpdate({ treatment: updatedTreatment, treatment_timing: timing });
+  };
+
+  const handleReliefTimingChange = async (timing: string) => {
+    setReliefTiming(timing);
+    const updatedTreatment = { ...treatmentData, relief_timing: timing };
+    setTreatmentData(updatedTreatment);
+    await persistUpdate({ treatment: updatedTreatment, relief_timing: timing });
+  };
+
+  const handleTreatmentOutcomeChange = async (outcome: string) => {
+    setTreatmentOutcome(outcome);
+    const updatedTreatment = { ...treatmentData, treatment_outcome: outcome };
+    setTreatmentData(updatedTreatment);
+    await persistUpdate({ treatment: updatedTreatment, treatment_outcome: outcome });
   };
 
   const handleSaveTreatment = async () => {
@@ -66,20 +104,19 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
       type: treatmentType,
       effectiveness,
       notes,
+      treatment_timing: treatmentTiming,
+      relief_timing: reliefTiming,
+      treatment_outcome: treatmentOutcome,
       savedAt: new Date().toISOString(),
     };
 
-    if (hasMultipleLocations && activeLocationId) {
-      await updateLocation(activeLocationId, { 
-        treatment: fullTreatment,
-        notes: notes || activeLocation?.notes 
-      });
-    } else if (episodeId) {
-      await updateEpisode(episodeId, { 
-        treatment: fullTreatment,
-        notes: notes || activeEpisode?.notes 
-      });
-    }
+    await persistUpdate({ 
+      treatment: fullTreatment,
+      treatment_timing: treatmentTiming,
+      relief_timing: reliefTiming,
+      treatment_outcome: treatmentOutcome,
+      notes: notes || (hasMultipleLocations ? activeLocation?.notes : activeEpisode?.notes),
+    });
   };
 
   return (
@@ -110,11 +147,19 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
           )}
           
           <TreatmentSection title="Treatment Timing">
-            <TreatmentTimingSection />
+            <TreatmentTimingSection 
+              value={treatmentTiming}
+              onChange={handleTreatmentTimingChange}
+            />
           </TreatmentSection>
           
-          <TreatmentSection title="Effectiveness">
-            <EffectivenessSection />
+          <TreatmentSection title="Effectiveness & Outcome">
+            <EffectivenessSection 
+              reliefTimingValue={reliefTiming}
+              onReliefTimingChange={handleReliefTimingChange}
+              outcomeValue={treatmentOutcome}
+              onOutcomeChange={handleTreatmentOutcomeChange}
+            />
           </TreatmentSection>
           
           <TreatmentSection title="Treatment Classification">

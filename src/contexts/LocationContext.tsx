@@ -8,11 +8,15 @@ export interface EpisodeLocation {
   episode_id: string;
   user_id: string;
   location_name: string;
+  is_origin: boolean;
   pain_intensity: number | null;
   symptoms: string[] | null;
   triggers: string[] | null;
   variables: any | null;
   treatment: any | null;
+  treatment_timing: string | null;
+  relief_timing: string | null;
+  treatment_outcome: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -77,10 +81,11 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
         .eq('episode_id', episodeId)
         .eq('user_id', user.id);
 
-      const rows = locationNames.map(name => ({
+      const rows = locationNames.map((name, index) => ({
         episode_id: episodeId,
         user_id: user.id,
         location_name: name,
+        is_origin: index === 0, // First selected location is origin
       }));
 
       const { data, error } = await supabase

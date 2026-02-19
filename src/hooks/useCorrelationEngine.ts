@@ -8,16 +8,18 @@ interface TriggerCorrelation {
   occurrences: number;
   avgPainIntensity: number;
   avgDuration: number;
-  correlationScore: number; // Simplified odds ratio representation
+  avgHoursBeforeOnset: number | null;
+  correlationScore: number;
   riskLevel: 'low' | 'medium' | 'high';
 }
 
 interface TreatmentEffectiveness {
   treatment: string;
   usageCount: number;
-  avgReliefTime: number; // minutes
-  effectivenessRate: number; // percentage
+  avgReliefTime: number;
+  effectivenessRate: number;
   avgPainReduction: number;
+  outcomeBreakdown: { effective: number; partial: number; notEffective: number };
 }
 
 interface SymptomPattern {
@@ -25,6 +27,7 @@ interface SymptomPattern {
   frequency: number;
   percentageOfEpisodes: number;
   avgAssociatedPain: number;
+  timingBreakdown: { before: number; during: number; after: number; unspecified: number };
 }
 
 interface CorrelationData {
@@ -36,6 +39,50 @@ interface CorrelationData {
   totalEpisodes: number;
   dataStartDate: string | null;
   dataEndDate: string | null;
+}
+
+// Parse symptom string like "Nausea (During headache)" into name and timing
+function parseSymptomString(raw: string): { name: string; timing: string | null } {
+  const match = raw.match(/^(.+?)\s*\(([^)]+)\)$/);
+  if (match) {
+    const timing = match[2].trim();
+    // Only extract timing if it's one of the known timing values
+    if (['Before headache', 'During headache', 'After headache started'].includes(timing)) {
+      return { name: match[1].trim(), timing };
+    }
+  }
+  return { name: raw, timing: null };
+}
+
+// Parse trigger string like "Food: Cheese (3h before)" into name and hours
+function parseTriggerString(raw: string): { name: string; category: string | null; hoursBefore: number | null } {
+  // Match patterns like "Food: Cheese (3h before)" or "Activity: Running (2h before) [30 min]"
+  const categoryMatch = raw.match(/^(Food|Beverage|Activity|Stress|Weather|Cycle Phase):\s*(.+)$/);
+  
+  let category: string | null = null;
+  let rest = raw;
+  
+  if (categoryMatch) {
+    category = categoryMatch[1];
+    rest = categoryMatch[2];
+  }
+  
+  // Extract hours before
+  const hoursMatch = rest.match(/\((\d+(?:\.\d+)?)h?\s*before\)/i);
+  const hoursBefore = hoursMatch ? parseFloat(hoursMatch[1]) : null;
+  
+  // Clean the name by removing the timing and duration annotations
+  let name = rest
+    .replace(/\s*\(\d+(?:\.\d+)?h?\s*before\)/i, '')
+    .replace(/\s*\[\d+\s*min\]/i, '')
+    .trim();
+  
+  // Prepend category back for display
+  if (category) {
+    name = `${category}: ${name}`;
+  }
+  
+  return { name, category, hoursBefore };
 }
 
 export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
@@ -98,30 +145,29 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
     const dataStartDate = episodes[0]?.start_time || null;
     const dataEndDate = episodes[episodes.length - 1]?.start_time || null;
 
-    // Calculate average pain for baseline comparison
     const avgPain = episodes.reduce((sum, ep) => sum + (ep.pain_intensity || 0), 0) / totalEpisodes;
 
-    // --- Trigger Correlations ---
+    // --- Trigger Correlations (with temporal parsing) ---
     const triggerMap = new Map<string, { 
       count: number; 
       totalPain: number; 
       totalDuration: number;
-      painValues: number[];
+      hoursBeforeValues: number[];
     }>();
 
     episodes.forEach(ep => {
-      (ep.triggers || []).forEach(trigger => {
-        const existing = triggerMap.get(trigger) || { 
-          count: 0, 
-          totalPain: 0, 
-          totalDuration: 0,
-          painValues: []
+      (ep.triggers || []).forEach(rawTrigger => {
+        const parsed = parseTriggerString(rawTrigger);
+        const existing = triggerMap.get(parsed.name) || { 
+          count: 0, totalPain: 0, totalDuration: 0, hoursBeforeValues: []
         };
         existing.count++;
         existing.totalPain += ep.pain_intensity || 0;
         existing.totalDuration += ep.duration_minutes || 0;
-        existing.painValues.push(ep.pain_intensity || 0);
-        triggerMap.set(trigger, existing);
+        if (parsed.hoursBefore !== null) {
+          existing.hoursBeforeValues.push(parsed.hoursBefore);
+        }
+        triggerMap.set(parsed.name, existing);
       });
     });
 
@@ -129,8 +175,9 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
       .map(([trigger, data]): TriggerCorrelation => {
         const avgPainIntensity = data.count > 0 ? data.totalPain / data.count : 0;
         const avgDuration = data.count > 0 ? data.totalDuration / data.count : 0;
-        
-        // Simplified correlation score: how much above average pain is when this trigger is present
+        const avgHoursBeforeOnset = data.hoursBeforeValues.length > 0
+          ? data.hoursBeforeValues.reduce((s, v) => s + v, 0) / data.hoursBeforeValues.length
+          : null;
         const correlationScore = avgPain > 0 ? (avgPainIntensity / avgPain) : 1;
         const riskLevel: 'low' | 'medium' | 'high' = correlationScore >= 1.3 ? 'high' : correlationScore >= 1.1 ? 'medium' : 'low';
         
@@ -139,38 +186,47 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
           occurrences: data.count,
           avgPainIntensity: Math.round(avgPainIntensity * 10) / 10,
           avgDuration: Math.round(avgDuration),
+          avgHoursBeforeOnset,
           correlationScore: Math.round(correlationScore * 100) / 100,
           riskLevel,
         };
       })
       .sort((a, b) => b.correlationScore - a.correlationScore);
 
-    // --- Treatment Effectiveness ---
+    // --- Treatment Effectiveness (using treatment_outcome) ---
     const treatmentMap = new Map<string, {
       count: number;
       totalDuration: number;
-      successfulTreatments: number;
+      outcomes: { effective: number; partial: number; notEffective: number };
     }>();
 
     episodes.forEach(ep => {
       const treatment = ep.treatment as any;
-      if (treatment) {
-        // Handle treatment as array or object
-        const treatments = Array.isArray(treatment) ? treatment : 
-          treatment.medications ? treatment.medications : 
-          treatment.type ? [treatment.type] : [];
+      if (!treatment) return;
+
+      const treatments = Array.isArray(treatment) ? treatment : 
+        treatment.medications ? treatment.medications : 
+        treatment.type ? [treatment.type] : [];
+      
+      // Use structured outcome field if available
+      const outcome = ep.treatment_outcome || treatment?.treatment_outcome;
+      
+      treatments.forEach((t: string) => {
+        const existing = treatmentMap.get(t) || { 
+          count: 0, totalDuration: 0, 
+          outcomes: { effective: 0, partial: 0, notEffective: 0 }
+        };
+        existing.count++;
+        existing.totalDuration += ep.duration_minutes || 0;
         
-        treatments.forEach((t: string) => {
-          const existing = treatmentMap.get(t) || { count: 0, totalDuration: 0, successfulTreatments: 0 };
-          existing.count++;
-          existing.totalDuration += ep.duration_minutes || 0;
-          // Consider treatment successful if duration is under 120 minutes
-          if ((ep.duration_minutes || 0) < 120) {
-            existing.successfulTreatments++;
-          }
-          treatmentMap.set(t, existing);
-        });
-      }
+        if (outcome === 'effective') existing.outcomes.effective++;
+        else if (outcome === 'partially_effective') existing.outcomes.partial++;
+        else if (outcome === 'not_effective' || outcome === 'worsened') existing.outcomes.notEffective++;
+        // If no outcome recorded, use duration heuristic as fallback
+        else if ((ep.duration_minutes || 0) < 120) existing.outcomes.effective++;
+        
+        treatmentMap.set(t, existing);
+      });
     });
 
     const treatmentEffectiveness: TreatmentEffectiveness[] = Array.from(treatmentMap.entries())
@@ -178,20 +234,39 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
         treatment,
         usageCount: data.count,
         avgReliefTime: data.count > 0 ? Math.round(data.totalDuration / data.count) : 0,
-        effectivenessRate: data.count > 0 ? Math.round((data.successfulTreatments / data.count) * 100) : 0,
-        avgPainReduction: 0, // Would need before/after pain data
+        effectivenessRate: data.count > 0 
+          ? Math.round(((data.outcomes.effective + data.outcomes.partial * 0.5) / data.count) * 100) 
+          : 0,
+        avgPainReduction: 0,
+        outcomeBreakdown: data.outcomes,
       }))
       .sort((a, b) => b.effectivenessRate - a.effectivenessRate);
 
-    // --- Symptom Patterns ---
-    const symptomMap = new Map<string, { count: number; totalPain: number }>();
+    // --- Symptom Patterns (with timing parsing) ---
+    const symptomMap = new Map<string, { 
+      count: number; totalPain: number; 
+      timings: { before: number; during: number; after: number; unspecified: number }
+    }>();
 
     episodes.forEach(ep => {
-      (ep.symptoms || []).forEach(symptom => {
-        const existing = symptomMap.get(symptom) || { count: 0, totalPain: 0 };
+      (ep.symptoms || []).forEach(rawSymptom => {
+        const parsed = parseSymptomString(rawSymptom);
+        // Skip pain characteristics stored in symptoms
+        if (parsed.name.startsWith('Pain:')) return;
+        
+        const existing = symptomMap.get(parsed.name) || { 
+          count: 0, totalPain: 0, 
+          timings: { before: 0, during: 0, after: 0, unspecified: 0 }
+        };
         existing.count++;
         existing.totalPain += ep.pain_intensity || 0;
-        symptomMap.set(symptom, existing);
+        
+        if (parsed.timing === 'Before headache') existing.timings.before++;
+        else if (parsed.timing === 'During headache') existing.timings.during++;
+        else if (parsed.timing === 'After headache started') existing.timings.after++;
+        else existing.timings.unspecified++;
+        
+        symptomMap.set(parsed.name, existing);
       });
     });
 
@@ -201,10 +276,11 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
         frequency: data.count,
         percentageOfEpisodes: Math.round((data.count / totalEpisodes) * 100),
         avgAssociatedPain: data.count > 0 ? Math.round((data.totalPain / data.count) * 10) / 10 : 0,
+        timingBreakdown: data.timings,
       }))
       .sort((a, b) => b.frequency - a.frequency);
 
-    // --- Heatmap Data (Pain vs Triggers) ---
+    // --- Heatmap Data ---
     const painTriggerHeatmap = triggerCorrelations.slice(0, 8).map((tc, index) => ({
       x: Math.floor(index / 2) + 1,
       y: (index % 2) + 1,
@@ -212,7 +288,6 @@ export const useCorrelationEngine = (dateRange?: { from: Date; to: Date }) => {
       name: tc.trigger,
     }));
 
-    // --- Heatmap Data (Duration vs Treatment) ---
     const durationTreatmentHeatmap = treatmentEffectiveness.slice(0, 8).map((te, index) => ({
       x: Math.floor(index / 2) + 1,
       y: (index % 2) + 1,

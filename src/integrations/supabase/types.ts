@@ -64,11 +64,15 @@ export type Database = {
           created_at: string
           episode_id: string
           id: string
+          is_origin: boolean
           location_name: string
           notes: string | null
           pain_intensity: number | null
+          relief_timing: string | null
           symptoms: string[] | null
           treatment: Json | null
+          treatment_outcome: string | null
+          treatment_timing: string | null
           triggers: string[] | null
           updated_at: string
           user_id: string
@@ -78,11 +82,15 @@ export type Database = {
           created_at?: string
           episode_id: string
           id?: string
+          is_origin?: boolean
           location_name: string
           notes?: string | null
           pain_intensity?: number | null
+          relief_timing?: string | null
           symptoms?: string[] | null
           treatment?: Json | null
+          treatment_outcome?: string | null
+          treatment_timing?: string | null
           triggers?: string[] | null
           updated_at?: string
           user_id: string
@@ -92,11 +100,15 @@ export type Database = {
           created_at?: string
           episode_id?: string
           id?: string
+          is_origin?: boolean
           location_name?: string
           notes?: string | null
           pain_intensity?: number | null
+          relief_timing?: string | null
           symptoms?: string[] | null
           treatment?: Json | null
+          treatment_outcome?: string | null
+          treatment_timing?: string | null
           triggers?: string[] | null
           updated_at?: string
           user_id?: string
@@ -121,10 +133,13 @@ export type Database = {
           notes: string | null
           pain_intensity: number | null
           pain_location: string | null
+          relief_timing: string | null
           start_time: string
           status: string
           symptoms: string[] | null
           treatment: Json | null
+          treatment_outcome: string | null
+          treatment_timing: string | null
           triggers: string[] | null
           updated_at: string | null
           user_id: string
@@ -137,10 +152,13 @@ export type Database = {
           notes?: string | null
           pain_intensity?: number | null
           pain_location?: string | null
+          relief_timing?: string | null
           start_time?: string
           status: string
           symptoms?: string[] | null
           treatment?: Json | null
+          treatment_outcome?: string | null
+          treatment_timing?: string | null
           triggers?: string[] | null
           updated_at?: string | null
           user_id: string
@@ -153,10 +171,13 @@ export type Database = {
           notes?: string | null
           pain_intensity?: number | null
           pain_location?: string | null
+          relief_timing?: string | null
           start_time?: string
           status?: string
           symptoms?: string[] | null
           treatment?: Json | null
+          treatment_outcome?: string | null
+          treatment_timing?: string | null
           triggers?: string[] | null
           updated_at?: string | null
           user_id?: string

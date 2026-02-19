@@ -24,6 +24,9 @@ export interface HeadacheEpisode {
   symptoms?: string[] | null;
   triggers?: string[] | null;
   treatment?: any; // Use any for JSON compatibility
+  treatment_timing?: string | null;
+  relief_timing?: string | null;
+  treatment_outcome?: string | null;
   notes?: string | null;
   created_at: string;
   updated_at: string;
