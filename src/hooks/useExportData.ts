@@ -24,10 +24,17 @@ interface HeadacheRecord {
   locations?: LocationRecord[];
 }
 
+export interface ExportRedFlag {
+  date: string;
+  priorityLevel: string;
+  flags: Array<{ label: string; detail: string; priority: string }>;
+}
+
 export function useExportData() {
   const { user } = useAuth();
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [locationsByEpisode, setLocationsByEpisode] = useState<Record<string, any[]>>({});
+  const [rawRedFlags, setRawRedFlags] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,18 +42,25 @@ export function useExportData() {
       if (!user) { setLoading(false); return; }
 
       try {
-        const { data: episodeData, error: epError } = await supabase
-          .from('headache_episodes')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'completed')
-          .order('start_time', { ascending: false });
+        const [epResult, flagResult] = await Promise.all([
+          supabase
+            .from('headache_episodes')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('status', 'completed')
+            .order('start_time', { ascending: false }),
+          supabase
+            .from('red_flags')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false }),
+        ]);
 
-        if (epError) { console.error('Error fetching episodes:', epError); }
-        const eps = episodeData || [];
+        if (epResult.error) console.error('Error fetching episodes:', epResult.error);
+        const eps = epResult.data || [];
         setEpisodes(eps);
+        setRawRedFlags(flagResult.data || []);
 
-        // Fetch locations for all episodes
         if (eps.length > 0) {
           const episodeIds = eps.map((e: any) => e.id);
           const { data: locData, error: locError } = await supabase
@@ -111,5 +125,20 @@ export function useExportData() {
     });
   }, [episodes, locationsByEpisode]);
 
-  return { data, loading, hasData: episodes.length > 0 };
+  const redFlags = useMemo<ExportRedFlag[]>(() => {
+    return rawRedFlags.map((rf) => {
+      const details = rf.flag_details as any;
+      return {
+        date: rf.created_at,
+        priorityLevel: rf.priority_level || 'low',
+        flags: (details?.flags || []).map((f: any) => ({
+          label: f.label,
+          detail: f.detail,
+          priority: f.priority,
+        })),
+      };
+    });
+  }, [rawRedFlags]);
+
+  return { data, redFlags, loading, hasData: episodes.length > 0 };
 }

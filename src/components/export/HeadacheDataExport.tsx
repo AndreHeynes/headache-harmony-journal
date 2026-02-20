@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { jsPDF } from "jspdf";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Share2, Lock, Shield, AlertTriangle } from "lucide-react";
+import { Download, FileText, Share2, Lock, Shield, AlertTriangle, ShieldAlert } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useTestContext } from "@/contexts/TestContext";
 import { toast } from "sonner";
 import { ExportConfirmationDialog } from "./ExportConfirmationDialog";
@@ -14,9 +15,11 @@ import { InlineDisclaimer } from "@/components/disclaimer";
 import { getDisclaimer } from "@/utils/legalContent";
 import { usePatientProfile } from "@/hooks/usePatientProfile";
 import { format } from "date-fns";
+import type { ExportRedFlag } from "@/hooks/useExportData";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
+  redFlags?: ExportRedFlag[];
   isPremium?: boolean;
   loading?: boolean;
 }
@@ -70,7 +73,7 @@ const demoHeadacheData: HeadacheRecord[] = [
   }
 ];
 
-export function HeadacheDataExport({ headacheData, isPremium = false, loading = false }: HeadacheDataExportProps) {
+export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = false, loading = false }: HeadacheDataExportProps) {
   const [exportFormat, setExportFormat] = useState<"pdf" | "csv">("pdf");
   const { logTestEvent, isTestMode } = useTestContext();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -269,6 +272,44 @@ export function HeadacheDataExport({ headacheData, isPremium = false, loading = 
       
       yPos += 5; // Add some space between records
     });
+
+    // Red Flags Section
+    if (redFlags.length > 0) {
+      doc.addPage();
+      yPos = 20;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("RED FLAG SCREENING HISTORY", 20, yPos);
+      doc.setFont("helvetica", "normal");
+      yPos += 10;
+      
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text("The following entries triggered safety screening alerts based on SNOOP criteria.", 20, yPos);
+      doc.setTextColor(0, 0, 0);
+      yPos += 8;
+
+      redFlags.forEach((rf, idx) => {
+        if (yPos > 250) { doc.addPage(); yPos = 20; }
+        
+        doc.setFontSize(11);
+        const rfDate = format(new Date(rf.date), 'PPP');
+        const priorityLabel = rf.priorityLevel.charAt(0).toUpperCase() + rf.priorityLevel.slice(1);
+        doc.text(`${idx + 1}. ${rfDate} — ${priorityLabel} Priority`, 20, yPos);
+        yPos += 6;
+        
+        doc.setFontSize(9);
+        rf.flags.forEach((flag) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20; }
+          const lines = doc.splitTextToSize(`• ${flag.label}: ${flag.detail}`, 165);
+          lines.forEach((line: string) => {
+            doc.text(line, 25, yPos);
+            yPos += 4;
+          });
+        });
+        yPos += 4;
+      });
+    }
     
     // Add summary section
     doc.addPage();
@@ -329,6 +370,17 @@ export function HeadacheDataExport({ headacheData, isPremium = false, loading = 
       
       csvContent += row.join(",") + "\n";
     });
+
+    // Red Flags section
+    if (redFlags.length > 0) {
+      csvContent += "\n# RED FLAG SCREENING HISTORY\n";
+      csvContent += "Date,Priority,Flags\n";
+      redFlags.forEach((rf) => {
+        const rfDate = format(new Date(rf.date), 'PPP');
+        const flagSummary = rf.flags.map(f => `${f.label}: ${f.detail}`).join('; ');
+        csvContent += `${rfDate},${rf.priorityLevel},"${flagSummary}"\n`;
+      });
+    }
     
     // Create and download CSV file with secure filename
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

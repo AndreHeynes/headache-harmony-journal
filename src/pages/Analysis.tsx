@@ -15,6 +15,7 @@ import { MedicationAnalysis } from "@/components/analysis/MedicationAnalysis";
 import { LifestyleAnalysis } from "@/components/analysis/LifestyleAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
+import { RedFlagHistory } from "@/components/analysis/RedFlagHistory";
 import BottomNav from "@/components/layout/BottomNav";
 import { useTestContext } from "@/contexts/TestContext";
 
@@ -117,6 +118,8 @@ export default function Analysis() {
       ) : (
         <>
           <OverviewStats daysRange={30} />
+          
+          <RedFlagHistory />
           
           <PremiumInsights onCardClick={handleInsightCardClick} />
           
