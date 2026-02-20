@@ -10,7 +10,7 @@ import { useExportData } from "@/hooks/useExportData";
 export default function DataExport() {
   const navigate = useNavigate();
   const { isTestMode, isPremiumOverride, logTestEvent } = useTestContext();
-  const { data: headacheData, loading, hasData } = useExportData();
+  const { data: headacheData, redFlags, loading, hasData } = useExportData();
   
   React.useEffect(() => {
     if (isTestMode) {
@@ -53,7 +53,8 @@ export default function DataExport() {
           </div>
         ) : (
           <HeadacheDataExport 
-            headacheData={hasData ? headacheData : undefined} 
+            headacheData={hasData ? headacheData : undefined}
+            redFlags={redFlags}
             isPremium={isPremiumOverride} 
           />
         )}
