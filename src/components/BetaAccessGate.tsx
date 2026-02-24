@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, ShieldX, Mail, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_CONFIG } from '@/config/appConfig';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface BetaAccessGateProps {
   children: ReactNode;
@@ -13,8 +13,15 @@ interface BetaAccessGateProps {
 const SIGNUP_URL = APP_CONFIG.BETA_SIGNUP_URL;
 
 export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
+  const location = useLocation();
+
   // In production mode, bypass beta gating entirely
   if (!APP_CONFIG.BETA_MODE) {
+    return <>{children}</>;
+  }
+
+  // Allow auth routes through the gate (e.g. /auth?mode=signin for magic link)
+  if (location.pathname === '/auth') {
     return <>{children}</>;
   }
 
