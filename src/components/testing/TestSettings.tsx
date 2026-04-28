@@ -274,7 +274,7 @@ export function TestSettings() {
               <div className="flex justify-between py-1">
                 <span className="text-gray-400">Environment:</span>
                 <span className="text-yellow-400">
-                  {process.env.NODE_ENV === 'development' ? "Development" : "Production"}
+                  {import.meta.env.DEV ? "Development" : "Production"}
                 </span>
               </div>
             </div>

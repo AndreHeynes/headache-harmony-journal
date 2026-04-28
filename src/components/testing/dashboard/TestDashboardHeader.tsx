@@ -60,7 +60,7 @@ export function TestDashboardHeader({ downloadTestData, clearTestEvents }: TestD
           <RotateCcw className="h-4 w-4 mr-1" />
           Clear
         </Button>
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.DEV && (
           <Button 
             variant="outline" 
             size="sm"

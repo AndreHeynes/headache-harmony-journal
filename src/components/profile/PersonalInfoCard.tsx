@@ -87,7 +87,7 @@ export function PersonalInfoCard() {
       }
 
       if (user) {
-        const updates: Record<string, unknown> = {};
+        const updates: { full_name?: string; date_of_birth?: string } = {};
         if (name) updates.full_name = name;
         if (dateOfBirth) updates.date_of_birth = dateOfBirth;
 

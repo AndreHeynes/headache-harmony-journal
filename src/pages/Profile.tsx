@@ -53,7 +53,7 @@ export default function Profile() {
     console.log("Viewing policies");
   };
 
-  const isTestingEnabled = process.env.NODE_ENV === 'development' || 
+  const isTestingEnabled = import.meta.env.DEV ||
                           localStorage.getItem('enableTesting') === 'true';
 
   return (
