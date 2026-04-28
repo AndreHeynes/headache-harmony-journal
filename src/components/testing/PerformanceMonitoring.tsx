@@ -28,7 +28,7 @@ export function PerformanceMonitoring() {
   const { logTestEvent } = useTestContext();
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const performanceObserverRef = useRef<PerformanceObserver | null>(null);
 
   // Performance monitoring functions
