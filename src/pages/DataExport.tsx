@@ -3,6 +3,8 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { HeadacheDataExport } from "@/components/export/HeadacheDataExport";
+import { AiPremiumReport } from "@/components/export/AiPremiumReport";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTestContext } from "@/contexts/TestContext";
 import BottomNavWithTest from "@/components/layout/BottomNavWithTest";
 import { useExportData } from "@/hooks/useExportData";
@@ -52,11 +54,22 @@ export default function DataExport() {
             <span className="ml-2 text-muted-foreground">Loading your headache data...</span>
           </div>
         ) : (
-          <HeadacheDataExport 
-            headacheData={hasData ? headacheData : undefined}
-            redFlags={redFlags}
-            isPremium={isPremiumOverride} 
-          />
+          <Tabs defaultValue="standard" className="w-full">
+            <TabsList className="bg-gray-800/50 border border-gray-700">
+              <TabsTrigger value="standard">Standard Export</TabsTrigger>
+              <TabsTrigger value="ai">AI Premium Report</TabsTrigger>
+            </TabsList>
+            <TabsContent value="standard" className="mt-4">
+              <HeadacheDataExport
+                headacheData={hasData ? headacheData : undefined}
+                redFlags={redFlags}
+                isPremium={isPremiumOverride}
+              />
+            </TabsContent>
+            <TabsContent value="ai" className="mt-4">
+              <AiPremiumReport isPremium={isPremiumOverride} />
+            </TabsContent>
+          </Tabs>
         )}
         
         <div className="bg-card border border-border p-4 rounded-lg">
