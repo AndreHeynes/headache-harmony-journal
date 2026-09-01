@@ -264,5 +264,10 @@ export const useRedFlagScreening = (): UseRedFlagScreeningReturn => {
     priorityMessage,
     saveScreeningResults,
     hasAnyFlags,
+    getMissingForStep,
+    isStepComplete,
+    markStepAttempted,
+    isMissing,
+
   };
 };
