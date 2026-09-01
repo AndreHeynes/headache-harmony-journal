@@ -39,8 +39,14 @@ function LogHeadacheInner() {
   const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   const { locations, loadLocations, clearLocations } = useLocations();
-  const { shouldAskFirstHeadache, userAge, submitFirstHeadacheFlag } = useRedFlagCheck();
-  const { flags, highestPriority, priorityMessage, saveScreeningResults, hasAnyFlags, responses, updateResponse } = useScreening();
+  const { shouldAskFirstHeadache, needsDateOfBirth, userAge, submitFirstHeadacheFlag, saveDateOfBirth, skipDateOfBirth } = useRedFlagCheck();
+  const { flags, highestPriority, priorityMessage, saveScreeningResults, hasAnyFlags, responses, updateResponse, isStepComplete, markStepAttempted } = useScreening();
+
+  const SCREENING_STEPS = ['duration', 'symptoms', 'triggers', 'treatment'] as const;
+  const currentStepId = steps[currentStep].id;
+  const isScreeningStep = (SCREENING_STEPS as readonly string[]).includes(currentStepId);
+  const screeningIncomplete = isScreeningStep && !isStepComplete(currentStepId as typeof SCREENING_STEPS[number]);
+
   
   const CurrentStepComponent = steps[currentStep].component;
 
@@ -119,7 +125,17 @@ function LogHeadacheInner() {
   };
 
   const handleNext = async () => {
+    if (isScreeningStep) {
+      markStepAttempted(currentStepId as typeof SCREENING_STEPS[number]);
+      if (screeningIncomplete) {
+        toast.error('Please answer all safety screening questions before continuing.');
+        return;
+      }
+    }
+
     markStepComplete(steps[currentStep].id);
+
+
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(current => current + 1);
@@ -210,24 +226,35 @@ function LogHeadacheInner() {
             ))}
           </div>
           
-          {currentStep === 0 && shouldAskFirstHeadache && (
+          {currentStep === 0 && (shouldAskFirstHeadache || needsDateOfBirth) && (
             <FirstHeadacheCheck
               userAge={userAge}
               episodeId={currentEpisodeId}
+              needsDateOfBirth={needsDateOfBirth}
               onSubmit={handleFirstHeadacheSubmit}
+              onSaveDateOfBirth={saveDateOfBirth}
+              onSkipDateOfBirth={skipDateOfBirth}
             />
           )}
+
           <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
-        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border">
+        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border space-y-2">
+          {screeningIncomplete && (
+            <p className="text-xs text-center text-destructive">
+              Answer all safety screening questions on this step to continue.
+            </p>
+          )}
           <Button 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium disabled:opacity-60"
             onClick={handleNext}
+            aria-disabled={screeningIncomplete}
           >
             {currentStep === steps.length - 1 ? 'Complete' : 'Continue'}
           </Button>
         </footer>
+
       </div>
     </>
   );

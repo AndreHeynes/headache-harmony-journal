@@ -3,7 +3,7 @@ import { ScreeningQuestion } from "./ScreeningQuestion";
 
 /** Pattern change screening — embedded in the Triggers step */
 export function PatternScreening() {
-  const { responses, updateResponse } = useScreening();
+  const { responses, updateResponse, isMissing } = useScreening();
 
   return (
     <div className="space-y-3">
@@ -12,12 +12,14 @@ export function PatternScreening() {
         helpText="Changes in your typical headache pattern can be clinically significant."
         answered={responses.hasPatternChange}
         onAnswer={(v) => updateResponse('hasPatternChange', v)}
+        invalid={isMissing('hasPatternChange')}
       />
       <ScreeningQuestion
         question="Has this new pattern been progressively worsening over days or weeks?"
         helpText="Progressive worsening suggests a pattern that should be evaluated by a healthcare provider."
         answered={responses.isWorsening}
         onAnswer={(v) => updateResponse('isWorsening', v)}
+        invalid={isMissing('isWorsening')}
         visible={responses.hasPatternChange === true}
       />
     </div>

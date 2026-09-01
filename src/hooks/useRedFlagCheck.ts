@@ -4,14 +4,22 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface RedFlagCheckResult {
   shouldAskFirstHeadache: boolean;
+  /** True when we still need a date of birth before we can decide */
+  needsDateOfBirth: boolean;
   userAge: number | null;
   loading: boolean;
   submitFirstHeadacheFlag: (episodeId: string, isFirstEver: boolean) => Promise<void>;
+  saveDateOfBirth: (dob: string) => Promise<void>;
+  skipDateOfBirth: () => void;
 }
+
+const calcAge = (dob: string) =>
+  Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 
 export const useRedFlagCheck = (): RedFlagCheckResult => {
   const { user } = useAuth();
   const [shouldAskFirstHeadache, setShouldAskFirstHeadache] = useState(false);
+  const [needsDateOfBirth, setNeedsDateOfBirth] = useState(false);
   const [userAge, setUserAge] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,35 +31,7 @@ export const useRedFlagCheck = (): RedFlagCheckResult => {
 
     const checkRedFlagEligibility = async () => {
       try {
-        // Get user DOB
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('date_of_birth')
-          .eq('id', user.id)
-          .single();
-
-        if (!profile?.date_of_birth) {
-          setLoading(false);
-          return;
-        }
-
-        const dob = new Date(profile.date_of_birth);
-        const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-        setUserAge(age);
-
-        if (age < 50) {
-          setLoading(false);
-          return;
-        }
-
-        // Check if user has any completed episodes already
-        const { count: episodeCount } = await supabase
-          .from('headache_episodes')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('status', 'completed');
-
-        // Check if we've already asked / flagged this
+        // Has this user already answered the first-headache question?
         const { data: existingFlag } = await supabase
           .from('red_flags')
           .select('id')
@@ -59,8 +39,28 @@ export const useRedFlagCheck = (): RedFlagCheckResult => {
           .eq('flag_type', 'first_headache_over_50')
           .maybeSingle();
 
-        // Ask only on first episode and if never flagged before
-        setShouldAskFirstHeadache((episodeCount ?? 0) === 0 && !existingFlag);
+        if (existingFlag) {
+          setLoading(false);
+          return;
+        }
+
+        // Age is derived from the profile date of birth
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('date_of_birth')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (!profile?.date_of_birth) {
+          // We can't determine age — ask for the date of birth inline
+          setNeedsDateOfBirth(true);
+          setLoading(false);
+          return;
+        }
+
+        const age = calcAge(profile.date_of_birth);
+        setUserAge(age);
+        setShouldAskFirstHeadache(age >= 50);
       } catch (err) {
         console.error('Error checking red flag eligibility:', err);
       } finally {
@@ -70,6 +70,24 @@ export const useRedFlagCheck = (): RedFlagCheckResult => {
 
     checkRedFlagEligibility();
   }, [user]);
+
+  const saveDateOfBirth = useCallback(async (dob: string) => {
+    if (!user || !dob) return;
+    try {
+      await supabase.from('profiles').update({ date_of_birth: dob }).eq('id', user.id);
+      const age = calcAge(dob);
+      setUserAge(age);
+      setNeedsDateOfBirth(false);
+      setShouldAskFirstHeadache(age >= 50);
+    } catch (err) {
+      console.error('Error saving date of birth:', err);
+    }
+  }, [user]);
+
+  const skipDateOfBirth = useCallback(() => {
+    setNeedsDateOfBirth(false);
+    setShouldAskFirstHeadache(false);
+  }, []);
 
   const submitFirstHeadacheFlag = useCallback(async (episodeId: string, isFirstEver: boolean) => {
     if (!user) return;
@@ -93,5 +111,13 @@ export const useRedFlagCheck = (): RedFlagCheckResult => {
     }
   }, [user, userAge]);
 
-  return { shouldAskFirstHeadache, userAge, loading, submitFirstHeadacheFlag };
+  return {
+    shouldAskFirstHeadache,
+    needsDateOfBirth,
+    userAge,
+    loading,
+    submitFirstHeadacheFlag,
+    saveDateOfBirth,
+    skipDateOfBirth,
+  };
 };

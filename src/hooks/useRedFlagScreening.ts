@@ -31,6 +31,30 @@ export interface RedFlagResult {
   detail: string;
 }
 
+export type ScreeningStepId = 'duration' | 'symptoms' | 'triggers' | 'treatment';
+
+/** Questions belonging to each logging step. Follow-ups are only required when their parent is Yes. */
+const STEP_QUESTIONS: Record<ScreeningStepId, { key: keyof ScreeningResponses; parent?: keyof ScreeningResponses }[]> = {
+  duration: [
+    { key: 'onsetSudden' },
+    { key: 'worstHeadacheEver', parent: 'onsetSudden' },
+  ],
+  symptoms: [
+    { key: 'hasNeurologicalSymptoms' },
+    { key: 'neuroOnsetSudden', parent: 'hasNeurologicalSymptoms' },
+    { key: 'hasSystemicSymptoms' },
+    { key: 'hasStiffNeckOrRash', parent: 'hasSystemicSymptoms' },
+  ],
+  triggers: [
+    { key: 'hasPatternChange' },
+    { key: 'isWorsening', parent: 'hasPatternChange' },
+  ],
+  treatment: [
+    { key: 'hasPositionalFactors' },
+    { key: 'hasPapilledema', parent: 'hasPositionalFactors' },
+  ],
+};
+
 interface UseRedFlagScreeningReturn {
   responses: ScreeningResponses;
   updateResponse: (key: keyof ScreeningResponses, value: boolean) => void;
@@ -39,7 +63,14 @@ interface UseRedFlagScreeningReturn {
   priorityMessage: { title: string; body: string; icon: 'high' | 'medium' | 'low' };
   saveScreeningResults: (episodeId: string) => Promise<void>;
   hasAnyFlags: boolean;
+  /** Keys that are visible but unanswered for a given step */
+  getMissingForStep: (stepId: ScreeningStepId) => (keyof ScreeningResponses)[];
+  isStepComplete: (stepId: ScreeningStepId) => boolean;
+  /** Mark a step as attempted so unanswered questions show validation state */
+  markStepAttempted: (stepId: ScreeningStepId) => void;
+  isMissing: (key: keyof ScreeningResponses) => boolean;
 }
+
 
 function evaluateFlags(r: ScreeningResponses): RedFlagResult[] {
   const flags: RedFlagResult[] = [];
@@ -175,6 +206,33 @@ export const useRedFlagScreening = (): UseRedFlagScreeningReturn => {
   const priorityMessage = PRIORITY_MESSAGES[highestPriority];
   const hasAnyFlags = flags.some(f => f.priority !== 'low');
 
+  const [attemptedSteps, setAttemptedSteps] = useState<ScreeningStepId[]>([]);
+
+  const getMissingForStep = useCallback((stepId: ScreeningStepId) => {
+    return STEP_QUESTIONS[stepId]
+      .filter(q => (q.parent ? responses[q.parent] === true : true))
+      .filter(q => responses[q.key] === undefined)
+      .map(q => q.key);
+  }, [responses]);
+
+  const isStepComplete = useCallback(
+    (stepId: ScreeningStepId) => getMissingForStep(stepId).length === 0,
+    [getMissingForStep]
+  );
+
+  const markStepAttempted = useCallback((stepId: ScreeningStepId) => {
+    setAttemptedSteps(prev => (prev.includes(stepId) ? prev : [...prev, stepId]));
+  }, []);
+
+  const isMissing = useCallback((key: keyof ScreeningResponses) => {
+    const stepId = (Object.keys(STEP_QUESTIONS) as ScreeningStepId[]).find(s =>
+      STEP_QUESTIONS[s].some(q => q.key === key)
+    );
+    if (!stepId || !attemptedSteps.includes(stepId)) return false;
+    return getMissingForStep(stepId).includes(key);
+  }, [attemptedSteps, getMissingForStep]);
+
+
   const saveScreeningResults = useCallback(async (episodeId: string) => {
     if (!user) return;
 
@@ -206,5 +264,10 @@ export const useRedFlagScreening = (): UseRedFlagScreeningReturn => {
     priorityMessage,
     saveScreeningResults,
     hasAnyFlags,
+    getMissingForStep,
+    isStepComplete,
+    markStepAttempted,
+    isMissing,
+
   };
 };

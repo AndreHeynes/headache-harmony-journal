@@ -3,7 +3,7 @@ import { ScreeningQuestion } from "./ScreeningQuestion";
 
 /** Positional / precipitating screening — embedded in the Treatment step */
 export function PositionalScreening() {
-  const { responses, updateResponse } = useScreening();
+  const { responses, updateResponse, isMissing } = useScreening();
 
   return (
     <div className="space-y-3">
@@ -12,12 +12,14 @@ export function PositionalScreening() {
         helpText="Positional headaches can indicate changes in intracranial pressure."
         answered={responses.hasPositionalFactors}
         onAnswer={(v) => updateResponse('hasPositionalFactors', v)}
+        invalid={isMissing('hasPositionalFactors')}
       />
       <ScreeningQuestion
         question="Have you been told you have papilledema (swelling behind the eye)?"
         helpText="Known papilledema with headache is an urgent finding requiring immediate evaluation."
         answered={responses.hasPapilledema}
         onAnswer={(v) => updateResponse('hasPapilledema', v)}
+        invalid={isMissing('hasPapilledema')}
         visible={responses.hasPositionalFactors === true}
       />
     </div>
