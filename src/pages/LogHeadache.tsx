@@ -125,7 +125,17 @@ function LogHeadacheInner() {
   };
 
   const handleNext = async () => {
+    if (isScreeningStep) {
+      markStepAttempted(currentStepId as typeof SCREENING_STEPS[number]);
+      if (screeningIncomplete) {
+        toast.error('Please answer all safety screening questions before continuing.');
+        return;
+      }
+    }
+
     markStepComplete(steps[currentStep].id);
+
+
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(current => current + 1);
