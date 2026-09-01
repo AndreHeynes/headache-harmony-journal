@@ -226,13 +226,17 @@ function LogHeadacheInner() {
             ))}
           </div>
           
-          {currentStep === 0 && shouldAskFirstHeadache && (
+          {currentStep === 0 && (shouldAskFirstHeadache || needsDateOfBirth) && (
             <FirstHeadacheCheck
               userAge={userAge}
               episodeId={currentEpisodeId}
+              needsDateOfBirth={needsDateOfBirth}
               onSubmit={handleFirstHeadacheSubmit}
+              onSaveDateOfBirth={saveDateOfBirth}
+              onSkipDateOfBirth={skipDateOfBirth}
             />
           )}
+
           <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
