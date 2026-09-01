@@ -31,6 +31,30 @@ export interface RedFlagResult {
   detail: string;
 }
 
+export type ScreeningStepId = 'duration' | 'symptoms' | 'triggers' | 'treatment';
+
+/** Questions belonging to each logging step. Follow-ups are only required when their parent is Yes. */
+const STEP_QUESTIONS: Record<ScreeningStepId, { key: keyof ScreeningResponses; parent?: keyof ScreeningResponses }[]> = {
+  duration: [
+    { key: 'onsetSudden' },
+    { key: 'worstHeadacheEver', parent: 'onsetSudden' },
+  ],
+  symptoms: [
+    { key: 'hasNeurologicalSymptoms' },
+    { key: 'neuroOnsetSudden', parent: 'hasNeurologicalSymptoms' },
+    { key: 'hasSystemicSymptoms' },
+    { key: 'hasStiffNeckOrRash', parent: 'hasSystemicSymptoms' },
+  ],
+  triggers: [
+    { key: 'hasPatternChange' },
+    { key: 'isWorsening', parent: 'hasPatternChange' },
+  ],
+  treatment: [
+    { key: 'hasPositionalFactors' },
+    { key: 'hasPapilledema', parent: 'hasPositionalFactors' },
+  ],
+};
+
 interface UseRedFlagScreeningReturn {
   responses: ScreeningResponses;
   updateResponse: (key: keyof ScreeningResponses, value: boolean) => void;
@@ -39,7 +63,14 @@ interface UseRedFlagScreeningReturn {
   priorityMessage: { title: string; body: string; icon: 'high' | 'medium' | 'low' };
   saveScreeningResults: (episodeId: string) => Promise<void>;
   hasAnyFlags: boolean;
+  /** Keys that are visible but unanswered for a given step */
+  getMissingForStep: (stepId: ScreeningStepId) => (keyof ScreeningResponses)[];
+  isStepComplete: (stepId: ScreeningStepId) => boolean;
+  /** Mark a step as attempted so unanswered questions show validation state */
+  markStepAttempted: (stepId: ScreeningStepId) => void;
+  isMissing: (key: keyof ScreeningResponses) => boolean;
 }
+
 
 function evaluateFlags(r: ScreeningResponses): RedFlagResult[] {
   const flags: RedFlagResult[] = [];
