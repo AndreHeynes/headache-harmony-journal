@@ -206,6 +206,33 @@ export const useRedFlagScreening = (): UseRedFlagScreeningReturn => {
   const priorityMessage = PRIORITY_MESSAGES[highestPriority];
   const hasAnyFlags = flags.some(f => f.priority !== 'low');
 
+  const [attemptedSteps, setAttemptedSteps] = useState<ScreeningStepId[]>([]);
+
+  const getMissingForStep = useCallback((stepId: ScreeningStepId) => {
+    return STEP_QUESTIONS[stepId]
+      .filter(q => (q.parent ? responses[q.parent] === true : true))
+      .filter(q => responses[q.key] === undefined)
+      .map(q => q.key);
+  }, [responses]);
+
+  const isStepComplete = useCallback(
+    (stepId: ScreeningStepId) => getMissingForStep(stepId).length === 0,
+    [getMissingForStep]
+  );
+
+  const markStepAttempted = useCallback((stepId: ScreeningStepId) => {
+    setAttemptedSteps(prev => (prev.includes(stepId) ? prev : [...prev, stepId]));
+  }, []);
+
+  const isMissing = useCallback((key: keyof ScreeningResponses) => {
+    const stepId = (Object.keys(STEP_QUESTIONS) as ScreeningStepId[]).find(s =>
+      STEP_QUESTIONS[s].some(q => q.key === key)
+    );
+    if (!stepId || !attemptedSteps.includes(stepId)) return false;
+    return getMissingForStep(stepId).includes(key);
+  }, [attemptedSteps, getMissingForStep]);
+
+
   const saveScreeningResults = useCallback(async (episodeId: string) => {
     if (!user) return;
 
