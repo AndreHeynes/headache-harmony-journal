@@ -39,7 +39,7 @@ function LogHeadacheInner() {
   const { user, loading: authLoading } = useAuth();
   const { activeEpisode, checkForActiveEpisode, startNewEpisode, completeEpisode, continueActiveEpisode } = useEpisode();
   const { locations, loadLocations, clearLocations } = useLocations();
-  const { shouldAskFirstHeadache, userAge, submitFirstHeadacheFlag } = useRedFlagCheck();
+  const { shouldAskFirstHeadache, needsDateOfBirth, userAge, submitFirstHeadacheFlag, saveDateOfBirth, skipDateOfBirth } = useRedFlagCheck();
   const { flags, highestPriority, priorityMessage, saveScreeningResults, hasAnyFlags, responses, updateResponse, isStepComplete, markStepAttempted } = useScreening();
 
   const SCREENING_STEPS = ['duration', 'symptoms', 'triggers', 'treatment'] as const;
