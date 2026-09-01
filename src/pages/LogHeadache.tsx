@@ -236,14 +236,21 @@ function LogHeadacheInner() {
           <CurrentStepComponent episodeId={currentEpisodeId} />
         </main>
 
-        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border">
+        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border space-y-2">
+          {screeningIncomplete && (
+            <p className="text-xs text-center text-destructive">
+              Answer all safety screening questions on this step to continue.
+            </p>
+          )}
           <Button 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium disabled:opacity-60"
             onClick={handleNext}
+            aria-disabled={screeningIncomplete}
           >
             {currentStep === steps.length - 1 ? 'Complete' : 'Continue'}
           </Button>
         </footer>
+
       </div>
     </>
   );
