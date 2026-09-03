@@ -27,7 +27,7 @@ interface HeadacheRecord {
 export interface ExportRedFlag {
   date: string;
   priorityLevel: string;
-  flags: Array<{ label: string; detail: string; priority: string }>;
+  flags: Array<{ criterion?: string; label: string; detail: string; priority: string }>;
 }
 
 export function useExportData() {
@@ -132,6 +132,7 @@ export function useExportData() {
         date: rf.created_at,
         priorityLevel: rf.priority_level || 'low',
         flags: (details?.flags || []).map((f: any) => ({
+          criterion: f.criterion,
           label: f.label,
           detail: f.detail,
           priority: f.priority,
