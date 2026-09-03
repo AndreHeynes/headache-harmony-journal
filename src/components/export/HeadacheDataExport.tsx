@@ -16,6 +16,7 @@ import { getDisclaimer } from "@/utils/legalContent";
 import { usePatientProfile } from "@/hooks/usePatientProfile";
 import { format } from "date-fns";
 import type { ExportRedFlag } from "@/hooks/useExportData";
+import { summarizeSnoop } from "@/utils/snoopCriteria";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -170,45 +171,79 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     doc.setFontSize(20);
     doc.text("Headache Experience Journal: Patient Report", 20, 25);
     
-    // Add patient identification section
+    // Add patient identification & demographics section
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("PATIENT IDENTIFICATION", 20, 38);
+    doc.text("PATIENT DEMOGRAPHICS & IDENTIFICATION", 20, 38);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    
+
     const patientName = profile?.fullName || 'Not provided';
     const patientEmail = profile?.email || 'Not provided';
-    const firstDataDate = profile?.firstDataDate 
+    const dob = profile?.dateOfBirth
+      ? format(new Date(profile.dateOfBirth), 'PPP')
+      : 'Not provided';
+    const age = profile?.age != null ? `${profile.age} years` : 'Not available';
+    const ageBand = profile?.age != null
+      ? (profile.age >= 50 ? 'Aged 50 or over — SNOOP "Older age at onset" criterion is screened' : 'Under 50')
+      : 'Unknown — age-related SNOOP screening cannot be applied';
+    const firstDataDate = profile?.firstDataDate
       ? format(new Date(profile.firstDataDate), 'PPP')
       : 'No data recorded';
-    const trackingPeriod = profile?.trackingPeriodDays 
+    const lastDataDate = profile?.lastDataDate
+      ? format(new Date(profile.lastDataDate), 'PPP')
+      : 'No data recorded';
+    const trackingPeriod = profile?.trackingPeriodDays
       ? `${profile.trackingPeriodDays} days`
       : 'N/A';
-    
-    doc.text(`Patient Name: ${patientName}`, 20, 46);
-    doc.text(`Email: ${patientEmail}`, 20, 52);
-    doc.text(`First Data Recorded: ${firstDataDate}`, 20, 58);
-    doc.text(`Tracking Period: ${trackingPeriod}`, 20, 64);
-    doc.text(`Total Episodes: ${profile?.totalEpisodes || exportData.length}`, 20, 70);
-    doc.text(`Report Generated: ${format(new Date(), 'PPP')}`, 20, 76);
-    
+    const frequency = profile?.episodesPerMonth != null
+      ? `${profile.episodesPerMonth} episodes / 30 days`
+      : 'Not calculable';
+
+    const demographics: Array<[string, string]> = [
+      ['Patient Name', patientName],
+      ['Email', patientEmail],
+      ['Date of Birth', dob],
+      ['Age', age],
+      ['Age Band', ageBand],
+      ['First Data Recorded', firstDataDate],
+      ['Most Recent Episode', lastDataDate],
+      ['Tracking Period', trackingPeriod],
+      ['Total Episodes', String(profile?.totalEpisodes || exportData.length)],
+      ['Average Frequency', frequency],
+      ['Report Generated', format(new Date(), 'PPP')],
+    ];
+
+    yPos = 46;
+    demographics.forEach(([label, value]) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(`${label}:`, 20, yPos);
+      doc.setFont("helvetica", "normal");
+      const lines = doc.splitTextToSize(value, 110);
+      lines.forEach((line: string, i: number) => {
+        doc.text(line, 65, yPos + i * 5);
+      });
+      yPos += 5 * Math.max(1, lines.length);
+    });
+
     // Add verification note
+    yPos += 3;
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text("This report should be verified against the patient presenting to the healthcare provider.", 20, 84);
+    doc.text("This report should be verified against the patient presenting to the healthcare provider.", 20, yPos);
     doc.setTextColor(0, 0, 0);
-    
+    yPos += 8;
+
     // Add comprehensive legal disclaimer
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
-    doc.text("LEGAL DISCLAIMER", 20, 92);
+    doc.text("LEGAL DISCLAIMER", 20, yPos);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    
+    yPos += 8;
+
     if (disclaimer) {
       const disclaimerLines = doc.splitTextToSize(disclaimer.content, 170);
-      yPos = 100;
       disclaimerLines.forEach((line: string) => {
         if (yPos > 280) {
           doc.addPage();
@@ -223,8 +258,8 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       yPos = 20;
     } else {
       // Fallback basic disclaimer
-      doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, 100);
-      yPos = 110;
+      doc.text("This report contains personal health information. Handle with care and share only with trusted healthcare providers.", 20, yPos);
+      yPos += 10;
     }
     
     // Add patient section title
@@ -271,6 +306,55 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       }
       
       yPos += 5; // Add some space between records
+    });
+
+    // Full SNOOP criteria overview
+    doc.addPage();
+    yPos = 20;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("SNOOP RED FLAG SCREENING — FULL CRITERIA", 20, yPos);
+    doc.setFont("helvetica", "normal");
+    yPos += 7;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    const snoopIntroLines = doc.splitTextToSize(
+      "Every criterion below is screened during each logged episode. Criteria marked 'Not detected' were asked and answered negatively; they are listed so the absence of a red flag is documented, not merely omitted.",
+      170
+    );
+    snoopIntroLines.forEach((line: string) => { doc.text(line, 20, yPos); yPos += 4; });
+    doc.setTextColor(0, 0, 0);
+    yPos += 4;
+
+    summarizeSnoop(redFlags).forEach((c) => {
+      if (yPos > 240) { doc.addPage(); yPos = 20; }
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${c.letter} — ${c.name}`, 20, yPos);
+      yPos += 5;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+
+      const status = c.triggeredCount > 0
+        ? `DETECTED — ${c.triggeredCount} occurrence(s), highest priority: ${c.highestPriority}${c.lastTriggered ? `, last ${format(new Date(c.lastTriggered), 'PPP')}` : ''}`
+        : 'Not detected — screened, no positive response recorded';
+      const rows: Array<[string, string]> = [
+        ['Status', status],
+        ['Screening question', c.screeningQuestion],
+        ['What was assessed', c.description],
+        ['Clinical concern', c.clinicalConcern],
+      ];
+      if (c.observedLabels.length > 0) rows.push(['Recorded findings', c.observedLabels.join('; ')]);
+
+      rows.forEach(([label, value]) => {
+        const lines = doc.splitTextToSize(`${label}: ${value}`, 165);
+        lines.forEach((line: string) => {
+          if (yPos > 275) { doc.addPage(); yPos = 20; }
+          doc.text(line, 25, yPos);
+          yPos += 4;
+        });
+      });
+      yPos += 5;
     });
 
     // Red Flags Section
@@ -343,9 +427,13 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     // Create CSV content with patient identification header
     let csvContent = `# Headache Experience Journal Export\n`;
     csvContent += `# ========================================\n`;
-    csvContent += `# PATIENT IDENTIFICATION\n`;
+    csvContent += `# PATIENT DEMOGRAPHICS & IDENTIFICATION\n`;
     csvContent += `# Patient Name: ${patientName}\n`;
     csvContent += `# Patient Email: ${patientEmail}\n`;
+    csvContent += `# Date of Birth: ${profile?.dateOfBirth ? format(new Date(profile.dateOfBirth), 'PPP') : 'Not provided'}\n`;
+    csvContent += `# Age: ${profile?.age != null ? `${profile.age} years` : 'Not available'}\n`;
+    csvContent += `# Most Recent Episode: ${profile?.lastDataDate ? format(new Date(profile.lastDataDate), 'PPP') : 'No data recorded'}\n`;
+    csvContent += `# Average Frequency: ${profile?.episodesPerMonth != null ? `${profile.episodesPerMonth} episodes / 30 days` : 'Not calculable'}\n`;
     csvContent += `# First Data Recorded: ${firstDataDate}\n`;
     csvContent += `# Tracking Period: ${profile?.trackingPeriodDays || 0} days\n`;
     csvContent += `# Total Episodes: ${profile?.totalEpisodes || exportData.length}\n`;
@@ -369,6 +457,22 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       ];
       
       csvContent += row.join(",") + "\n";
+    });
+
+    // Full SNOOP criteria overview
+    csvContent += "\n# SNOOP RED FLAG SCREENING - FULL CRITERIA\n";
+    csvContent += "Letter,Criterion,Status,Occurrences,HighestPriority,LastTriggered,ScreeningQuestion,ClinicalConcern\n";
+    summarizeSnoop(redFlags).forEach((c) => {
+      csvContent += [
+        c.letter,
+        `"${c.name}"`,
+        c.triggeredCount > 0 ? 'Detected' : 'Not detected',
+        c.triggeredCount,
+        c.highestPriority || 'n/a',
+        c.lastTriggered ? format(new Date(c.lastTriggered), 'PPP') : 'n/a',
+        `"${c.screeningQuestion}"`,
+        `"${c.clinicalConcern}"`,
+      ].join(',') + "\n";
     });
 
     // Red Flags section
