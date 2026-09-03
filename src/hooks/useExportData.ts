@@ -132,6 +132,7 @@ export function useExportData() {
         date: rf.created_at,
         priorityLevel: rf.priority_level || 'low',
         flags: (details?.flags || []).map((f: any) => ({
+          criterion: f.criterion,
           label: f.label,
           detail: f.detail,
           priority: f.priority,
