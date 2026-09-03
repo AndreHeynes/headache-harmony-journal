@@ -27,7 +27,7 @@ interface HeadacheRecord {
 export interface ExportRedFlag {
   date: string;
   priorityLevel: string;
-  flags: Array<{ label: string; detail: string; priority: string }>;
+  flags: Array<{ criterion?: string; label: string; detail: string; priority: string }>;
 }
 
 export function useExportData() {
