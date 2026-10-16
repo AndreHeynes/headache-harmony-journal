@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeadacheEpisode } from '@/types/episode';
+import { fetchAnalysisData, AnalysisUnit, extractTreatmentNames } from '@/lib/analysis';
 import { subDays, differenceInDays, startOfDay, format } from 'date-fns';
 
 interface MedicationUsage {
@@ -52,6 +53,7 @@ const OVERUSE_THRESHOLDS: Record<string, number> = {
 export const useMedicationAnalysis = () => {
   const { user } = useAuth();
   const [episodes, setEpisodes] = useState<HeadacheEpisode[]>([]);
+  const [units, setUnits] = useState<AnalysisUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,15 +68,9 @@ export const useMedicationAnalysis = () => {
         // Fetch last 90 days for comprehensive analysis
         const startDate = subDays(new Date(), 90);
 
-        const { data, error: fetchError } = await supabase
-          .from('headache_episodes')
-          .select('*')
-          .eq('user_id', user.id)
-          .gte('start_time', startDate.toISOString())
-          .order('start_time', { ascending: false });
-
-        if (fetchError) throw fetchError;
-        setEpisodes(data as HeadacheEpisode[]);
+        const r = await fetchAnalysisData(user.id, { from: startDate });
+        setEpisodes(r.episodes);
+        setUnits(r.units);
       } catch (err) {
         console.error('Error fetching medication data:', err);
         setError('Failed to load medication data');
@@ -106,39 +102,24 @@ export const useMedicationAnalysis = () => {
       uses: Array<{ date: Date; duration: number; effectiveness?: number; sideEffects?: string[] }>;
     }>();
 
-    episodes.forEach(ep => {
-      const treatment = ep.treatment as any;
+    // Read each area's treatment; a medication counts once per episode (overuse is counted in days).
+    const seen = new Set<string>();
+    units.forEach(u => {
+      const treatment = u.treatment as any;
       if (!treatment) return;
+      const epDate = new Date(u.start_time);
+      const duration = u.duration_minutes || 0;
+      const effectiveness = typeof treatment === 'object' && treatment.effectiveness !== undefined && Number(treatment.effectiveness) > 0
+        ? Number(treatment.effectiveness) : undefined;
+      const sideEffects: string[] = typeof treatment === 'object' && treatment.sideEffects
+        ? (Array.isArray(treatment.sideEffects) ? treatment.sideEffects : [treatment.sideEffects]) : [];
 
-      const epDate = new Date(ep.start_time);
-      const duration = ep.duration_minutes || 0;
-
-      // Handle various treatment data structures
-      let medications: string[] = [];
-      let effectiveness: number | undefined;
-      let sideEffects: string[] = [];
-
-      if (Array.isArray(treatment)) {
-        medications = treatment.filter(t => typeof t === 'string');
-      } else if (typeof treatment === 'object') {
-        if (treatment.medications) {
-          medications = Array.isArray(treatment.medications) ? treatment.medications : [treatment.medications];
-        }
-        if (treatment.type) {
-          medications.push(treatment.type);
-        }
-        if (treatment.effectiveness !== undefined) {
-          effectiveness = Number(treatment.effectiveness);
-        }
-        if (treatment.sideEffects) {
-          sideEffects = Array.isArray(treatment.sideEffects) ? treatment.sideEffects : [treatment.sideEffects];
-        }
-      }
-
-      medications.forEach(med => {
+      extractTreatmentNames(treatment).forEach(med => {
         const medLower = med.toLowerCase().trim();
         if (!medLower) return;
-
+        const dedupe = `${u.episodeId}|${medLower}`;
+        if (seen.has(dedupe)) return;
+        seen.add(dedupe);
         const existing = medicationMap.get(medLower) || { uses: [] };
         existing.uses.push({ date: epDate, duration, effectiveness, sideEffects });
         medicationMap.set(medLower, existing);
@@ -216,9 +197,9 @@ export const useMedicationAnalysis = () => {
 
     // Calculate overall statistics
     const uniqueMedicationDays = new Set(
-      episodes
-        .filter(ep => ep.treatment)
-        .map(ep => format(new Date(ep.start_time), 'yyyy-MM-dd'))
+      units
+        .filter(u => extractTreatmentNames(u.treatment).length > 0)
+        .map(u => format(new Date(u.start_time), 'yyyy-MM-dd'))
     ).size;
 
     const overuseAlertCount = medications.filter(m => m.overuseAlert).length;
