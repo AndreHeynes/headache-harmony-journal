@@ -8,6 +8,8 @@ export interface EpisodeLocation {
   episode_id: string;
   user_id: string;
   location_name: string;
+  location_key: string | null;
+  deselected_at: string | null;
   is_origin: boolean;
   pain_intensity: number | null;
   symptoms: string[] | null;
@@ -27,7 +29,7 @@ interface LocationContextType {
   activeLocationId: string | null;
   activeLocation: EpisodeLocation | null;
   setActiveLocationId: (id: string | null) => void;
-  createLocationsForEpisode: (episodeId: string, locationNames: string[]) => Promise<void>;
+  syncLocationsForEpisode: (episodeId: string, areas: Array<{ key: string; name: string }>) => Promise<void>;
   updateLocation: (locationId: string, updates: Partial<EpisodeLocation>) => Promise<void>;
   loadLocations: (episodeId: string) => Promise<void>;
   clearLocations: () => void;
@@ -58,6 +60,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
         .select('*')
         .eq('episode_id', episodeId)
         .eq('user_id', user.id)
+        .is('deselected_at', null)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -70,38 +73,94 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, activeLocationId]);
 
-  const createLocationsForEpisode = useCallback(async (episodeId: string, locationNames: string[]) => {
-    if (!user || locationNames.length === 0) return;
+  /**
+   * Reconcile the selected skull areas with stored rows WITHOUT deleting anything:
+   * - existing rows are matched by stable key (or by name for legacy rows) and kept with their data
+   * - newly selected areas get a new row (or a previously unselected row is restored)
+   * - unselected areas are marked deselected_at so their data comes back if reselected
+   */
+  const syncLocationsForEpisode = useCallback(async (episodeId: string, areas: Array<{ key: string; name: string }>) => {
+    if (!user) return;
 
     try {
-      // Remove existing locations for this episode first
-      await supabase
+      const { data: existingData, error: loadError } = await supabase
         .from('episode_locations')
-        .delete()
+        .select('*')
         .eq('episode_id', episodeId)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+      if (loadError) throw loadError;
 
-      const rows = locationNames.map((name, index) => ({
-        episode_id: episodeId,
-        user_id: user.id,
-        location_name: name,
-        is_origin: index === 0, // First selected location is origin
-      }));
+      const existing = (existingData as EpisodeLocation[]) || [];
+      const matched = new Set<string>();
+      const findRow = (area: { key: string; name: string }) =>
+        existing.find(r => !matched.has(r.id) && r.location_key === area.key) ||
+        existing.find(r => !matched.has(r.id) && !r.location_key && r.location_name === area.name);
 
-      const { data, error } = await supabase
-        .from('episode_locations')
-        .insert(rows)
-        .select();
+      const now = new Date().toISOString();
+      const selectedRowIds: string[] = [];
 
-      if (error) throw error;
-
-      const newLocations = (data as EpisodeLocation[]) || [];
-      setLocations(newLocations);
-      if (newLocations.length > 0) {
-        setActiveLocationId(newLocations[0].id);
+      for (const area of areas) {
+        const row = findRow(area);
+        if (row) {
+          matched.add(row.id);
+          selectedRowIds.push(row.id);
+          if (row.deselected_at || row.location_key !== area.key || row.location_name !== area.name) {
+            await supabase
+              .from('episode_locations')
+              .update({ deselected_at: null, location_key: area.key, location_name: area.name })
+              .eq('id', row.id);
+          }
+        } else {
+          const { data: inserted, error: insertError } = await supabase
+            .from('episode_locations')
+            .insert({
+              episode_id: episodeId,
+              user_id: user.id,
+              location_name: area.name,
+              location_key: area.key,
+              is_origin: false,
+            })
+            .select()
+            .single();
+          if (insertError) throw insertError;
+          selectedRowIds.push(inserted.id);
+        }
       }
+
+      // Soft-unselect rows no longer chosen (data is kept)
+      const toDeselect = existing.filter(r => !matched.has(r.id) && !r.deselected_at).map(r => r.id);
+      if (toDeselect.length > 0) {
+        await supabase
+          .from('episode_locations')
+          .update({ deselected_at: now, is_origin: false })
+          .in('id', toDeselect);
+      }
+
+      // Origin: keep the current origin if still selected, otherwise first selected area
+      const currentOrigin = existing.find(r => r.is_origin && selectedRowIds.includes(r.id) && !r.deselected_at);
+      const originId = currentOrigin?.id ?? selectedRowIds[0];
+      if (originId) {
+        await supabase.from('episode_locations').update({ is_origin: false }).eq('episode_id', episodeId).neq('id', originId);
+        await supabase.from('episode_locations').update({ is_origin: true }).eq('id', originId);
+      }
+
+      const { data: fresh, error: freshError } = await supabase
+        .from('episode_locations')
+        .select('*')
+        .eq('episode_id', episodeId)
+        .eq('user_id', user.id)
+        .is('deselected_at', null)
+        .order('created_at', { ascending: true });
+      if (freshError) throw freshError;
+
+      const newLocations = (fresh as EpisodeLocation[]) || [];
+      setLocations(newLocations);
+      setActiveLocationId(prev =>
+        prev && newLocations.some(l => l.id === prev) ? prev : newLocations[0]?.id ?? null
+      );
     } catch (error) {
-      console.error('Error creating locations:', error);
+      console.error('Error saving locations:', error);
       toast.error('Failed to save pain locations');
     }
   }, [user]);
@@ -136,7 +195,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
         activeLocationId,
         activeLocation,
         setActiveLocationId,
-        createLocationsForEpisode,
+        syncLocationsForEpisode,
         updateLocation,
         loadLocations,
         clearLocations,
