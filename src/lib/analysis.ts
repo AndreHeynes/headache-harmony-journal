@@ -8,7 +8,7 @@ import type { HeadacheEpisode } from '@/types/episode';
  */
 export const ANALYSIS_EPISODE_STATUS = 'completed' as const;
 export const EPISODE_RULE_TEXT =
-  'Statistics include completed episodes only. An episode you are still logging (in progress) is not counted until you finish Step 6.';
+  'Statistics include completed episodes only. An episode you are still logging (in progress) is not counted until you finish the last step of the log.';
 
 export interface AreaRow {
   id: string;
