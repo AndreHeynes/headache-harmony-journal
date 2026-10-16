@@ -1,18 +1,21 @@
-
-import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export function ClassificationSection() {
-  const [classifications, setClassifications] = useState<string[]>([]);
+interface ClassificationSectionProps {
+  /** Saved with the treatment record (treatment.classifications) for the episode or the active area. */
+  value: string[];
+  onChange: (value: string[]) => void;
+}
+
+export function ClassificationSection({ value, onChange }: ClassificationSectionProps) {
 
   return (
     <div>
       <Label className="text-gray-400 mb-2 block">Treatment Classification</Label>
       <ToggleGroup 
         type="multiple" 
-        value={classifications}
-        onValueChange={setClassifications}
+        value={value}
+        onValueChange={onChange}
         className="grid grid-cols-2 gap-3"
       >
         <ToggleGroupItem 

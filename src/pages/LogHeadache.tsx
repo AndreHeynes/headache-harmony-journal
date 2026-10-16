@@ -7,7 +7,6 @@ import LogPainIntensity from "@/components/logheadache/LogPainIntensity";
 import LogPainDuration from "@/components/logheadache/LogPainDuration";
 import LogSymptoms from "@/components/logheadache/LogSymptoms";
 import LogTriggers from "@/components/logheadache/LogTriggers";
-import LogVariables from "@/components/logheadache/LogVariables";
 import LogTreatment from "@/components/logheadache/LogTreatment";
 import { useEpisode } from "@/contexts/EpisodeContext";
 import { useLocations } from "@/contexts/LocationContext";
@@ -25,7 +24,7 @@ const steps = [
   { id: 'duration', title: 'Pain Duration', component: LogPainDuration },
   { id: 'symptoms', title: 'Associated Symptoms', component: LogSymptoms },
   { id: 'triggers', title: 'Triggers', component: LogTriggers },
-  { id: 'variables', title: 'Self-Determined Variables', component: LogVariables },
+  // Step 'Self-Determined Variables' (LogVariables) is hidden until it saves to the database.
   { id: 'treatment', title: 'Treatment Log', component: LogTreatment }
 ];
 
