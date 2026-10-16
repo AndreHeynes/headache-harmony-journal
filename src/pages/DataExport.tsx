@@ -1,4 +1,5 @@
 import React from "react";
+import { EpisodeRuleNote } from "@/components/common/EpisodeRuleNote";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +48,7 @@ export default function DataExport() {
           Generate a report of your headache data to share with your healthcare provider. 
           This helps them better understand your headache patterns and make more informed treatment decisions.
         </p>
+        <EpisodeRuleNote />
         
         {loading ? (
           <div className="flex items-center justify-center py-12">
