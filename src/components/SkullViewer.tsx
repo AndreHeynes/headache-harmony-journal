@@ -1,19 +1,30 @@
-
-import React, { useState, useMemo } from 'react';
-import { SKULL_HOTSPOTS, SkullView } from './skull-viewer/skull-hotspots';
+import React, { useState, useMemo, useEffect } from 'react';
+import { SKULL_HOTSPOTS, SkullView, resolveAreaKey } from './skull-viewer/skull-hotspots';
 import SkullImage from './skull-viewer/SkullImage';
 import { ViewControls } from './skull-viewer/ViewControls';
 import { SelectionInfo } from './skull-viewer/SelectionInfo';
 import { SmartAnalysis } from './skull-viewer/SmartAnalysis';
 
 interface SkullViewerProps {
-  onLocationSelect?: (location: string) => void;
+  /** Called with the selected stable area keys (e.g. ["temple_left", "eye_right"]). */
+  onSelectionChange?: (areaKeys: string[]) => void;
+  /** Area keys to show as selected when the viewer first loads. */
+  initialSelection?: string[];
 }
 
-const SkullViewer = ({ onLocationSelect }: SkullViewerProps) => {
+const SkullViewer = ({ onSelectionChange, initialSelection }: SkullViewerProps) => {
   const [currentView, setCurrentView] = useState<SkullView>('front');
-  const [selectedHotspots, setSelectedHotspots] = useState<string[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>(initialSelection ?? []);
   const [selectedSide, setSelectedSide] = useState<'left' | 'right'>('left');
+  const [hydrated, setHydrated] = useState((initialSelection ?? []).length > 0);
+
+  // Hydrate once when saved selection arrives after mount
+  useEffect(() => {
+    if (!hydrated && initialSelection && initialSelection.length > 0) {
+      setSelectedKeys(initialSelection);
+      setHydrated(true);
+    }
+  }, [initialSelection, hydrated]);
 
   const currentViewHotspots = useMemo(
     () => SKULL_HOTSPOTS.filter((h) => h.view === currentView),
@@ -21,26 +32,21 @@ const SkullViewer = ({ onLocationSelect }: SkullViewerProps) => {
   );
 
   const toggleHotspotSelection = (hotspotId: string) => {
-    setSelectedHotspots((prev) => {
-      const newSelection = prev.includes(hotspotId)
-        ? prev.filter((id) => id !== hotspotId)
-        : [...prev, hotspotId];
-      
-      // Notify parent of the location change
-      if (onLocationSelect) {
-        const locationString = newSelection.join(', ');
-        onLocationSelect(locationString);
-      }
-      
-      return newSelection;
+    const hotspot = SKULL_HOTSPOTS.find((h) => h.id === hotspotId);
+    if (!hotspot) return;
+    const key = resolveAreaKey(hotspot, selectedSide);
+    setHydrated(true);
+    setSelectedKeys((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      onSelectionChange?.(next);
+      return next;
     });
   };
 
   const clearAllSelections = () => {
-    setSelectedHotspots([]);
-    if (onLocationSelect) {
-      onLocationSelect('');
-    }
+    setHydrated(true);
+    setSelectedKeys([]);
+    onSelectionChange?.([]);
   };
 
   return (
@@ -52,24 +58,19 @@ const SkullViewer = ({ onLocationSelect }: SkullViewerProps) => {
           selectedSide={selectedSide}
           onSideChange={setSelectedSide}
         />
-        <SelectionInfo
-          selectedCount={selectedHotspots.length}
-          onClearAll={clearAllSelections}
-        />
+        <SelectionInfo selectedCount={selectedKeys.length} onClearAll={clearAllSelections} />
       </div>
       <div className="flex justify-center items-center">
         <SkullImage
           currentView={currentView}
           hotspots={currentViewHotspots}
-          selectedHotspots={selectedHotspots}
+          selectedKeys={selectedKeys}
           onHotspotToggle={toggleHotspotSelection}
           selectedSide={selectedSide}
         />
       </div>
-      
-      {selectedHotspots.length > 0 && (
-        <SmartAnalysis selectedHotspots={selectedHotspots} />
-      )}
+
+      {selectedKeys.length > 0 && <SmartAnalysis selectedKeys={selectedKeys} />}
     </div>
   );
 };

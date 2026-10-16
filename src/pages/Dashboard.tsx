@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EpisodeRuleNote } from "@/components/common/EpisodeRuleNote";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/layout/BottomNav";
@@ -253,6 +254,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <EpisodeRuleNote />
               {data.avgPainIntensity > 0 && (
                 <div className="flex items-start gap-3">
                   <TrendingUp className="h-5 w-5 text-primary mt-0.5" />

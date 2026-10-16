@@ -1,28 +1,22 @@
 
 import React, { useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { SKULL_HOTSPOTS } from './skull-hotspots';
 import { InlineDisclaimer } from '@/components/disclaimer';
 
 interface SmartAnalysisProps {
-  selectedHotspots: string[];
+  selectedKeys: string[];
 }
 
-export const SmartAnalysis = ({ selectedHotspots }: SmartAnalysisProps) => {
+export const SmartAnalysis = ({ selectedKeys }: SmartAnalysisProps) => {
+  const selectedHotspots = selectedKeys;
   const analysis = useMemo(() => {
-    if (selectedHotspots.length === 0) return null;
+    if (selectedKeys.length === 0) return null;
 
-    const selectedHotspotData = SKULL_HOTSPOTS.filter(h => selectedHotspots.includes(h.id));
-    
-    // Determine distribution (left, right, bilateral)
-    const hasLeft = selectedHotspotData.some(h => 
-      h.id.includes('left') || h.id.includes('right') // Note: our IDs are reversed for visual reasons
-    );
-    const hasRight = selectedHotspotData.some(h => 
-      h.id.includes('right') || h.id.includes('left') // Note: our IDs are reversed for visual reasons
-    );
-    const hasBoth = selectedHotspotData.some(h => 
-      h.id.includes('both') || h.id.includes('middle') || h.id.includes('pressure-band')
+    // Keys are on the patient's own side (e.g. temple_left)
+    const hasLeft = selectedKeys.some(k => k.endsWith('_left'));
+    const hasRight = selectedKeys.some(k => k.endsWith('_right'));
+    const hasBoth = selectedKeys.some(k =>
+      k.endsWith('_center') || k === 'pressure_band' || k === 'crown' || k === 'skull_base'
     );
 
     let distribution = 'Unilateral';
@@ -44,16 +38,16 @@ export const SmartAnalysis = ({ selectedHotspots }: SmartAnalysisProps) => {
 
     // Determine anatomical regions
     const regions = [];
-    if (selectedHotspotData.some(h => h.id.includes('forehead') || h.id.includes('eye'))) {
+    if (selectedKeys.some(k => k.includes('forehead') || k.includes('eye'))) {
       regions.push('Frontal');
     }
-    if (selectedHotspotData.some(h => h.id.includes('temple'))) {
+    if (selectedKeys.some(k => k.includes('temple'))) {
       regions.push('Temporal');
     }
-    if (selectedHotspotData.some(h => h.id.includes('occiput') || h.id.includes('back'))) {
+    if (selectedKeys.some(k => k.includes('occipital') || k.includes('crown'))) {
       regions.push('Occipital');
     }
-    if (selectedHotspotData.some(h => h.id.includes('neck') || h.id.includes('base'))) {
+    if (selectedKeys.some(k => k.includes('skull_base'))) {
       regions.push('Cervical');
     }
 
@@ -63,7 +57,7 @@ export const SmartAnalysis = ({ selectedHotspots }: SmartAnalysisProps) => {
       regions,
       intensity: selectedHotspots.length
     };
-  }, [selectedHotspots]);
+  }, [selectedKeys]);
 
   if (!analysis) return null;
 

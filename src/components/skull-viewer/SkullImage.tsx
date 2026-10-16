@@ -1,20 +1,20 @@
 
 import React, { useState } from 'react';
-import { SkullView, SKULL_IMAGES, Hotspot } from './skull-hotspots';
+import { SkullView, SKULL_IMAGES, Hotspot, resolveAreaKey } from './skull-hotspots';
 import { HotspotOverlay } from './HotspotOverlay';
 
 interface SkullImageProps {
   currentView: SkullView;
   hotspots: Hotspot[];
-  selectedHotspots: string[];
+  selectedKeys: string[];
   onHotspotToggle: (hotspotId: string) => void;
-  selectedSide?: 'left' | 'right';
+  selectedSide: 'left' | 'right';
 }
 
 const SkullImage = ({
   currentView,
   hotspots,
-  selectedHotspots,
+  selectedKeys,
   onHotspotToggle,
   selectedSide,
 }: SkullImageProps) => {
@@ -83,7 +83,7 @@ const SkullImage = ({
           <HotspotOverlay
             key={hotspot.id}
             hotspot={hotspot}
-            isSelected={selectedHotspots.includes(hotspot.id)}
+            isSelected={selectedKeys.includes(resolveAreaKey(hotspot, selectedSide))}
             onToggle={onHotspotToggle}
             selectedSide={selectedSide}
             currentView={currentView}

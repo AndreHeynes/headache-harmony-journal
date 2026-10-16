@@ -1,3 +1,4 @@
+import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { HeadacheEpisode } from '@/types/episode';
@@ -36,7 +37,9 @@ export const useDashboardData = () => {
           .order('start_time', { ascending: false });
 
         if (error) throw error;
-        const episodesData = episodes as HeadacheEpisode[];
+        const allEpisodes = episodes as HeadacheEpisode[];
+        // Statistics use completed episodes only (shared rule); the in-progress one is shown separately
+        const episodesData = allEpisodes.filter(ep => ep.status === ANALYSIS_EPISODE_STATUS);
 
         // Fetch per-location data
         const episodeIds = episodesData.map(e => e.id);
@@ -46,7 +49,8 @@ export const useDashboardData = () => {
           const { data: locData } = await supabase
             .from('episode_locations')
             .select('*')
-            .in('episode_id', episodeIds);
+            .in('episode_id', episodeIds)
+            .is('deselected_at', null);
 
           if (locData && locData.length > 0) {
             const locationMap = new Map<string, { count: number; totalIntensity: number; intensityCount: number }>();
@@ -71,7 +75,7 @@ export const useDashboardData = () => {
         }
 
         // Calculate stats (same as before)
-        const lastEpisode = episodesData[0] || null;
+        const lastEpisode = allEpisodes[0] || null;
         const weeklyEpisodes = episodesData.filter(ep => new Date(ep.start_time) >= sevenDaysAgo);
         const weeklyCount = weeklyEpisodes.length;
 
@@ -111,7 +115,7 @@ export const useDashboardData = () => {
           avgDuration: Math.round(avgDuration),
           mostCommonTrigger,
           weeklyChartData,
-          recentEpisodes: episodesData.slice(0, 5),
+          recentEpisodes: allEpisodes.slice(0, 5),
           locationBreakdown,
         });
       } catch (error) {

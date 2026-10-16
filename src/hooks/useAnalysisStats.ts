@@ -1,3 +1,4 @@
+import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ export const useAnalysisStats = (daysRange: number = 30) => {
           .from('headache_episodes')
           .select('*')
           .eq('user_id', user.id)
+          .eq('status', ANALYSIS_EPISODE_STATUS)
           .gte('start_time', startDate.toISOString())
           .order('start_time', { ascending: false });
 

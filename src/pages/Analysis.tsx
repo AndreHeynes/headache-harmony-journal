@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { EpisodeRuleNote } from "@/components/common/EpisodeRuleNote";
 import { DateRange } from "react-day-picker";
 import { BarChart2, Plus, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -109,6 +110,7 @@ export default function Analysis() {
       </header>
       
       <DateRangeSelector onRangeChange={handleDateRangeChange} />
+      <EpisodeRuleNote className="mb-4" />
       
       {selectedInsight ? (
         <DetailedInsight 

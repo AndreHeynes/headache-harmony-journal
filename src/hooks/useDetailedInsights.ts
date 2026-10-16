@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeadacheEpisode } from '@/types/episode';
+import { fetchAnalysisData, AnalysisUnit, extractTreatmentNames, addOutcome, effectivenessRate, OutcomeCounts } from '@/lib/analysis';
 import { format, parseISO, getMonth } from 'date-fns';
 
 interface PainAreaEntry { name: string; value: number }
@@ -43,21 +44,18 @@ function parseTimingHours(raw: string): number | null {
 export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): DetailedInsightsData => {
   const { user } = useAuth();
   const [episodes, setEpisodes] = useState<HeadacheEpisode[]>([]);
+  const [units, setUnits] = useState<AnalysisUnit[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
     const fetch = async () => {
       try {
-        let q = supabase
-          .from('headache_episodes')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('start_time', { ascending: true });
-        if (dateRange?.from) q = q.gte('start_time', dateRange.from.toISOString());
-        if (dateRange?.to) q = q.lte('start_time', dateRange.to.toISOString());
-        const { data } = await q;
-        setEpisodes((data as HeadacheEpisode[]) || []);
+        const r = await fetchAnalysisData(user.id, dateRange);
+        setEpisodes(r.episodes);
+        setUnits(r.units);
+      } catch (e) {
+        console.error('Error loading insights:', e);
       } finally { setLoading(false); }
     };
     fetch();
@@ -78,7 +76,11 @@ export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): Detai
 
     // --- Pain Area Distribution ---
     const locMap = new Map<string, number>();
+    // Per-area rows when present; legacy episodes fall back to the pain_location text
+    units.forEach(u => { if (u.location_name) locMap.set(u.location_name, (locMap.get(u.location_name) || 0) + 1); });
+    const episodesWithAreas = new Set(units.filter(u => u.location_name).map(u => u.episodeId));
     episodes.forEach(ep => {
+      if (episodesWithAreas.has(ep.id)) return;
       const loc = ep.pain_location;
       if (!loc) return;
       // Strip spread annotation e.g. "(remain)" 
@@ -135,23 +137,24 @@ export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): Detai
       .slice(0, 8);
 
     // --- Triggers ---
-    const trigMap = new Map<string, { count: number; totalPain: number; hoursVals: number[] }>();
-    const avgPain = episodes.reduce((s, e) => s + (e.pain_intensity || 0), 0) / total;
-    episodes.forEach(ep => {
+    const trigMap = new Map<string, { eps: Set<string>; pains: number[]; hoursVals: number[] }>();
+    const painUnits = units.filter(u => u.pain_intensity != null);
+    const avgPain = painUnits.length ? painUnits.reduce((s, u) => s + (u.pain_intensity || 0), 0) / painUnits.length : 0;
+    units.forEach(ep => {
       (ep.triggers || []).forEach(raw => {
         const name = raw.replace(/\s*\(\d+(?:\.\d+)?h?\s*before\)/i, '').replace(/\s*\[\d+\s*min\]/i, '').trim();
         const hours = parseTimingHours(raw);
-        const e = trigMap.get(name) || { count: 0, totalPain: 0, hoursVals: [] };
-        e.count++;
-        e.totalPain += ep.pain_intensity || 0;
+        const e = trigMap.get(name) || { eps: new Set<string>(), pains: [], hoursVals: [] };
+        e.eps.add(ep.episodeId);
+        if (ep.pain_intensity != null) e.pains.push(ep.pain_intensity);
         if (hours !== null) e.hoursVals.push(hours);
         trigMap.set(name, e);
       });
     });
     const triggerData = Array.from(trigMap.entries())
       .map(([name, d]) => {
-        const avgP = d.count > 0 ? d.totalPain / d.count : 0;
-        return { name, count: d.count, correlationScore: avgPain > 0 ? Math.round((avgP / avgPain) * 100) / 100 : 1 };
+        const avgP = d.pains.length > 0 ? d.pains.reduce((a, b) => a + b, 0) / d.pains.length : 0;
+        return { name, count: d.eps.size, correlationScore: avgPain > 0 ? Math.round((avgP / avgPain) * 100) / 100 : 1 };
       })
       .sort((a, b) => b.correlationScore - a.correlationScore)
       .slice(0, 8);
@@ -168,26 +171,19 @@ export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): Detai
     const topTriggerScore = triggerData.length > 0 ? triggerData[0].correlationScore : 0;
 
     // --- Treatment ---
-    const txMap = new Map<string, { count: number; effective: number }>();
-    episodes.forEach(ep => {
-      const t = ep.treatment as any;
-      if (!t) return;
-      const treatments: string[] = Array.isArray(t) ? t : t.medications ? t.medications : t.type ? [t.type] : [];
-      const outcome = ep.treatment_outcome || t?.treatment_outcome;
-      treatments.forEach(name => {
-        const e = txMap.get(name) || { count: 0, effective: 0 };
-        e.count++;
-        if (outcome === 'effective') e.effective++;
-        else if (outcome === 'partially_effective') e.effective += 0.5;
-        else if (!outcome && (ep.duration_minutes || 0) < 120) e.effective++;
-        txMap.set(name, e);
+    // Per-area treatment ratings; uses with no recorded outcome are excluded from the rate
+    const txMap = new Map<string, OutcomeCounts>();
+    units.forEach(u => {
+      extractTreatmentNames(u.treatment).forEach(name => {
+        const c = txMap.get(name) || { effective: 0, partial: 0, notEffective: 0 };
+        addOutcome(c, u.treatment_outcome);
+        txMap.set(name, c);
       });
     });
     const treatmentData = Array.from(txMap.entries())
-      .map(([name, d]) => {
-        const rate = d.count > 0 ? Math.round((d.effective / d.count) * 100) : 0;
-        return { name, effective: rate, ineffective: 100 - rate };
-      })
+      .map(([name, c]) => ({ name, rate: effectivenessRate(c) }))
+      .filter((x): x is { name: string; rate: number } => x.rate !== null)
+      .map(({ name, rate }) => ({ name, effective: rate, ineffective: 100 - rate }))
       .sort((a, b) => b.effective - a.effective)
       .slice(0, 6);
 
@@ -206,19 +202,14 @@ export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): Detai
     const neckAssociatedPercent = total > 0 ? Math.round((neckEpisodes.length / total) * 100) : 0;
 
     // Neck vs non-neck treatment effectiveness
-    const calcRate = (eps: HeadacheEpisode[]) => {
-      let eff = 0, tot = 0;
-      eps.forEach(ep => {
-        const outcome = ep.treatment_outcome || (ep.treatment as any)?.treatment_outcome;
-        if (!outcome) return;
-        tot++;
-        if (outcome === 'effective') eff++;
-        else if (outcome === 'partially_effective') eff += 0.5;
-      });
-      return tot > 0 ? Math.round((eff / tot) * 100) : 0;
+    const neckIds = new Set(neckEpisodes.map(e => e.id));
+    const calcRate = (us: AnalysisUnit[]) => {
+      const c: OutcomeCounts = { effective: 0, partial: 0, notEffective: 0 };
+      us.forEach(u => addOutcome(c, u.treatment_outcome));
+      return effectivenessRate(c) ?? 0;
     };
-    const neckWithTreatmentRate = calcRate(neckEpisodes);
-    const neckWithoutTreatmentRate = calcRate(nonNeckEpisodes);
+    const neckWithTreatmentRate = calcRate(units.filter(u => neckIds.has(u.episodeId)));
+    const neckWithoutTreatmentRate = calcRate(units.filter(u => !neckIds.has(u.episodeId)));
 
     // Neck pain over time (weekly bins)
     const neckByWeek = new Map<string, { totalIntensity: number; count: number }>();
@@ -242,5 +233,5 @@ export const useDetailedInsights = (dateRange?: { from: Date; to: Date }): Detai
       avgReliefMinutes, bestTreatmentName, bestTreatmentRate,
       loading, hasData: true,
     };
-  }, [episodes, loading]);
+  }, [episodes, units, loading]);
 };

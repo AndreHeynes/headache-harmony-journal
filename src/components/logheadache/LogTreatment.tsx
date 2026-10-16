@@ -99,6 +99,12 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
     await persistUpdate({ treatment: updatedTreatment, treatment_outcome: outcome });
   };
 
+  const handleClassificationsChange = async (classifications: string[]) => {
+    const updatedTreatment = { ...treatmentData, classifications };
+    setTreatmentData(updatedTreatment);
+    await persistUpdate({ treatment: updatedTreatment });
+  };
+
   const handleSaveTreatment = async () => {
     const fullTreatment = {
       ...treatmentData,
@@ -166,7 +172,10 @@ export default function LogTreatment({ episodeId }: LogTreatmentProps) {
           </TreatmentSection>
           
           <TreatmentSection title="Treatment Classification">
-            <ClassificationSection />
+            <ClassificationSection
+              value={Array.isArray(treatmentData?.classifications) ? treatmentData.classifications : []}
+              onChange={handleClassificationsChange}
+            />
           </TreatmentSection>
           
           <TreatmentSection title="Additional Notes" isLast={true}>

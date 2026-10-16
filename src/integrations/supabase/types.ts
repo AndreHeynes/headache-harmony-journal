@@ -62,9 +62,11 @@ export type Database = {
       episode_locations: {
         Row: {
           created_at: string
+          deselected_at: string | null
           episode_id: string
           id: string
           is_origin: boolean
+          location_key: string | null
           location_name: string
           notes: string | null
           pain_intensity: number | null
@@ -80,9 +82,11 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deselected_at?: string | null
           episode_id: string
           id?: string
           is_origin?: boolean
+          location_key?: string | null
           location_name: string
           notes?: string | null
           pain_intensity?: number | null
@@ -98,9 +102,11 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deselected_at?: string | null
           episode_id?: string
           id?: string
           is_origin?: boolean
+          location_key?: string | null
           location_name?: string
           notes?: string | null
           pain_intensity?: number | null

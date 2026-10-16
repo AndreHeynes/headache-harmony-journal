@@ -1,3 +1,4 @@
+import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,6 +50,7 @@ export const usePatientProfile = () => {
           .from('headache_episodes')
           .select('start_time')
           .eq('user_id', user.id)
+          .eq('status', ANALYSIS_EPISODE_STATUS)
           .order('start_time', { ascending: true });
 
         const firstDataDate = episodeData && episodeData.length > 0 
