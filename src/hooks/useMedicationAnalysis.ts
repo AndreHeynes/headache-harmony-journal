@@ -224,7 +224,7 @@ export const useMedicationAnalysis = () => {
       mostEffectiveMedication,
       leastSideEffectsMedication,
     };
-  }, [episodes]);
+  }, [episodes, units]);
 
   return {
     ...analysisData,
