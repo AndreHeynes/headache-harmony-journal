@@ -1,3 +1,4 @@
+import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,7 +48,7 @@ export function useExportData() {
             .from('headache_episodes')
             .select('*')
             .eq('user_id', user.id)
-            .eq('status', 'completed')
+            .eq('status', ANALYSIS_EPISODE_STATUS)
             .order('start_time', { ascending: false }),
           supabase
             .from('red_flags')
@@ -66,7 +67,8 @@ export function useExportData() {
           const { data: locData, error: locError } = await supabase
             .from('episode_locations')
             .select('*')
-            .in('episode_id', episodeIds);
+            .in('episode_id', episodeIds)
+            .is('deselected_at', null);
 
           if (!locError && locData) {
             const grouped: Record<string, any[]> = {};
