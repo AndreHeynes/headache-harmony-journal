@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import SkullViewer from "../SkullViewer";
 import { PainSpreadSelector } from "./pain-location/PainSpreadSelector";
 import { useEpisode } from "@/contexts/EpisodeContext";
 import { useLocations } from "@/contexts/LocationContext";
-import { SKULL_HOTSPOTS } from "../skull-viewer/skull-hotspots";
+import { getAreaLabel, areaKeyFromLabel } from "../skull-viewer/skull-hotspots";
 
 interface LogPainLocationProps {
   episodeId?: string | null;
@@ -13,53 +13,40 @@ interface LogPainLocationProps {
 export default function LogPainLocation({ episodeId }: LogPainLocationProps) {
   const [painSpreads, setPainSpreads] = useState(false);
   const [spreadPattern, setSpreadPattern] = useState("remain");
-  const [selectedLocationNames, setSelectedLocationNames] = useState<string[]>([]);
-  const { updateEpisode, activeEpisode } = useEpisode();
-  const { createLocationsForEpisode } = useLocations();
+  const { updateEpisode } = useEpisode();
+  const { locations, syncLocationsForEpisode } = useLocations();
+  const [selectedKeys, setSelectedKeys] = useState<string[] | null>(null);
 
-  // Load existing pain location
-  useEffect(() => {
-    if (activeEpisode?.pain_location) {
-      const names = activeEpisode.pain_location.split(', ').filter(Boolean);
-      setSelectedLocationNames(names);
-    }
-  }, [activeEpisode]);
+  // Saved selection (stable keys; legacy rows fall back to name lookup)
+  const savedKeys = useMemo(
+    () =>
+      locations
+        .map((l) => l.location_key || areaKeyFromLabel(l.location_name))
+        .filter((k): k is string => !!k),
+    [locations]
+  );
+  const currentKeys = selectedKeys ?? savedKeys;
+  const selectedNames = currentKeys.map(getAreaLabel);
 
-  const handleLocationChange = async (locationString: string) => {
-    // locationString is comma-separated hotspot IDs from SkullViewer
-    const ids = locationString.split(', ').filter(Boolean);
-    
-    // Map hotspot IDs to readable names
-    const names = ids.map(id => {
-      const hotspot = SKULL_HOTSPOTS.find(h => h.id === id);
-      return hotspot?.title || id;
+  const buildLocationString = (names: string[], spreads: boolean, pattern: string) =>
+    spreads ? `${names.join(", ")} (${pattern})` : names.join(", ");
+
+  const handleSelectionChange = async (keys: string[]) => {
+    setSelectedKeys(keys);
+    if (!episodeId) return;
+    const areas = keys.map((key) => ({ key, name: getAreaLabel(key) }));
+    // Episode-level text kept for backward compatibility with older screens
+    await updateEpisode(episodeId, {
+      pain_location: buildLocationString(areas.map((a) => a.name), painSpreads, spreadPattern),
     });
-    
-    setSelectedLocationNames(names);
-
-    if (episodeId) {
-      // Save the combined string to the episode for backward compatibility
-      const fullLocation = painSpreads 
-        ? `${names.join(', ')} (${spreadPattern})`
-        : names.join(', ');
-      await updateEpisode(episodeId, { pain_location: fullLocation });
-
-      // Create individual location records
-      if (names.length > 0) {
-        await createLocationsForEpisode(episodeId, names);
-      }
-    }
+    await syncLocationsForEpisode(episodeId, areas);
   };
 
   const handleSpreadChange = async (spreads: boolean, pattern: string) => {
     setPainSpreads(spreads);
     setSpreadPattern(pattern);
-    
-    if (episodeId && selectedLocationNames.length > 0) {
-      const fullLocation = spreads 
-        ? `${selectedLocationNames.join(', ')} (${pattern})`
-        : selectedLocationNames.join(', ');
-      await updateEpisode(episodeId, { pain_location: fullLocation });
+    if (episodeId && selectedNames.length > 0) {
+      await updateEpisode(episodeId, { pain_location: buildLocationString(selectedNames, spreads, pattern) });
     }
   };
 
@@ -71,12 +58,12 @@ export default function LogPainLocation({ episodeId }: LogPainLocationProps) {
           <p className="text-sm text-muted-foreground">
             Click on the skull diagram to mark your pain locations. You can select multiple areas — each will have its own intensity, symptoms, and triggers in the following steps.
           </p>
-          <SkullViewer onLocationSelect={handleLocationChange} />
-          
-          {selectedLocationNames.length > 1 && (
+          <SkullViewer onSelectionChange={handleSelectionChange} initialSelection={savedKeys} />
+
+          {selectedNames.length > 1 && (
             <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
               <p className="text-sm text-primary font-medium">
-                {selectedLocationNames.length} locations selected — you'll provide details for each in the next steps.
+                {selectedNames.length} locations selected — you'll provide details for each in the next steps.
               </p>
             </div>
           )}
@@ -85,11 +72,11 @@ export default function LogPainLocation({ episodeId }: LogPainLocationProps) {
 
       <Card className="bg-card border-border backdrop-blur-sm">
         <div className="p-4 space-y-4">
-          <PainSpreadSelector 
-            painSpreads={painSpreads} 
-            setPainSpreads={(spreads) => handleSpreadChange(spreads, spreadPattern)} 
-            spreadPattern={spreadPattern} 
-            setSpreadPattern={(pattern) => handleSpreadChange(painSpreads, pattern)} 
+          <PainSpreadSelector
+            painSpreads={painSpreads}
+            setPainSpreads={(spreads) => handleSpreadChange(spreads, spreadPattern)}
+            spreadPattern={spreadPattern}
+            setSpreadPattern={(pattern) => handleSpreadChange(painSpreads, pattern)}
           />
         </div>
       </Card>
