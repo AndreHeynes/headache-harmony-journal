@@ -9,6 +9,10 @@ export interface Hotspot {
   description: string;
   view: 'front' | 'side' | 'back';
   zIndex?: number;
+  /** Stable area ID on the patient's own side (e.g. temple_left). */
+  areaKey: string;
+  /** Side-view hotspots: final key gets the chosen side appended (e.g. jaw_left). */
+  sided?: boolean;
 }
 
 export type SkullView = 'front' | 'side' | 'back';
@@ -21,23 +25,25 @@ export const SKULL_IMAGES = {
 
 export const SKULL_HOTSPOTS: Hotspot[] = [
   // FRONT
-  { id: 'front-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'A horizontal band across the forehead.', view: 'front' },
-  { id: 'front-forehead-middle', x: 50, y: 40, size: 14, title: 'Middle of the Forehead', description: 'Central point above the eyebrows.', view: 'front' },
-  { id: 'front-forehead-left', x: 32, y: 40, size: 12, title: 'Right Forehead', description: 'Right section of the forehead.', view: 'front' },
-  { id: 'front-eye-left', x: 30, y: 50, size: 18, title: 'Right Eye', description: 'Right eye socket.', view: 'front' },
-  { id: 'front-forehead-right', x: 68, y: 40, size: 12, title: 'Left Forehead', description: 'Left section of the forehead.', view: 'front' },
-  { id: 'front-eye-right', x: 70, y: 50, size: 18, title: 'Left Eye', description: 'Left eye socket.', view: 'front' },
-  { id: 'front-temple-left', x: 8, y: 36, size: 15, title: 'Right Temple', description: 'Right temple area.', view: 'front' },
-  { id: 'front-temple-right', x: 92, y: 36, size: 15, title: 'Left Temple', description: 'Left temple area.', view: 'front' },
-  { id: 'front-half-face-left', x: 32, y: 55, size: 65, title: 'Right Half of Face', description: 'Entire right half of the face.', view: 'front' },
-  { id: 'front-half-face-right', x: 70, y: 55, size: 65, title: 'Left Half of Face', description: 'Entire left half of the face.', view: 'front' },
-  { id: 'front-upper-sinus-left', x: 43, y: 50, size: 8, title: 'Right Upper Sinus', description: 'Upper sinus on the right.', view: 'front' },
-  { id: 'front-upper-sinus-right', x: 57, y: 50, size: 8, title: 'Left Upper Sinus', description: 'Upper sinus on the left.', view: 'front' },
-  { id: 'front-lower-sinus-left', x: 42, y: 57, size: 7, title: 'Right Lower Sinus', description: 'Lower sinus on the right.', view: 'front' },
-  { id: 'front-lower-sinus-right', x: 58, y: 58, size: 7, title: 'Left Lower Sinus', description: 'Lower sinus on the left.', view: 'front' },
+  { id: 'front-pressure-band', areaKey: 'pressure_band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'A horizontal band across the forehead.', view: 'front' },
+  { id: 'front-forehead-middle', areaKey: 'forehead_center', x: 50, y: 40, size: 14, title: 'Middle of the Forehead', description: 'Central point above the eyebrows.', view: 'front' },
+  { id: 'front-forehead-left', areaKey: 'forehead_right', x: 32, y: 40, size: 12, title: 'Right Forehead', description: 'Right section of the forehead.', view: 'front' },
+  { id: 'front-eye-left', areaKey: 'eye_right', x: 30, y: 50, size: 18, title: 'Right Eye', description: 'Right eye socket.', view: 'front' },
+  { id: 'front-forehead-right', areaKey: 'forehead_left', x: 68, y: 40, size: 12, title: 'Left Forehead', description: 'Left section of the forehead.', view: 'front' },
+  { id: 'front-eye-right', areaKey: 'eye_left', x: 70, y: 50, size: 18, title: 'Left Eye', description: 'Left eye socket.', view: 'front' },
+  { id: 'front-temple-left', areaKey: 'temple_right', x: 8, y: 36, size: 15, title: 'Right Temple', description: 'Right temple area.', view: 'front' },
+  { id: 'front-temple-right', areaKey: 'temple_left', x: 92, y: 36, size: 15, title: 'Left Temple', description: 'Left temple area.', view: 'front' },
+  { id: 'front-half-face-left', areaKey: 'half_face_right', x: 32, y: 55, size: 65, title: 'Right Half of Face', description: 'Entire right half of the face.', view: 'front' },
+  { id: 'front-half-face-right', areaKey: 'half_face_left', x: 70, y: 55, size: 65, title: 'Left Half of Face', description: 'Entire left half of the face.', view: 'front' },
+  { id: 'front-upper-sinus-left', areaKey: 'upper_sinus_right', x: 43, y: 50, size: 8, title: 'Right Upper Sinus', description: 'Upper sinus on the right.', view: 'front' },
+  { id: 'front-upper-sinus-right', areaKey: 'upper_sinus_left', x: 57, y: 50, size: 8, title: 'Left Upper Sinus', description: 'Upper sinus on the left.', view: 'front' },
+  { id: 'front-lower-sinus-left', areaKey: 'lower_sinus_right', x: 42, y: 57, size: 7, title: 'Right Lower Sinus', description: 'Lower sinus on the right.', view: 'front' },
+  { id: 'front-lower-sinus-right', areaKey: 'lower_sinus_left', x: 58, y: 58, size: 7, title: 'Left Lower Sinus', description: 'Lower sinus on the left.', view: 'front' },
   // SIDE
   {
     id: 'side-temple',
+    areaKey: 'temple',
+    sided: true,
     x: 50,
     y: 50,
     size: 22,
@@ -47,6 +53,8 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'side-back-head',
+    areaKey: 'parietal',
+    sided: true,
     x: 75,
     y: 30,
     size: 25,
@@ -56,6 +64,8 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'side-jaw',
+    areaKey: 'jaw',
+    sided: true,
     x: 42,
     y: 75,
     size: 20,
@@ -65,6 +75,8 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'side-neck',
+    areaKey: 'occipital',
+    sided: true,
     x: 80,
     y: 68,
     size: 18,
@@ -74,6 +86,7 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
   },
   {
     id: 'side-pressure-band',
+    areaKey: 'pressure_band',
     x: 50,
     y: 30,
     size: 75,
@@ -82,10 +95,45 @@ export const SKULL_HOTSPOTS: Hotspot[] = [
     view: 'side',
   },
   // BACK
-  { id: 'back-occiput', x: 50, y: 55, size: 28, title: 'Occipital Area', description: 'Center occipital region.', view: 'back' },
-  { id: 'back-top', x: 50, y: 20, size: 19, title: 'Crown of Head', description: 'Top/crown of the skull.', view: 'back' },
-  { id: 'back-base', x: 50, y: 95, size: 18, title: 'Base of Head', description: 'Base of the skull (nape area).', view: 'back' },
-  { id: 'back-occiput-left', x: 28, y: 57, size: 13, title: 'Left Occipital Area', description: 'Left side of the occiput.', view: 'back' },
-  { id: 'back-occiput-right', x: 72, y: 57, size: 13, title: 'Right Occipital Area', description: 'Right side of the occiput.', view: 'back' },
-  { id: 'back-pressure-band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'Horizontal pressure band from the back view.', view: 'back' },
+  { id: 'back-occiput', areaKey: 'occipital_center', x: 50, y: 55, size: 28, title: 'Occipital Area', description: 'Center occipital region.', view: 'back' },
+  { id: 'back-top', areaKey: 'crown', x: 50, y: 20, size: 19, title: 'Crown of Head', description: 'Top/crown of the skull.', view: 'back' },
+  { id: 'back-base', areaKey: 'skull_base', x: 50, y: 95, size: 18, title: 'Base of Head', description: 'Base of the skull (nape area).', view: 'back' },
+  { id: 'back-occiput-left', areaKey: 'occipital_left', x: 28, y: 57, size: 13, title: 'Left Occipital Area', description: 'Left side of the occiput.', view: 'back' },
+  { id: 'back-occiput-right', areaKey: 'occipital_right', x: 72, y: 57, size: 13, title: 'Right Occipital Area', description: 'Right side of the occiput.', view: 'back' },
+  { id: 'back-pressure-band', areaKey: 'pressure_band', x: 50, y: 30, size: 75, title: 'Pressure Band', description: 'Horizontal pressure band from the back view.', view: 'back' },
 ];
+
+/** Resolve the stable area key for a hotspot, using the chosen side for side-view areas. */
+export function resolveAreaKey(hotspot: Hotspot, side: 'left' | 'right'): string {
+  return hotspot.sided ? `${hotspot.areaKey}_${side}` : hotspot.areaKey;
+}
+
+const SIDED_BASE_LABELS: Record<string, string> = {
+  temple: 'Temple',
+  parietal: 'Parietal',
+  jaw: 'Jaw',
+  occipital: 'Occipital Area',
+};
+
+/** Human-readable label for a stable area key. */
+export function getAreaLabel(key: string): string {
+  const direct = SKULL_HOTSPOTS.find((h) => !h.sided && h.areaKey === key);
+  if (direct) return direct.title;
+  const m = key.match(/^(.+)_(left|right)$/);
+  if (m && SIDED_BASE_LABELS[m[1]]) {
+    return `${m[2] === 'left' ? 'Left' : 'Right'} ${SIDED_BASE_LABELS[m[1]]}`;
+  }
+  return key;
+}
+
+/** Best-effort key for a legacy row that only stored a name. Returns null when ambiguous. */
+export function areaKeyFromLabel(label: string): string | null {
+  const h = SKULL_HOTSPOTS.find((x) => !x.sided && x.title === label);
+  if (h) return h.areaKey;
+  const m = label.match(/^(Left|Right) (.+)$/);
+  if (m) {
+    const base = Object.entries(SIDED_BASE_LABELS).find(([, l]) => l === m[2])?.[0];
+    if (base) return `${base}_${m[1].toLowerCase()}`;
+  }
+  return null;
+}
