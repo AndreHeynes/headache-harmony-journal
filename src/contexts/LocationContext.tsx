@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { toast } from 'sonner';
@@ -79,7 +79,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
    * - newly selected areas get a new row (or a previously unselected row is restored)
    * - unselected areas are marked deselected_at so their data comes back if reselected
    */
-  const syncLocationsForEpisode = useCallback(async (episodeId: string, areas: Array<{ key: string; name: string }>) => {
+  const runSync = useCallback(async (episodeId: string, areas: Array<{ key: string; name: string }>) => {
     if (!user) return;
 
     try {
@@ -164,6 +164,13 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
       toast.error('Failed to save pain locations');
     }
   }, [user]);
+
+  // Serialize saves so quick taps on the skull can't create duplicate rows
+  const syncQueue = useRef<Promise<void>>(Promise.resolve());
+  const syncLocationsForEpisode = useCallback((episodeId: string, areas: Array<{ key: string; name: string }>) => {
+    syncQueue.current = syncQueue.current.then(() => runSync(episodeId, areas));
+    return syncQueue.current;
+  }, [runSync]);
 
   const updateLocation = useCallback(async (locationId: string, updates: Partial<EpisodeLocation>) => {
     try {
