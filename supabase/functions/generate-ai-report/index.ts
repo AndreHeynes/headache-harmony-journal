@@ -66,19 +66,68 @@ function liftStrength(lift: number, n: number): "Strong" | "Moderate" | "Weak" |
   return "Weak";
 }
 
-function computeStats(episodes: Episode[], health: HealthRow[]) {
+interface AreaRow {
+  episode_id: string;
+  location_name: string;
+  location_key: string | null;
+  pain_intensity: number | null;
+  symptoms: string[] | null;
+  triggers: string[] | null;
+  treatment: any;
+  treatment_timing: string | null;
+  treatment_outcome: string | null;
+}
+
+const nonEmpty = (a: any) => Array.isArray(a) && a.length > 0;
+const hasTx = (t: any) => t && (typeof t !== "object" || Object.keys(t).length > 0);
+
+// One unit per selected area for multi-area episodes (area value, else episode value);
+// single-area episodes use episode values with the area row as fallback.
+function buildUnits(episodes: Episode[], areas: AreaRow[]): Episode[] {
+  const by = new Map<string, AreaRow[]>();
+  areas.forEach(a => by.set(a.episode_id, [...(by.get(a.episode_id) || []), a]));
+  const out: Episode[] = [];
+  episodes.forEach(ep => {
+    const locs = by.get(ep.id) || [];
+    if (locs.length <= 1) {
+      const l = locs[0];
+      out.push({
+        ...ep,
+        pain_intensity: ep.pain_intensity ?? l?.pain_intensity ?? null,
+        triggers: nonEmpty(ep.triggers) ? ep.triggers : l?.triggers ?? [],
+        treatment: hasTx(ep.treatment) ? ep.treatment : l?.treatment ?? null,
+        treatment_outcome: ep.treatment_outcome || l?.treatment_outcome || ep.treatment?.treatment_outcome || null,
+        treatment_timing: ep.treatment_timing || l?.treatment_timing || null,
+      });
+      return;
+    }
+    locs.forEach(l => out.push({
+      ...ep,
+      pain_location: l.location_name,
+      pain_intensity: l.pain_intensity ?? ep.pain_intensity,
+      triggers: nonEmpty(l.triggers) ? l.triggers : ep.triggers,
+      treatment: hasTx(l.treatment) ? l.treatment : ep.treatment,
+      treatment_outcome: l.treatment_outcome || l.treatment?.treatment_outcome || ep.treatment_outcome,
+      treatment_timing: l.treatment_timing || ep.treatment_timing,
+    }));
+  });
+  return out;
+}
+
+function computeStats(episodes: Episode[], health: HealthRow[], units: Episode[] = episodes) {
   const total = episodes.length;
   const HIGH_PAIN = 7;
-  const baseHigh = episodes.filter(e => (e.pain_intensity ?? 0) >= HIGH_PAIN).length / Math.max(total, 1);
+  const baseHigh = units.filter(e => (e.pain_intensity ?? 0) >= HIGH_PAIN).length / Math.max(units.length, 1);
 
   // Trigger correlations
-  const trigMap = new Map<string, { n: number; high: number; pains: number[]; durations: number[] }>();
-  episodes.forEach(ep => {
+  const trigMap = new Map<string, { n: number; eps: Set<string>; high: number; pains: number[]; durations: number[] }>();
+  units.forEach(ep => {
     (ep.triggers || []).forEach(raw => {
       const name = clean(raw);
       if (!name) return;
-      const e = trigMap.get(name) || { n: 0, high: 0, pains: [], durations: [] };
+      const e = trigMap.get(name) || { n: 0, eps: new Set<string>(), high: 0, pains: [], durations: [] };
       e.n++;
+      e.eps.add(ep.id);
       if ((ep.pain_intensity ?? 0) >= HIGH_PAIN) e.high++;
       if (ep.pain_intensity != null) e.pains.push(ep.pain_intensity);
       if (ep.duration_minutes != null) e.durations.push(ep.duration_minutes);
@@ -91,7 +140,8 @@ function computeStats(episodes: Episode[], health: HealthRow[]) {
       const lift = baseHigh > 0 ? Math.round((pHigh / baseHigh) * 100) / 100 : 1;
       return {
         name,
-        occurrences: d.n,
+        occurrences: d.eps.size,
+        area_reports: d.n,
         avg_pain: d.pains.length ? Math.round((d.pains.reduce((a, b) => a + b, 0) / d.pains.length) * 10) / 10 : 0,
         avg_duration_min: d.durations.length ? Math.round(d.durations.reduce((a, b) => a + b, 0) / d.durations.length) : 0,
         lift,
@@ -133,7 +183,7 @@ function computeStats(episodes: Episode[], health: HealthRow[]) {
     n: number; effective: number; partial: number; not_effective: number;
     durations: number[]; sideEffects: Map<string, number>;
   }>();
-  episodes.forEach(ep => {
+  units.forEach(ep => {
     const t = ep.treatment;
     if (!t) return;
     let names: string[] = [];
@@ -152,7 +202,8 @@ function computeStats(episodes: Episode[], health: HealthRow[]) {
       e.n++;
       if (outcome === "effective") e.effective++;
       else if (outcome === "partially_effective") e.partial++;
-      else if (outcome === "not_effective") e.not_effective++;
+      else if (outcome === "not_effective" || outcome === "worsened") e.not_effective++;
+      // blank outcome: counted as a use but excluded from the effectiveness rate
       if (ep.duration_minutes != null) e.durations.push(ep.duration_minutes);
       sideEffects.forEach(se => e.sideEffects.set(se, (e.sideEffects.get(se) || 0) + 1));
       txMap.set(name, e);
@@ -233,7 +284,7 @@ function computeStats(episodes: Episode[], health: HealthRow[]) {
 
   // Timing analysis (early treatment)
   const earlyVsLate = { early: [] as number[], late: [] as number[] };
-  episodes.forEach(ep => {
+  units.forEach(ep => {
     if (!ep.treatment_timing || ep.duration_minutes == null) return;
     const m = ep.treatment_timing.match(/(\d+)/);
     if (!m) return;
@@ -298,17 +349,25 @@ Deno.serve(async (req) => {
     const toIso: string = body.to ?? new Date().toISOString();
 
     const [{ data: episodes }, { data: health }, { data: redFlags }] = await Promise.all([
-      supabase.from("headache_episodes").select("*").eq("user_id", userId).gte("start_time", fromIso).lte("start_time", toIso).order("start_time", { ascending: true }),
+      supabase.from("headache_episodes").select("*").eq("user_id", userId).eq("status", "completed").gte("start_time", fromIso).lte("start_time", toIso).order("start_time", { ascending: true }),
       supabase.from("unified_health_data").select("date,data_type,sleep_duration_minutes,sleep_quality_score,menstrual_phase").eq("user_id", userId).gte("date", fromIso.slice(0, 10)).lte("date", toIso.slice(0, 10)),
       supabase.from("red_flags").select("flag_type,priority_level,acknowledged,created_at").eq("user_id", userId).gte("created_at", fromIso).lte("created_at", toIso),
     ]);
 
     const eps = (episodes ?? []) as Episode[];
     if (eps.length === 0) {
-      return new Response(JSON.stringify({ error: "No headache episodes in selected range." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "No completed headache episodes in selected range." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const stats = computeStats(eps, (health ?? []) as HealthRow[]);
+    const { data: areaRows } = await supabase
+      .from("episode_locations")
+      .select("episode_id,location_name,location_key,pain_intensity,symptoms,triggers,treatment,treatment_timing,treatment_outcome")
+      .eq("user_id", userId)
+      .is("deselected_at", null)
+      .in("episode_id", eps.map(e => e.id));
+    const units = buildUnits(eps, (areaRows ?? []) as AreaRow[]);
+
+    const stats = computeStats(eps, (health ?? []) as HealthRow[], units);
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
