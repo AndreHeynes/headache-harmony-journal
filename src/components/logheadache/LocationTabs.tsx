@@ -1,6 +1,7 @@
 import { useLocations } from '@/contexts/LocationContext';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin } from 'lucide-react';
+import { isOrigin } from '@/lib/analysis';
 
 export function LocationTabs() {
   const { locations, activeLocationId, setActiveLocationId } = useLocations();
@@ -21,7 +22,8 @@ export function LocationTabs() {
               value={loc.id}
               className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              {loc.location_name}
+              {loc.selection_order != null ? `${loc.selection_order} · ` : ''}{loc.location_name}
+              {isOrigin(loc) && <span className="ml-1 text-[10px] uppercase opacity-80">Origin</span>}
             </TabsTrigger>
           ))}
         </TabsList>

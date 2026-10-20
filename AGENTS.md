@@ -6,3 +6,4 @@
 - `episode_locations` rows are never deleted on reselection; unselected areas get `deselected_at` and are restored if reselected; queries must filter `deselected_at is null`; why: keep per-area details.
 - Effectiveness rate excludes uses with no recorded outcome; why: no guessing from duration.
 - Tests run with `bun run test` (vitest) in `src/**/__tests__`.
+- Area origin = `episode_locations.selection_order = 1` while selected; numbers are assigned by a DB insert trigger and locked on update (gaps kept, never renumbered); `is_origin` is written only for older readers; why: a stable per-episode spread order.

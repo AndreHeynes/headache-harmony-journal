@@ -11,6 +11,8 @@ export interface EpisodeLocation {
   location_key: string | null;
   deselected_at: string | null;
   is_origin: boolean;
+  selection_order: number | null;
+  first_selected_at: string | null;
   pain_intensity: number | null;
   symptoms: string[] | null;
   triggers: string[] | null;
@@ -61,7 +63,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
         .eq('episode_id', episodeId)
         .eq('user_id', user.id)
         .is('deselected_at', null)
-        .order('created_at', { ascending: true });
+        .order('selection_order', { ascending: true });
 
       if (error) throw error;
       setLocations((data as EpisodeLocation[]) || []);
@@ -133,17 +135,14 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
       if (toDeselect.length > 0) {
         await supabase
           .from('episode_locations')
-          .update({ deselected_at: now, is_origin: false })
+          .update({ deselected_at: now })
           .in('id', toDeselect);
       }
 
-      // Origin: keep the current origin if still selected, otherwise first selected area
-      const currentOrigin = existing.find(r => r.is_origin && selectedRowIds.includes(r.id) && !r.deselected_at);
-      const originId = currentOrigin?.id ?? selectedRowIds[0];
-      if (originId) {
-        await supabase.from('episode_locations').update({ is_origin: false }).eq('episode_id', episodeId).neq('id', originId);
-        await supabase.from('episode_locations').update({ is_origin: true }).eq('id', originId);
-      }
+      // Origin is derived from selection_order = 1 (assigned once by the database).
+      // is_origin is still written only for older readers.
+      await supabase.from('episode_locations').update({ is_origin: false }).eq('episode_id', episodeId).neq('selection_order', 1);
+      await supabase.from('episode_locations').update({ is_origin: true }).eq('episode_id', episodeId).eq('selection_order', 1).is('deselected_at', null);
 
       const { data: fresh, error: freshError } = await supabase
         .from('episode_locations')
@@ -151,7 +150,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
         .eq('episode_id', episodeId)
         .eq('user_id', user.id)
         .is('deselected_at', null)
-        .order('created_at', { ascending: true });
+        .order('selection_order', { ascending: true });
       if (freshError) throw freshError;
 
       const newLocations = (fresh as EpisodeLocation[]) || [];
