@@ -367,7 +367,42 @@ Deno.serve(async (req) => {
       .in("episode_id", eps.map(e => e.id));
     const units = buildUnits(eps, (areaRows ?? []) as AreaRow[]);
 
-    const stats = computeStats(eps, (health ?? []) as HealthRow[], units);
+    const stats: any = computeStats(eps, (health ?? []) as HealthRow[], units);
+
+    // Area order (mirrors src/lib/analysis.ts): origin = selection_order 1; unselected areas included
+    const { data: orderRows } = await supabase
+      .from("episode_locations")
+      .select("episode_id,location_name,location_key,selection_order,first_selected_at,pain_intensity,triggers,treatment_outcome")
+      .eq("user_id", userId)
+      .in("episode_id", eps.map(e => e.id));
+    {
+      const rows = (orderRows ?? []) as any[];
+      const epById = new Map(eps.map(e => [e.id, e as any]));
+      const firstCounts: Record<string, number> = {};
+      const ranks: Record<string, { count: number; pains: number[]; triggers: Record<string, number>; effective: number; partial: number; not_effective: number }> = {};
+      const times: Record<string, { a?: string; b?: string }> = {};
+      const med = (n: number[]) => { if (!n.length) return null; const s = [...n].sort((x, y) => x - y); const m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+      rows.forEach(r => {
+        const ep = epById.get(r.episode_id); if (!ep || r.selection_order == null) return;
+        if (r.selection_order === 1) firstCounts[r.location_name] = (firstCounts[r.location_name] || 0) + 1;
+        const k = r.selection_order === 1 ? "1st" : r.selection_order === 2 ? "2nd" : "later";
+        const g = ranks[k] ??= { count: 0, pains: [], triggers: {}, effective: 0, partial: 0, not_effective: 0 };
+        g.count++;
+        const p = r.pain_intensity ?? ep.pain_intensity; if (p != null) g.pains.push(p);
+        const tr = (r.triggers?.length ? r.triggers : ep.triggers) ?? [];
+        tr.forEach((t: string) => g.triggers[t] = (g.triggers[t] || 0) + 1);
+        const o = r.treatment_outcome || ep.treatment_outcome;
+        if (o === "effective") g.effective++; else if (o === "partially_effective") g.partial++; else if (o === "not_effective" || o === "worsened") g.not_effective++;
+        const t = times[r.episode_id] ??= {};
+        if (r.selection_order === 1) t.a = r.first_selected_at; if (r.selection_order === 2) t.b = r.first_selected_at;
+      });
+      const gaps = Object.values(times).filter(t => t.a && t.b).map(t => Math.max(0, Math.round((Date.parse(t.b!) - Date.parse(t.a!)) / 60000)));
+      stats.area_order = {
+        first_area_counts: firstCounts,
+        by_rank: Object.fromEntries(Object.entries(ranks).map(([k, g]) => [k, { sample_size: g.count, small_sample: g.count < 5, median_pain: med(g.pains), top_triggers: Object.entries(g.triggers).sort((a, b) => b[1] - a[1]).slice(0, 3), outcomes: { effective: g.effective, partial: g.partial, not_effective: g.not_effective } }])),
+        spread_minutes: { episodes: gaps.length, median: gaps.length >= 5 ? med(gaps) : null, gaps: gaps.length < 5 ? gaps : undefined, note: "time between logging areas, not pain onset" },
+      };
+    }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
@@ -381,7 +416,8 @@ Rules:
 - Always remind that correlation does not imply causation.
 - If sample size < 5 for any item, label as "insufficient data" and do not draw conclusions.
 - Be concise, clinical, and patient-friendly.
-- Quote exact numbers from the stats.`;
+- Quote exact numbers from the stats.
+- In pattern_insights, add a short "Area order" paragraph from stats.area_order (which area is usually first, how 1st/2nd/later areas differ, typical gap). Use counts, not percentages, for small samples.`;
 
     const userPrompt = `Statistics for the period ${fromIso} to ${toIso}:\n\n${JSON.stringify(stats, null, 2)}\n\nRed flag events: ${JSON.stringify(redFlags ?? [])}\n\nGenerate the report now.`;
 
