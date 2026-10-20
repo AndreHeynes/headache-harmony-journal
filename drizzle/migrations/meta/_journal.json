@@ -8,6 +8,13 @@
       "when": 1792171164188,
       "tag": "0000_episode_locations_stable_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792486364099,
+      "tag": "0001_episode_location_selection_order",
+      "breakpoints": true
     }
   ]
 }

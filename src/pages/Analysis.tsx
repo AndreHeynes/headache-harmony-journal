@@ -16,6 +16,7 @@ import { MedicationAnalysis } from "@/components/analysis/MedicationAnalysis";
 import { LifestyleAnalysis } from "@/components/analysis/LifestyleAnalysis";
 import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
+import { AreaOrderAnalysis } from "@/components/analysis/AreaOrderAnalysis";
 import { RedFlagHistory } from "@/components/analysis/RedFlagHistory";
 import BottomNav from "@/components/layout/BottomNav";
 import { useTestContext } from "@/contexts/TestContext";
@@ -125,6 +126,8 @@ export default function Analysis() {
           
           <PremiumInsights onCardClick={handleInsightCardClick} />
           
+          <AreaOrderAnalysis />
+
           <CorrelationAnalysis />
           
           <TrendComparison monthsToAnalyze={6} />
