@@ -17,6 +17,7 @@ import { usePatientProfile } from "@/hooks/usePatientProfile";
 import { format } from "date-fns";
 import type { ExportRedFlag } from "@/hooks/useExportData";
 import { summarizeSnoop } from "@/utils/snoopCriteria";
+import { canExport, sortAreas, areaPdfLines, csvAreaRows, CSV_AREA_HEADER, csvCell, type ExportArea } from "@/lib/exportFormat";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -35,6 +36,7 @@ interface HeadacheRecord {
   triggers?: string[];
   treatments?: string[];
   notes?: string;
+  areas?: ExportArea[];
 }
 
 // Sample data for demo/testing purposes
@@ -81,11 +83,17 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const { profile } = usePatientProfile();
   
-  // Use demo data only if no real data provided
-  const exportData = headacheData && headacheData.length > 0 ? headacheData : demoHeadacheData;
-  const isUsingDemoData = !headacheData || headacheData.length === 0;
+  // Real data only for files; sample records are for the on-screen preview layout only
+  const exportData: HeadacheRecord[] = headacheData ?? [];
+  const isUsingDemoData = !loading && exportData.length === 0;
+  const previewData = isUsingDemoData ? demoHeadacheData : exportData;
+  const exportAllowed = canExport(exportData.length, loading);
 
   const handleExportRequest = () => {
+    if (!canExport(exportData.length, loading)) {
+      toast.error("Export unavailable", { description: "Finish logging at least one headache (all steps) to download your report." });
+      return;
+    }
     // Validate user session
     if (!validateUserSession()) {
       toast.error("Session validation failed", {
@@ -268,13 +276,15 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     yPos += 10;
     
     // Add headache records
+    const ensureSpace = (needed: number) => {
+      if (yPos + needed > 280) { doc.addPage(); yPos = 20; return true; }
+      return false;
+    };
+    const fmtTime = (iso: string) => format(new Date(iso), "d MMM yyyy, HH:mm");
     exportData.forEach((record, index) => {
-      // Ensure we don't go off the page
-      if (yPos > 250) {
-        doc.addPage();
-        yPos = 20;
-      }
-      
+      const summaryLines = 4 + [record.symptoms?.length, record.triggers?.length, record.treatments?.length, record.notes].filter(Boolean).length;
+      ensureSpace(6 + summaryLines * 5);
+
       doc.setFontSize(12);
       const recordDate = new Date(record.date).toLocaleDateString();
       doc.text(`Record ${index + 1} - ${recordDate}`, 20, yPos);
@@ -303,6 +313,33 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       if (record.notes) {
         doc.text(`Notes: ${record.notes}`, 25, yPos); 
         yPos += 5;
+      }
+
+      // Areas in selection order
+      const areas = sortAreas(record.areas || []);
+      if (areas.length === 0) {
+        ensureSpace(5);
+        doc.setFontSize(10);
+        doc.text("Areas: none recorded", 25, yPos); yPos += 5;
+      } else {
+        ensureSpace(5);
+        doc.setFontSize(10);
+        doc.text("Areas (in selection order)", 25, yPos); yPos += 5;
+        areas.forEach((area) => {
+          const { head, details } = areaPdfLines(area, fmtTime);
+          doc.setFontSize(9);
+          const headLines = doc.splitTextToSize(head, 160);
+          const detailLines = details.flatMap((d) => doc.splitTextToSize(d, 155));
+          const height = (headLines.length + detailLines.length) * 4 + 1;
+          if (ensureSpace(height + 5)) {
+            doc.setFontSize(10);
+            doc.text(`Record ${index + 1} (continued) — areas`, 25, yPos); yPos += 5;
+            doc.setFontSize(9);
+          }
+          headLines.forEach((l: string) => { doc.text(l, 30, yPos); yPos += 4; });
+          detailLines.forEach((l: string) => { doc.text(l, 35, yPos); yPos += 4; });
+          yPos += 1;
+        });
       }
       
       yPos += 5; // Add some space between records
@@ -442,22 +479,27 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     csvContent += `# Generated: ${format(new Date(), 'PPpp')}\n`;
     csvContent += `# CONFIDENTIAL: Contains personal health information\n`;
     csvContent += `# This report should be verified against the patient presenting to the healthcare provider.\n#\n`;
-    csvContent += "Date,Intensity,Location,Duration,Symptoms,Triggers,Treatments,Notes\n";
+    csvContent += "EpisodeId,Date,Intensity,Location,Duration,Symptoms,Triggers,Treatments,Notes\n";
     
     exportData.forEach(record => {
       const row = [
+        csvCell(record.id),
         new Date(record.date).toLocaleDateString(),
         record.intensity,
-        `"${record.location}"`,
+        csvCell(record.location),
         record.duration,
-        `"${record.symptoms?.join("; ") || ""}"`,
-        `"${record.triggers?.join("; ") || ""}"`,
-        `"${record.treatments?.join("; ") || ""}"`,
-        `"${record.notes || ""}"`
+        csvCell(record.symptoms?.join("; ") || ""),
+        csvCell(record.triggers?.join("; ") || ""),
+        csvCell(record.treatments?.join("; ") || ""),
+        csvCell(record.notes || "")
       ];
       
       csvContent += row.join(",") + "\n";
     });
+
+    csvContent += "\n# EPISODE AREAS (selection order)\n";
+    csvContent += CSV_AREA_HEADER + "\n";
+    csvAreaRows(exportData).forEach((r) => { csvContent += r + "\n"; });
 
     // Full SNOOP criteria overview
     csvContent += "\n# SNOOP RED FLAG SCREENING - FULL CRITERIA\n";
@@ -537,10 +579,10 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
                   <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-3">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertTriangle className="h-4 w-4 text-amber-400" />
-                      <span className="text-amber-300 font-medium text-sm">No Headache Data Found</span>
+                      <span className="text-amber-300 font-medium text-sm">No completed episodes yet — export is turned off</span>
                     </div>
                     <p className="text-amber-200 text-xs">
-                      You haven't logged any completed headache episodes yet. The preview below shows sample data for demonstration purposes only. Start logging your headaches to export your real data.
+                      Finish logging at least one headache (all steps) to download your report. The preview below is sample data for layout only and cannot be downloaded.
                     </p>
                   </div>
                 )}
@@ -563,6 +605,9 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
                   </TabsList>
                   
                   <TabsContent value="preview" className="mt-4">
+                    {isUsingDemoData && (
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-amber-300">SAMPLE — layout only, not downloadable</p>
+                    )}
                     <div className="bg-gray-900 p-4 rounded-lg max-h-[400px] overflow-y-auto">
                       <Table>
                         <TableHeader className="bg-gray-800/80">
@@ -574,9 +619,10 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {exportData.map((record) => (
+                          {previewData.map((record) => (
                             <TableRow key={record.id} className="border-gray-800">
                               <TableCell className="text-gray-300">
+                                {isUsingDemoData && <Badge variant="outline" className="mr-2 text-amber-300 border-amber-500/40">Sample</Badge>}
                                 {new Date(record.date).toLocaleDateString()}
                               </TableCell>
                               <TableCell className="text-gray-300">{record.intensity}/10</TableCell>
@@ -639,7 +685,7 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
         </CardContent>
         <CardFooter className="justify-between">
           <div className="text-xs text-gray-500">
-            {exportData.length} records{isUsingDemoData ? ' (demo)' : ''} • Security verified
+            {exportAllowed ? `${exportData.length} completed episodes • Security verified` : loading ? 'Loading…' : '0 completed episodes • export unavailable'}
           </div>
           <div className="flex space-x-2">
             <Button
@@ -654,11 +700,11 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
             </Button>
             <Button
               onClick={handleExportRequest}
-              disabled={isGenerating || (!isPremium && !isTestMode)}
+              disabled={isGenerating || !exportAllowed || (!isPremium && !isTestMode)}
               className="bg-teal-600 hover:bg-teal-700"
             >
               <Download className="h-4 w-4 mr-2" />
-              {isGenerating ? "Generating..." : `Secure Export ${exportFormat.toUpperCase()}`}
+              {isGenerating ? "Generating..." : !exportAllowed ? "Export unavailable" : `Secure Export ${exportFormat.toUpperCase()}`}
             </Button>
           </div>
         </CardFooter>
