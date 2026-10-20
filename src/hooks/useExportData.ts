@@ -1,4 +1,5 @@
 import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
+import { sortAreas, type ExportArea } from '@/lib/exportFormat';
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +24,7 @@ interface HeadacheRecord {
   treatments?: string[];
   notes?: string;
   locations?: LocationRecord[];
+  areas?: ExportArea[];
 }
 
 export interface ExportRedFlag {
@@ -67,8 +69,7 @@ export function useExportData() {
           const { data: locData, error: locError } = await supabase
             .from('episode_locations')
             .select('*')
-            .in('episode_id', episodeIds)
-            .is('deselected_at', null);
+            .in('episode_id', episodeIds);
 
           if (!locError && locData) {
             const grouped: Record<string, any[]> = {};
@@ -102,7 +103,8 @@ export function useExportData() {
         }
       }
 
-      const locs = locationsByEpisode[episode.id] || [];
+      const allAreas = sortAreas((locationsByEpisode[episode.id] || []) as ExportArea[]);
+      const locs = allAreas.filter((l: any) => !l.deselected_at);
       const locationRecords: LocationRecord[] = locs.map((loc: any) => ({
         location_name: loc.location_name,
         pain_intensity: loc.pain_intensity,
@@ -123,6 +125,7 @@ export function useExportData() {
         treatments: treatmentNames.length > 0 ? treatmentNames : undefined,
         notes: episode.notes || undefined,
         locations: locationRecords.length > 0 ? locationRecords : undefined,
+        areas: allAreas,
       };
     });
   }, [episodes, locationsByEpisode]);
@@ -143,5 +146,5 @@ export function useExportData() {
     });
   }, [rawRedFlags]);
 
-  return { data, redFlags, loading, hasData: episodes.length > 0 };
+  return { data, redFlags, loading, hasData: episodes.length > 0, hasRealData: episodes.length > 0 };
 }
