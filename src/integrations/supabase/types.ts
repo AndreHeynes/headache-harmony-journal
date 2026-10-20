@@ -71,6 +71,7 @@ export type Database = {
           location_name: string
           notes: string | null
           pain_intensity: number | null
+          region_id: string | null
           relief_timing: string | null
           selection_order: number | null
           symptoms: string[] | null
@@ -93,6 +94,7 @@ export type Database = {
           location_name: string
           notes?: string | null
           pain_intensity?: number | null
+          region_id?: string | null
           relief_timing?: string | null
           selection_order?: number | null
           symptoms?: string[] | null
@@ -115,6 +117,7 @@ export type Database = {
           location_name?: string
           notes?: string | null
           pain_intensity?: number | null
+          region_id?: string | null
           relief_timing?: string | null
           selection_order?: number | null
           symptoms?: string[] | null
