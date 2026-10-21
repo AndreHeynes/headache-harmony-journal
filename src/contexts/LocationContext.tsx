@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useRef, ReactNode } f
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { toast } from 'sonner';
+import { resolveRegion, REGION_KEY_PREFIX } from '@/lib/regionMapping';
 
 export interface EpisodeLocation {
   id: string;
@@ -95,32 +96,30 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
 
       const existing = (existingData as EpisodeLocation[]) || [];
       const matched = new Set<string>();
-      const findRow = (area: { key: string; name: string }) =>
-        existing.find(r => !matched.has(r.id) && r.location_key === area.key) ||
-        existing.find(r => !matched.has(r.id) && !r.location_key && r.location_name === area.name);
-
+      // area.key is a region ID (or "legacy:..." for old unmapped areas).
+      // Old rows are matched through the mapping and keep their stored key, name and details.
       const now = new Date().toISOString();
       const selectedRowIds: string[] = [];
 
       for (const area of areas) {
-        const row = findRow(area);
-        if (row) {
-          matched.add(row.id);
-          selectedRowIds.push(row.id);
-          if (row.deselected_at || row.location_key !== area.key || row.location_name !== area.name) {
-            await supabase
-              .from('episode_locations')
-              .update({ deselected_at: null, location_key: area.key, location_name: area.name })
-              .eq('id', row.id);
+        const rows = existing.filter(r => !matched.has(r.id) && resolveRegion(r).id === area.key);
+        if (rows.length > 0) {
+          for (const row of rows) {
+            matched.add(row.id);
+            selectedRowIds.push(row.id);
+            if (row.deselected_at) {
+              await supabase.from('episode_locations').update({ deselected_at: null }).eq('id', row.id);
+            }
           }
-        } else {
+        } else if (!area.key.startsWith('legacy:')) {
           const { data: inserted, error: insertError } = await supabase
             .from('episode_locations')
             .insert({
               episode_id: episodeId,
               user_id: user.id,
               location_name: area.name,
-              location_key: area.key,
+              location_key: REGION_KEY_PREFIX + area.key,
+              region_id: area.key,
               is_origin: false,
             })
             .select()
