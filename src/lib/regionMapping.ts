@@ -46,3 +46,9 @@ export function resolveRegion(row: { region_id?: string | null; location_key?: s
   if (id && REGION_LABELS[id]) return { id, label: REGION_LABELS[id], legacy: false };
   return { id: `legacy:${key || row.location_name}`, label: row.location_name, legacy: true };
 }
+
+/** Read-only view of a stored area row on the new map: name = region label, key = region ID. Never write the result back. */
+export function withRegion<T extends { region_id?: string | null; location_key?: string | null; location_name: string }>(row: T): T {
+  const r = resolveRegion(row);
+  return { ...row, location_name: r.label, location_key: r.id };
+}

@@ -1,3 +1,4 @@
+import { resolveRegion } from '@/lib/regionMapping';
 import { useLocations } from '@/contexts/LocationContext';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin } from 'lucide-react';
@@ -22,7 +23,7 @@ export function LocationTabs() {
               value={loc.id}
               className="text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              {loc.selection_order != null ? `${loc.selection_order} · ` : ''}{loc.location_name}
+              {loc.selection_order != null ? `${loc.selection_order} · ` : ''}{resolveRegion(loc).label}
               {isOrigin(loc) && <span className="ml-1 text-[10px] uppercase opacity-80">Origin</span>}
             </TabsTrigger>
           ))}

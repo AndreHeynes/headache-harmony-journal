@@ -1,3 +1,4 @@
+import { withRegion } from '@/lib/regionMapping';
 import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,7 +55,7 @@ export const useDashboardData = () => {
 
           if (locData && locData.length > 0) {
             const locationMap = new Map<string, { count: number; totalIntensity: number; intensityCount: number }>();
-            locData.forEach((loc: any) => {
+            locData.map((l: any) => withRegion(l)).forEach((loc: any) => {
               const existing = locationMap.get(loc.location_name) || { count: 0, totalIntensity: 0, intensityCount: 0 };
               existing.count++;
               if (loc.pain_intensity != null) {
