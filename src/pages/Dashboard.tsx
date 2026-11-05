@@ -13,6 +13,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { formatDistanceToNow, format } from "date-fns";
 import { useEffect } from "react";
+import { WearableCheckIn } from "@/components/wearables/WearableCheckIn";
 
 export default function Dashboard() {
   const isPremium = false;
@@ -63,8 +64,9 @@ export default function Dashboard() {
               </Link>
             </div>
           </header>
-          <main className="p-4 pb-20">
+          <main className="p-4 pb-20 space-y-6">
             <EmptyDashboard />
+            <WearableCheckIn />
           </main>
           <BottomNav />
         </div>
@@ -92,6 +94,7 @@ export default function Dashboard() {
         </header>
 
         <main className="p-4 pb-20 space-y-6">
+          <WearableCheckIn />
           {/* Active Episode Indicator */}
           {activeEpisode && (
             <Card className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border-red-700">
