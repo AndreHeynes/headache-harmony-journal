@@ -10,13 +10,13 @@ const corsHeaders = {
 console.log("[send-beta-email] Edge function loaded");
 
 // Email templates
-const getEmailTemplate = (emailType: string, fullName: string, appUrl: string): { subject: string; html: string } => {
+const getEmailTemplate = (emailType: string, fullName: string, appUrl: string, expiresOn = "8 weeks from today"): { subject: string; html: string } => {
   const name = fullName || "Beta Tester";
   const unsubscribeUrl = `${appUrl}/unsubscribe`;
   
   const templates: Record<string, { subject: string; html: string }> = {
     welcome: {
-      subject: "Welcome to My Headache Experience Journal Beta!",
+      subject: "Welcome! Your 8-week Beta Premium has started",
       html: `
 <!DOCTYPE html>
 <html>
@@ -41,8 +41,12 @@ const getEmailTemplate = (emailType: string, fullName: string, appUrl: string): 
     <li>⌚ Connect health trackers (Fitbit, Oura)</li>
   </ul>
   
+  <p style="background:#f0fdfa;border:1px solid #2dd4bf;border-radius:8px;padding:12px;"><strong>Your Beta Premium is active until ${expiresOn}.</strong> Every feature, including AI pattern analysis, is unlocked until then. Logging and the Standard Doctor PDF stay free after that.</p>
+
+  <p>⌚ Wear a Fitbit, Apple Watch, or Oura Ring? Use your morning sleep score and HRV to populate your daily check-in. Our AI correlation engine will analyze how sleep architecture affects your episode frequency.</p>
+
   <div style="text-align: center; margin: 30px 0;">
-    <a href="${appUrl}" style="background-color: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Log Your First Headache</a>
+    <a href="${appUrl}/auth?mode=signin" style="background-color: #0d9488; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Sign In to Your Journal</a>
   </div>
   
   <p>Your feedback directly shapes the future of this app. We can't wait to hear what you think!</p>
@@ -413,8 +417,27 @@ const handler = async (req: Request): Promise<Response> => {
     // Get the app URL from environment or use default
     const appUrl = Deno.env.get("APP_URL") || "https://headacherecovery.org";
     
+    // Personal Beta Premium end date for the welcome email
+    let expiresOn: string | undefined;
+    if (queue_id && (email_type === "welcome" || !email_type)) {
+      try {
+        const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+        const { data: q } = await admin.from("beta_email_queue").select("user_id").eq("id", queue_id).maybeSingle();
+        if (q?.user_id) {
+          const { data: p } = await admin.from("profiles").select("premium_expires_at").eq("id", q.user_id).maybeSingle();
+          if (p?.premium_expires_at) {
+            expiresOn = new Date(p.premium_expires_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+          }
+        }
+      } catch (e) {
+        console.error(`[${requestId}] Could not load expiry date:`, e);
+      }
+    }
+
     // Get email template
-    const template = getEmailTemplate(email_type, full_name || "Beta Tester", appUrl);
+    const template = getEmailTemplate(email_type, full_name || "Beta Tester", appUrl, expiresOn);
     
     console.log(`[${requestId}] Sending email to: ${email}, subject: ${template.subject}`);
 
