@@ -279,6 +279,8 @@ export type Database = {
           export_preferences: Json | null
           full_name: string | null
           id: string
+          premium_expires_at: string | null
+          subscription_tier: string
           updated_at: string | null
         }
         Insert: {
@@ -288,6 +290,8 @@ export type Database = {
           export_preferences?: Json | null
           full_name?: string | null
           id: string
+          premium_expires_at?: string | null
+          subscription_tier?: string
           updated_at?: string | null
         }
         Update: {
@@ -297,6 +301,8 @@ export type Database = {
           export_preferences?: Json | null
           full_name?: string | null
           id?: string
+          premium_expires_at?: string | null
+          subscription_tier?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -421,10 +427,12 @@ export type Database = {
           cycle_day: number | null
           data_type: string
           date: string
+          hrv: number | null
           id: string
           menstrual_phase: string | null
           period_flow: string | null
           raw_data: Json | null
+          resting_heart_rate: number | null
           sleep_duration_minutes: number | null
           sleep_quality_score: number | null
           sleep_stages: Json | null
@@ -440,10 +448,12 @@ export type Database = {
           cycle_day?: number | null
           data_type: string
           date: string
+          hrv?: number | null
           id?: string
           menstrual_phase?: string | null
           period_flow?: string | null
           raw_data?: Json | null
+          resting_heart_rate?: number | null
           sleep_duration_minutes?: number | null
           sleep_quality_score?: number | null
           sleep_stages?: Json | null
@@ -459,10 +469,12 @@ export type Database = {
           cycle_day?: number | null
           data_type?: string
           date?: string
+          hrv?: number | null
           id?: string
           menstrual_phase?: string | null
           period_flow?: string | null
           raw_data?: Json | null
+          resting_heart_rate?: number | null
           sleep_duration_minutes?: number | null
           sleep_quality_score?: number | null
           sleep_stages?: Json | null

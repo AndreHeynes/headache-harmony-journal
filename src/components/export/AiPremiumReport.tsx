@@ -11,6 +11,7 @@ import { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 import { useAiReport } from "@/hooks/useAiReport";
 import { getDisclaimer } from "@/utils/legalContent";
+import { useBetaStatus } from "@/hooks/useBetaStatus";
 
 interface Props {
   isPremium?: boolean;
@@ -29,6 +30,7 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     to: new Date(),
   });
   const { generate, loading, error, report } = useAiReport();
+  const beta = useBetaStatus();
 
   const handleGenerate = async () => {
     if (!range?.from || !range?.to) {
@@ -58,6 +60,7 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     };
 
     const heading = (text: string) => { y += 8; writeWrapped(text, 14, true); y += 2; };
+    writeWrapped("AI Pattern Analysis (Beta Premium Feature)", 9, true);
     const sub = (text: string) => writeWrapped(text, 12, true);
 
     writeWrapped("AI Premium Headache Report", 18, true);
@@ -124,6 +127,21 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     doc.save(`ai-headache-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
+  if (beta.expired) {
+    return (
+      <Card className="bg-gray-800/50 border-gray-700">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Lock className="h-5 w-5 text-teal-400" /> AI Pattern Analysis
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Your 8-week Beta Premium has ended. Logging headaches and the Standard Doctor PDF stay free. Upgrade to Premium to keep using AI pattern and correlation insights.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   if (!isPremium) {
     return (
       <Card className="bg-gray-800/50 border-gray-700">
@@ -143,7 +161,8 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     <Card className="bg-gray-800/50 border-gray-700">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
-          <Sparkles className="h-5 w-5 text-teal-400" /> AI Premium Report
+          <Sparkles className="h-5 w-5 text-teal-400" /> AI Pattern Analysis
+          <Badge variant="outline" className="ml-1 text-xs border-teal-600/40 text-teal-300">Beta Premium Feature</Badge>
         </CardTitle>
         <CardDescription className="text-gray-400">
           AI-generated narrative report covering correlations across all logged variables and a dedicated treatment effectiveness assessment.

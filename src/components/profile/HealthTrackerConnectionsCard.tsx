@@ -54,6 +54,13 @@ export function HealthTrackerConnectionsCard() {
           Connect external sleep and menstrual cycle trackers for more accurate analysis
         </CardDescription>
       </CardHeader>
+      <div className="mx-6 mb-4 rounded-lg border border-primary/30 bg-primary/5 p-3 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-foreground">Wearable Sync (Apple Health, Fitbit, Oura)</p>
+          <p className="text-xs text-muted-foreground">Automatic sync is in development. Until then, enter your sleep and HRV in the daily check-in on the Dashboard.</p>
+        </div>
+        <Badge variant="secondary" className="shrink-0">Coming Soon</Badge>
+      </div>
       <CardContent className="space-y-4">
         {TRACKER_INFO.map((tracker) => {
           const connection = getConnectionStatus(tracker.provider);

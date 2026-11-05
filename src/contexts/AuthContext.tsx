@@ -29,6 +29,9 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+// Landing page publishable key (public by design)
+const LANDING_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsZ2FybWlqdXF5bnhleXlta2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NDg4NDMsImV4cCI6MjA4MDUyNDg0M30.Mmp7C2efUazxM2poJlB44aob-c3CQce-wzU8a_0ExxQ";
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -145,13 +148,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsZ2FybWlqdXF5bnhleXlta2NvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5NDg4NDMsImV4cCI6MjA4MDUyNDg0M30.Mmp7C2efUazxM2poJlB44aob-c3CQce-wzU8a_0ExxQ"
+            "apikey": LANDING_ANON_KEY,
+            "Authorization": `Bearer ${LANDING_ANON_KEY}`
           },
           body: JSON.stringify({
             email: email,
             name: name,
             sequence_name: "beta_app",
-            source: "app_signup"
+            source: "journal_open_beta"
           })
         }
       );

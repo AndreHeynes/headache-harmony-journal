@@ -18,7 +18,7 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode');
   
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>(mode === 'signup' ? 'signup' : 'signin');
   const [showMagicLink, setShowMagicLink] = useState(APP_CONFIG.BETA_MODE && mode === 'signin');
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);

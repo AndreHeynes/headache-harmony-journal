@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.protect_profile_tier() FROM PUBLIC, anon, authenticated;

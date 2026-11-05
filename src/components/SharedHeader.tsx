@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useEffect } from 'react';
+import { useBetaStatus } from '@/hooks/useBetaStatus';
 import { toast } from 'sonner';
 
 export const SharedHeader = () => {
@@ -20,6 +21,7 @@ export const SharedHeader = () => {
   const displayName = betaUser?.full_name || user?.user_metadata?.full_name || 'User';
   const displayEmail = betaUser?.email || user?.email;
   const isLoggedIn = !!user || !!betaUser;
+  const beta = useBetaStatus();
 
   // Show welcome toast on first authentication
   useEffect(() => {
@@ -43,7 +45,11 @@ export const SharedHeader = () => {
           <span className="font-semibold text-lg hidden sm:inline">
             My Headache Experience Journal!™
           </span>
-          {APP_CONFIG.BETA_MODE && (
+          {isLoggedIn && beta.expiresAt && !beta.expired ? (
+            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full whitespace-nowrap">
+              Beta Premium: Day {beta.dayNumber} of {beta.totalDays}
+            </span>
+          ) : APP_CONFIG.BETA_MODE && (
             <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               Beta
             </span>

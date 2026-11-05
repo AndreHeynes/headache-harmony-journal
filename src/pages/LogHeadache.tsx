@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useRedFlagCheck } from "@/hooks/useRedFlagCheck";
 import { FirstHeadacheCheck } from "@/components/logheadache/FirstHeadacheCheck";
 import { RedFlagScreeningProvider, useScreening } from "@/contexts/RedFlagScreeningContext";
+import { WearableCheckIn } from "@/components/wearables/WearableCheckIn";
 import { RedFlagAlertDialog } from "@/components/logheadache/screening/RedFlagAlertDialog";
 
 const steps = [
@@ -237,6 +238,12 @@ function LogHeadacheInner() {
           )}
 
           <CurrentStepComponent episodeId={currentEpisodeId} />
+
+          {currentStep === 0 && (
+            <div className="mt-6">
+              <WearableCheckIn title="Last night's sleep & wearable data" compact />
+            </div>
+          )}
         </main>
 
         <footer className="fixed bottom-0 left-0 right-0 p-4 bg-card/90 backdrop-blur-sm border-t border-border space-y-2">

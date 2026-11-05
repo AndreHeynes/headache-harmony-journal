@@ -17,7 +17,7 @@ import { usePatientProfile } from "@/hooks/usePatientProfile";
 import { format } from "date-fns";
 import type { ExportRedFlag } from "@/hooks/useExportData";
 import { summarizeSnoop } from "@/utils/snoopCriteria";
-import { canExport, sortAreas, areaPdfLines, csvAreaRows, CSV_AREA_HEADER, csvCell, type ExportArea } from "@/lib/exportFormat";
+import { canExport, sortAreas, areaPdfLines, csvAreaRows, CSV_AREA_HEADER, csvCell, frequencySummary, mohCounter, type ExportArea } from "@/lib/exportFormat";
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -270,6 +270,36 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       yPos += 10;
     }
     
+    // Frequency summary (30 / 60 days)
+    doc.setFontSize(14);
+    doc.text("FREQUENCY SUMMARY", 20, yPos);
+    yPos += 7;
+    doc.setFontSize(10);
+    [frequencySummary(exportData, 30), frequencySummary(exportData, 60)].forEach((f) => {
+      doc.text(
+        `Last ${f.days} days: ${f.episodes} episode${f.episodes === 1 ? "" : "s"} • ${f.totalHours} hours total • average intensity ${f.avgIntensity ?? "not recorded"}${f.avgIntensity != null ? "/10" : ""}`,
+        20, yPos,
+      );
+      yPos += 5;
+    });
+    yPos += 5;
+
+    // Medication intake counter (medication overuse headache thresholds)
+    doc.setFontSize(14);
+    doc.text("MEDICATION INTAKE — LAST 30 DAYS", 20, yPos);
+    yPos += 7;
+    doc.setFontSize(10);
+    mohCounter(exportData).forEach((m) => {
+      doc.text(
+        `${m.label}: ${m.days} day${m.days === 1 ? "" : "s"} (overuse threshold ${m.threshold} days/month)${m.atOrOver ? " — AT OR ABOVE THRESHOLD" : ""}`,
+        20, yPos,
+      );
+      yPos += 5;
+    });
+    doc.setFontSize(8);
+    doc.text("Counted from treatments recorded on completed episodes; unrecognised medicines are not counted.", 20, yPos);
+    yPos += 10;
+
     // Add patient section title
     doc.setFontSize(14);
     doc.text("Headache Records", 20, yPos);
