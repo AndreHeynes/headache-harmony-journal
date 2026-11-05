@@ -21,7 +21,7 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
   }
 
   // Allow auth routes through the gate (e.g. /auth?mode=signin for magic link)
-  if (location.pathname === '/auth') {
+  if (['/auth', '/signin', '/signup'].includes(location.pathname)) {
     return <>{children}</>;
   }
 
@@ -31,7 +31,12 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
 // Separate component to use hooks conditionally
 const BetaGateContent = ({ children }: BetaAccessGateProps) => {
   const { isValidating, isValid, error } = useTokenValidation();
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, user } = useAuth();
+
+  // Open beta: anyone with an account (signed up directly) gets in
+  if (!authLoading && user) {
+    return <>{children}</>;
+  }
 
   // Show loading while validating token or checking auth
   if (isValidating || authLoading) {
@@ -57,9 +62,9 @@ const BetaGateContent = ({ children }: BetaAccessGateProps) => {
           <div className="space-y-3 pt-4">
             {/* New beta tester */}
             <Button asChild size="lg" className="w-full">
-              <a href={SIGNUP_URL}>
+              <a href="/signup">
                 <KeyRound className="mr-2 h-4 w-4" />
-                Request Beta Access
+                Create a Free Account
               </a>
             </Button>
             
