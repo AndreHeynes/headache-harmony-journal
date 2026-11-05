@@ -1,3 +1,4 @@
+import { resolveRegion } from '@/lib/regionMapping';
 import { ANALYSIS_EPISODE_STATUS } from '@/lib/analysis';
 import { sortAreas, type ExportArea } from '@/lib/exportFormat';
 import { useState, useEffect, useMemo } from 'react';
@@ -75,7 +76,7 @@ export function useExportData() {
             const grouped: Record<string, any[]> = {};
             locData.forEach((loc: any) => {
               if (!grouped[loc.episode_id]) grouped[loc.episode_id] = [];
-              grouped[loc.episode_id].push(loc);
+              grouped[loc.episode_id].push({ ...loc, location_name: resolveRegion(loc).label });
             });
             setLocationsByEpisode(grouped);
           }

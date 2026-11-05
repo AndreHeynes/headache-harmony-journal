@@ -1,3 +1,4 @@
+import { withRegion } from '@/lib/regionMapping';
 import { supabase } from '@/integrations/supabase/client';
 import type { HeadacheEpisode } from '@/types/episode';
 
@@ -158,7 +159,7 @@ export async function fetchAnalysisData(userId: string, range?: { from?: Date; t
       .is('deselected_at', null)
       .in('episode_id', episodes.map(e => e.id));
     if (locError) throw locError;
-    areas = (locData as AreaRow[]) || [];
+    areas = ((locData as AreaRow[]) || []).map(withRegion);
   }
   return { episodes, areas, units: buildAnalysisUnits(episodes, areas) };
 }
@@ -278,5 +279,5 @@ export async function fetchAreaOrderData(userId: string, range?: { from?: Date; 
     .eq('user_id', userId)
     .in('episode_id', episodes.map(e => e.id));
   if (locError) throw locError;
-  return { episodes, areas: (locData as OrderedAreaRow[]) || [] };
+  return { episodes, areas: ((locData as OrderedAreaRow[]) || []).map(withRegion) };
 }
