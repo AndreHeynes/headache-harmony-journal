@@ -104,7 +104,7 @@ export default function RegionMap({ viewBox, outline, regions, label, leftText, 
                 }}
                 fill="transparent"
                 className={`cursor-pointer outline-none transition-colors focus-visible:stroke-ring ${
-                  on ? 'stroke-primary' : r.parent ? 'stroke-secondary/40 hover:fill-primary/20 hover:stroke-primary' : 'stroke-transparent hover:fill-primary/10'
+                  on ? 'stroke-primary' : r.parent ? 'stroke-secondary/40 hover:fill-primary/20 hover:stroke-primary' : 'stroke-secondary/25 hover:fill-primary/10'
                 }`}
                 strokeWidth={on ? w / 160 : w / 320}
                 strokeDasharray={on ? undefined : `${w / 100} ${w / 100}`}
