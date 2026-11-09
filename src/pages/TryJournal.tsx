@@ -51,6 +51,8 @@ export default function TryJournal() {
         const result = await supabase.from('episode_locations').insert({ episode_id: draft.id, user_id: user.id, region_id: a.id, location_key: `region:${a.id}`, location_name: REGION_LABELS[a.id], first_selected_at: a.firstSelectedAt, deselected_at: a.selected ? null : new Date().toISOString(), pain_intensity: a.intensity, symptoms: a.symptoms, triggers: a.triggers, treatment: a.treatment ? { medications: [a.treatment] } : null, treatment_timing: a.treatmentTiming || null, relief_timing: a.reliefTiming || null, treatment_outcome: a.outcome || null, notes: a.notes || null });
         if (result.error) throw result.error;
       }
+      const verified = await supabase.from('episode_locations').select('region_id, selection_order, pain_intensity').eq('episode_id', draft.id).eq('user_id', user.id);
+      if (verified.error || draft.areas.some(a => !verified.data?.some(row => row.region_id === a.id && row.selection_order === a.order && row.pain_intensity === a.intensity))) throw new Error('Draft read-back mismatch');
       sessionStorage.removeItem(GUEST_DRAFT_KEY);
       toast.success('Draft saved. Complete the safety questions before it counts in reports.');
       navigate('/dashboard');
@@ -69,7 +71,7 @@ export default function TryJournal() {
           <Tabs value={area.id} onValueChange={setActiveId}><TabsList className="h-auto flex flex-wrap justify-start gap-1 bg-transparent">{areas.map(a => <TabsTrigger key={a.id} value={a.id} className="whitespace-normal text-left">{a.order} · {REGION_LABELS[a.id]}{a.order === 1 ? ' · Origin' : ''}</TabsTrigger>)}</TabsList></Tabs>
           <h2 className="text-xl font-semibold">{REGION_LABELS[area.id]}</h2>
           <Label htmlFor="trial-intensity">Pain intensity {area.intensity == null ? '— not recorded' : `${area.intensity}/10`}</Label>
-          <Input id="trial-intensity" type="range" min="1" max="10" value={area.intensity ?? 5} onChange={e => update({ intensity: Number(e.target.value) })} />
+          <Input id="trial-intensity" className="accent-primary" type="range" min="1" max="10" value={area.intensity ?? 5} onChange={e => update({ intensity: Number(e.target.value) })} />
           {(['symptoms', 'triggers'] as const).map(field => <fieldset key={field} className="space-y-3"><legend className="font-medium mb-2">{field === 'symptoms' ? 'Symptoms' : 'Reported triggers'}</legend><div className="flex flex-wrap gap-4">{(field === 'symptoms' ? ['Nausea', 'Light sensitivity', 'Sound sensitivity'] : ['Stress', 'Missed meal', 'Poor sleep', 'Neck tension']).map(name => <label key={name} className="flex items-center gap-2 text-sm"><Checkbox checked={area[field].includes(name)} onCheckedChange={() => toggle(field, name)} />{name}</label>)}</div></fieldset>)}
           <div className="grid sm:grid-cols-2 gap-4">{([
             ['treatment', 'Treatment / management'], ['treatmentTiming', 'Treatment timing'], ['reliefTiming', 'Relief timing'],

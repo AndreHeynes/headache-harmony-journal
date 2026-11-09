@@ -36,9 +36,11 @@ export function selectTrialAreas(draft: TrialDraft, selected: string[], now = ne
 export function readTrialDraft(): TrialDraft | null {
   try {
     const value = JSON.parse(sessionStorage.getItem(GUEST_DRAFT_KEY) || 'null');
-    if (!value || value.version !== 1 || typeof value.id !== 'string' || !Array.isArray(value.areas)) return null;
+    if (!value || value.version !== 1 || typeof value.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(value.id) || !Array.isArray(value.areas)) return null;
     if (!Number.isFinite(Date.parse(value.startedAt))) return null;
-    if (value.areas.some((a: TrialArea) => !REGION_LABELS[a.id] || !Number.isInteger(a.order) || a.order < 1 || !Number.isFinite(Date.parse(a.firstSelectedAt)))) return null;
+    if (value.duration !== null && (!Number.isFinite(value.duration) || value.duration < 0)) return null;
+    if (new Set(value.areas.map((a: TrialArea) => a.id)).size !== value.areas.length) return null;
+    if (value.areas.some((a: TrialArea) => !a || !REGION_LABELS[a.id] || !Number.isInteger(a.order) || a.order < 1 || !Number.isFinite(Date.parse(a.firstSelectedAt)) || typeof a.selected !== 'boolean' || (a.intensity !== null && (!Number.isInteger(a.intensity) || a.intensity < 1 || a.intensity > 10)) || !Array.isArray(a.symptoms) || !a.symptoms.every(s => typeof s === 'string') || !Array.isArray(a.triggers) || !a.triggers.every(s => typeof s === 'string') || [a.treatment, a.treatmentTiming, a.reliefTiming, a.outcome, a.notes].some(s => typeof s !== 'string'))) return null;
     return value as TrialDraft;
   } catch { return null; }
 }
