@@ -1,38 +1,40 @@
 // Front view, facing the patient: the patient's right is on the viewer's left.
+// Anatomical vectors from the Headache Mapping Journal design (viewBox 0 0 400 500).
 // Broad regions first, detailed regions after (painted on top = layered brushing).
 import type { MapRegion } from './backRegions';
 
-export const FRONT_VIEWBOX = '0 0 200 260';
+export const FRONT_VIEWBOX = '0 0 400 500';
 
 export const FRONT_OUTLINE =
-  'M100 14 C150 14 178 50 178 110 C178 170 150 240 100 244 C50 240 22 170 22 110 C22 50 50 14 100 14 Z';
+  'M200 12 C298 12 354 80 354 170 C354 212 346 240 336 260 C348 278 346 302 326 314 C320 342 306 364 290 382 C280 422 254 458 222 470 C210 474 190 474 178 470 C146 458 120 422 110 382 C94 364 80 342 74 314 C54 302 52 278 64 260 C54 240 46 212 46 170 C46 80 102 12 200 12Z';
 
-const e = (cx: number, cy: number, rx: number, ry: number) =>
-  `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`;
+const ell = (cx: number, cy: number, rx: number, ry: number) =>
+  `M${cx - rx} ${cy} a${rx} ${ry} 0 1 0 ${2 * rx} 0 a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+const rect = (x1: number, y1: number, x2: number, y2: number) => `M${x1} ${y1} L${x2} ${y1} L${x2} ${y2} L${x1} ${y2}Z`;
 
 export const FRONT_REGIONS: MapRegion[] = [
-  // Broad
-  { id: 'crown', d: 'M30 50 C40 24 66 14 100 14 C134 14 160 24 170 50 Z' },
-  { id: 'forehead', d: 'M46 50 L154 50 L154 98 L46 98 Z' },
-  { id: 'r-side', d: 'M30 50 L46 50 L46 160 L26 160 C22 140 22 120 22 110 C22 84 25 64 30 50 Z' },
-  { id: 'l-side', d: 'M154 50 L170 50 C175 64 178 84 178 110 C178 120 178 140 174 160 L154 160 Z' },
-  { id: 'r-face', d: 'M46 98 L100 98 L100 244 C60 240 34 200 26 160 L46 160 Z' },
-  { id: 'l-face', d: 'M100 98 L154 98 L154 160 L174 160 C166 200 140 240 100 244 Z' },
+  // Broad — together they tile the skull (clipped to the outline)
+  { id: 'crown', d: rect(0, 0, 400, 100) },
+  { id: 'forehead', d: rect(112, 100, 288, 182) },
+  { id: 'r-side', d: rect(0, 100, 112, 182) },
+  { id: 'l-side', d: rect(288, 100, 400, 182) },
+  { id: 'r-face', d: rect(0, 182, 200, 500) },
+  { id: 'l-face', d: rect(200, 182, 400, 500) },
   // Detailed
-  { id: 'vertex', parent: 'crown', d: e(100, 30, 18, 9) },
-  { id: 'mid-forehead', parent: 'forehead', d: e(100, 68, 16, 11) },
-  { id: 'r-brow', parent: 'forehead', d: e(70, 89, 18, 6) },
-  { id: 'l-brow', parent: 'forehead', d: e(130, 89, 18, 6) },
-  { id: 'r-temple', parent: 'r-side', d: e(36, 96, 10, 16) },
-  { id: 'l-temple', parent: 'l-side', d: e(164, 96, 10, 16) },
-  { id: 'r-eye', parent: 'r-face', d: e(70, 110, 15, 9) },
-  { id: 'l-eye', parent: 'l-face', d: e(130, 110, 15, 9) },
-  { id: 'nasal', parent: 'r-face', d: e(100, 118, 7, 14) },
-  { id: 'r-sinus', parent: 'r-face', d: e(72, 138, 15, 10) },
-  { id: 'l-sinus', parent: 'l-face', d: e(128, 138, 15, 10) },
-  { id: 'r-tmj', parent: 'r-side', d: e(38, 150, 9, 10) },
-  { id: 'l-tmj', parent: 'l-side', d: e(162, 150, 9, 10) },
-  { id: 'teeth', parent: 'r-face', d: e(100, 184, 22, 8) },
-  { id: 'r-jaw', parent: 'r-face', d: e(60, 206, 18, 11) },
-  { id: 'l-jaw', parent: 'l-face', d: e(140, 206, 18, 11) },
+  { id: 'vertex', parent: 'crown', d: ell(200, 62, 95, 40) },
+  { id: 'mid-forehead', parent: 'forehead', d: ell(200, 140, 72, 34) },
+  { id: 'r-brow', parent: 'forehead', d: 'M100 196 Q140 178 188 194 L186 208 Q140 196 104 212Z' },
+  { id: 'l-brow', parent: 'forehead', d: 'M300 196 Q260 178 212 194 L214 208 Q260 196 296 212Z' },
+  { id: 'r-temple', parent: 'r-side', d: 'M48 186 L102 192 Q96 240 98 282 L66 272 Q50 240 48 186Z' },
+  { id: 'l-temple', parent: 'l-side', d: 'M352 186 L298 192 Q304 240 302 282 L334 272 Q350 240 352 186Z' },
+  { id: 'r-eye', parent: 'r-face', d: 'M108 222 C114 206 168 202 184 218 C192 238 184 268 160 274 C134 278 108 262 106 244Z' },
+  { id: 'l-eye', parent: 'l-face', d: 'M292 222 C286 206 232 202 216 218 C208 238 216 268 240 274 C266 278 292 262 294 244Z' },
+  { id: 'nasal', parent: 'r-face', d: 'M200 228 C190 260 178 300 180 330 Q200 340 220 330 C222 300 210 260 200 228Z' },
+  { id: 'r-sinus', parent: 'r-face', d: 'M104 284 C130 280 168 284 178 300 C178 326 160 342 130 340 C110 336 100 312 104 284Z' },
+  { id: 'l-sinus', parent: 'l-face', d: 'M296 284 C270 280 232 284 222 300 C222 326 240 342 270 340 C290 336 300 312 296 284Z' },
+  { id: 'r-tmj', parent: 'r-side', d: ell(78, 300, 16, 26) },
+  { id: 'l-tmj', parent: 'l-side', d: ell(322, 300, 16, 26) },
+  { id: 'teeth', parent: 'r-face', d: 'M146 352 Q200 342 254 352 L250 404 Q200 414 150 404Z' },
+  { id: 'r-jaw', parent: 'r-face', d: 'M90 340 L148 360 Q150 420 196 432 L196 476 C140 466 108 430 100 390Z' },
+  { id: 'l-jaw', parent: 'l-face', d: 'M310 340 L252 360 Q250 420 204 432 L204 476 C260 466 292 430 300 390Z' },
 ];
