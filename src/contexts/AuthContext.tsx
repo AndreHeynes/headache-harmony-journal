@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { readTrialDraft } from '@/lib/publicExperience';
 
 interface BetaUser {
   email: string;
@@ -118,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           // Navigate to dashboard
           setTimeout(() => {
-            navigate('/dashboard');
+            navigate(readTrialDraft() ? '/try' : '/dashboard');
           }, 0);
         } else if (event === 'SIGNED_OUT') {
           setTimeout(() => {

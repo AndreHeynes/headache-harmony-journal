@@ -14,6 +14,7 @@ import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { formatDistanceToNow, format } from "date-fns";
 import { useEffect } from "react";
 import { WearableCheckIn } from "@/components/wearables/WearableCheckIn";
+import { DoctorSharing } from '@/components/dashboard/DoctorSharing';
 
 export default function Dashboard() {
   const isPremium = false;
@@ -66,6 +67,7 @@ export default function Dashboard() {
           </header>
           <main className="p-4 pb-20 space-y-6">
             <EmptyDashboard />
+            <DoctorSharing />
             <WearableCheckIn />
           </main>
           <BottomNav />
@@ -94,6 +96,7 @@ export default function Dashboard() {
         </header>
 
         <main className="p-4 pb-20 space-y-6">
+          <DoctorSharing />
           <WearableCheckIn />
           {/* Active Episode Indicator */}
           {activeEpisode && (

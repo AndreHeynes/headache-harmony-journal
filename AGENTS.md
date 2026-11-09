@@ -9,3 +9,6 @@
 - Area origin = `episode_locations.selection_order = 1` while selected; numbers are assigned by a DB insert trigger and locked on update (gaps kept, never renumbered); `is_origin` is written only for older readers; why: a stable per-episode spread order.
 - Standard PDF/CSV export never uses sample data and is blocked until the user has at least one completed episode (`canExport` in `src/lib/exportFormat.ts`); sample rows are preview-only; why: downloaded medical reports must contain only real data.
 - Beta Premium window is computed only from `profiles.premium_expires_at` via `src/lib/betaStatus.ts`; tier/expiry are protected from user edits by a DB trigger; why: one source for badge and AI gating.
+- Public trial drafts stay in sessionStorage and save only with explicit authenticated consent as active episodes; why: avoid anonymous health-data writes and bypassing required screening.
+- Public sample fixtures are separate from Standard Export, and every sample PDF is labelled fictional; why: keep patient reports real-data-only.
+- PDF QR codes contain only the public clinician reference URL, never health data or report access tokens; why: sharing must not expose patient records.
