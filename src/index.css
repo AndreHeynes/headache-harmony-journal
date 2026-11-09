@@ -26,6 +26,11 @@
     --input: 220 9% 33%;
     --ring: 168 76% 42%;
     --radius: 1rem;
+    /* Anatomical head map */
+    --bone: 40 30% 92%;
+    --bone-shade: 35 18% 74%;
+    --bone-hollow: 30 14% 52%;
+    --bone-ink: 28 18% 26%;
   }
 
   body {

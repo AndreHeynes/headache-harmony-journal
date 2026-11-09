@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import RegionMap from './RegionMap';
 import BackHeadMap from './BackHeadMap';
+import { SkullLines, SkullShading } from './SkullArt';
 import { FRONT_OUTLINE, FRONT_REGIONS, FRONT_VIEWBOX } from './frontRegions';
 
 interface Props {
@@ -33,7 +34,8 @@ export default function HeadMapPicker({ selected, labelFor, onChange }: Props) {
       {view === 'front' ? (
         <RegionMap viewBox={FRONT_VIEWBOX} outline={FRONT_OUTLINE} regions={FRONT_REGIONS} label="Front of head and face"
           leftText="Right" rightText="Left" caption="Facing you — your right is on the left. Small areas paint on top of large ones."
-          selected={selected} onChange={onChange} />
+          selected={selected} onChange={onChange}
+          underlay={(clipId) => <SkullShading clipId={clipId} />} overlay={<SkullLines />} />
       ) : (
         <BackHeadMap selected={selected} onChange={onChange} />
       )}
