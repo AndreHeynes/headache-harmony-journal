@@ -5,6 +5,7 @@ import { ChartLine, Search, Users, ArrowRight, ExternalLink } from "lucide-react
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { APP_CONFIG } from "@/config/appConfig";
+import TryJournal from './TryJournal';
 
 export default function Index() {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ export default function Index() {
     );
   }
   
+  return <TryJournal />;
+  /* Legacy welcome page retained for reference.
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto p-6 space-y-8 animate-fade-in">
@@ -116,5 +119,5 @@ export default function Index() {
         </Card>
       </div>
     </div>
-  );
+  ); */
 }

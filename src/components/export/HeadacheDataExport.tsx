@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import type { ExportRedFlag } from "@/hooks/useExportData";
 import { summarizeSnoop } from "@/utils/snoopCriteria";
 import { canExport, sortAreas, areaPdfLines, csvAreaRows, CSV_AREA_HEADER, csvCell, frequencySummary, mohCounter, type ExportArea } from "@/lib/exportFormat";
+import { addClinicianFooter } from '@/lib/clinicianPdf';
 
 interface HeadacheDataExportProps {
   headacheData?: HeadacheRecord[];
@@ -138,12 +139,12 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       });
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
         let fileSize: number | undefined;
         
         if (exportFormat === "pdf") {
-          fileSize = generateSecurePDF(session);
+          fileSize = await generateSecurePDF(session);
         } else {
           fileSize = generateSecureCSV(session);
         }
@@ -165,7 +166,7 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     }, 500);
   };
 
-  const generateSecurePDF = (session: any): number => {
+  const generateSecurePDF = async (session: any): Promise<number> => {
     const doc = new jsPDF();
     const disclaimer = getDisclaimer('ai-premium-report');
     let yPos = 20;
@@ -477,6 +478,7 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     doc.text(`Average Duration: ${avgDuration.toFixed(0)} minutes`, 20, 40);
     
     // Save the PDF with secure filename
+    await addClinicianFooter(doc);
     const filename = `Headache_Report_${session.id.slice(-8)}_${Date.now()}.pdf`;
     doc.save(filename);
     

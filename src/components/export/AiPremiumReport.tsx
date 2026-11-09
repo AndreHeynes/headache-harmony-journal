@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useAiReport } from "@/hooks/useAiReport";
 import { getDisclaimer } from "@/utils/legalContent";
 import { useBetaStatus } from "@/hooks/useBetaStatus";
+import { addClinicianFooter } from '@/lib/clinicianPdf';
 
 interface Props {
   isPremium?: boolean;
@@ -41,8 +42,8 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     if (result) toast.success("AI report generated");
   };
 
-  const handleDownload = () => {
-    if (!report) return;
+  const handleDownload = async () => {
+    if (!report || !range?.from || !range?.to) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 40;
@@ -53,7 +54,7 @@ export function AiPremiumReport({ isPremium = false }: Props) {
       doc.setFontSize(size);
       const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
       lines.forEach((line: string) => {
-        if (y > 800) { doc.addPage(); y = margin; }
+        if (y > 780) { doc.addPage(); y = margin; }
         doc.text(line, margin, y);
         y += size + 4;
       });
@@ -65,7 +66,7 @@ export function AiPremiumReport({ isPremium = false }: Props) {
 
     writeWrapped("AI Premium Headache Report", 18, true);
     writeWrapped(
-      `Period: ${format(range!.from!, "MMM d, yyyy")} – ${format(range!.to!, "MMM d, yyyy")}`,
+      `Period: ${format(range.from, "MMM d, yyyy")} – ${format(range.to, "MMM d, yyyy")}`,
       10
     );
     writeWrapped(`Generated: ${format(new Date(), "PPP p")}`, 10);
@@ -124,7 +125,10 @@ export function AiPremiumReport({ isPremium = false }: Props) {
     const disc = getDisclaimer("ai-premium-report");
     if (disc) writeWrapped(disc.content, 8);
 
-    doc.save(`ai-headache-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    try {
+      await addClinicianFooter(doc);
+      doc.save(`ai-headache-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    } catch { toast.error('PDF download failed. Please retry.'); }
   };
 
   if (beta.expired) {

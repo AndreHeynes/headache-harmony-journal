@@ -30,6 +30,9 @@ import { BetaAccessGate } from "./components/BetaAccessGate";
 import { SharedHeader } from "./components/SharedHeader";
 import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
 import { BetaModeRedirect } from "./components/auth/BetaModeRedirect";
+import TryJournal from './pages/TryJournal';
+import SampleReport from './pages/SampleReport';
+import Clinicians from './pages/Clinicians';
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -120,6 +123,9 @@ const App = () => {
                   <main className="flex-1">
                     <Routes>
                     <Route path="/" element={<Index />} />
+                      <Route path="/try" element={<TryJournal />} />
+                      <Route path="/sample-report" element={<SampleReport />} />
+                      <Route path="/clinicians" element={<Clinicians />} />
                       <Route path="/auth" element={<BetaModeRedirect><Auth /></BetaModeRedirect>} />
                       <Route path="/signin" element={<BetaModeRedirect><SignIn /></BetaModeRedirect>} />
                       <Route path="/signup" element={<BetaModeRedirect><SignUp /></BetaModeRedirect>} />

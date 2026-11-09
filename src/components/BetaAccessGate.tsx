@@ -21,7 +21,7 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
   }
 
   // Allow auth routes through the gate (e.g. /auth?mode=signin for magic link)
-  if (['/auth', '/signin', '/signup'].includes(location.pathname)) {
+  if (['/', '/try', '/sample-report', '/clinicians', '/auth', '/signin', '/signup'].includes(location.pathname)) {
     return <>{children}</>;
   }
 
