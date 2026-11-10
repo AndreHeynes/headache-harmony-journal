@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { trackCampaignStep } from '@/lib/campaignTracking';
 import { useNavigate } from 'react-router-dom';
 import { readTrialDraft } from '@/lib/publicExperience';
+import { isPostSigninEntryPath } from '@/lib/publicRoutes';
 
 interface BetaUser {
   email: string;
