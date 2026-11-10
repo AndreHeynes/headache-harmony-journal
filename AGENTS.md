@@ -13,3 +13,4 @@
 - Public sample fixtures are separate from Standard Export, and every sample PDF is labelled fictional; why: keep patient reports real-data-only.
 - PDF QR codes contain only the public clinician reference URL, never health data or report access tokens; why: sharing must not expose patient records.
 - Campaign tracking (`src/lib/campaignTracking.ts`, table `campaign_events`) stores only tag values, page, step and a per-tab random id — never user ids, emails or health data; results visible only to admins at /post-results; why: measure posts without tracking people.
+- Pages open to visitors are listed once in `src/lib/publicRoutes.ts` (`PUBLIC_PATHS`, `POST_SIGNIN_ENTRY_PATHS`); the beta gate and the post-signin redirect both read it; why: signup consent links to /policy so it must be readable before an account exists, and a signed-in reader must not be yanked to the dashboard from a page they opened.
