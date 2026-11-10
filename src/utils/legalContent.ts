@@ -60,7 +60,7 @@ This AI-generated report is NOT a medical report, diagnosis, or professional med
 
 By accessing this AI-generated report, you acknowledge that you understand these limitations and will use this information appropriately in consultation with qualified healthcare professionals.
 
-Last Updated: ${new Date().toLocaleDateString()}
+Last Updated: November 10, 2026
 Report Version: ${DISCLAIMER_VERSIONS.AI_REPORT}
     `.trim()
   },
