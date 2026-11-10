@@ -5,6 +5,7 @@ import { Loader2, ShieldX, Mail, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_CONFIG } from '@/config/appConfig';
 import { Link, useLocation } from 'react-router-dom';
+import { isPublicPath } from '@/lib/publicRoutes';
 
 interface BetaAccessGateProps {
   children: ReactNode;
