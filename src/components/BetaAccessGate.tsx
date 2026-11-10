@@ -20,9 +20,9 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
     return <>{children}</>;
   }
 
-  // Allow auth routes through the gate (e.g. /auth?mode=signin for magic link)
-  // /policy must be readable before signup: the signup consent links to it.
-  if (['/', '/try', '/sample-report', '/clinicians', '/auth', '/signin', '/signup', '/policy'].includes(location.pathname)) {
+  // Visitors who are not signed in may open the trial, sample report,
+  // clinician sheet, auth pages and the policies (signup consent links there).
+  if (isPublicPath(location.pathname)) {
     return <>{children}</>;
   }
 

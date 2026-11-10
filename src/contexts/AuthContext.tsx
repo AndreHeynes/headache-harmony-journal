@@ -121,8 +121,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Navigate to dashboard — but never yank a user away from a page
           // they opened on purpose (e.g. /policy from the Profile screen).
           setTimeout(() => {
-            const entryPaths = ['/', '/auth', '/signin', '/signup', '/try', '/sample-report', '/clinicians'];
-            if (!entryPaths.includes(window.location.pathname)) return;
+            if (!isPostSigninEntryPath(window.location.pathname)) return;
             navigate(readTrialDraft() ? '/try' : '/dashboard');
           }, 0);
         } else if (event === 'SIGNED_OUT') {
