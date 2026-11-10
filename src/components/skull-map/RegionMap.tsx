@@ -117,8 +117,8 @@ export default function RegionMap({ viewBox, outline, regions, label, leftText, 
 
         {overlay}
 
-        <text x={w * 0.03} y={h * 0.98} className="fill-muted-foreground" fontSize={w / 30}>{leftText}</text>
-        <text x={w * 0.97} y={h * 0.98} textAnchor="end" className="fill-muted-foreground" fontSize={w / 30}>{rightText}</text>
+        <text x={w * 0.03} y={h * 0.98} className="fill-foreground" fontWeight={600} fontSize={w / 30}>{leftText}</text>
+        <text x={w * 0.97} y={h * 0.98} textAnchor="end" className="fill-foreground" fontWeight={600} fontSize={w / 30}>{rightText}</text>
       </svg>
       <p className="mt-2 text-center text-xs text-muted-foreground">{caption}</p>
     </div>
