@@ -20,5 +20,6 @@ export default function Clinicians() {
       ['Safety & privacy', 'Screening is not a diagnosis or an emergency assessment. Patients choose whether to share their downloaded report. The QR code opens this public reference page, never a patient record.'],
     ].map(([title, body]) => <section key={title} className="py-6"><h2 className="text-xl font-semibold mb-2">{title}</h2><p className="text-muted-foreground leading-relaxed">{body}</p></section>)}</div>
     <div className="flex flex-wrap gap-3"><Button onClick={() => downloadClinicSheet().catch(() => toast.error('Download failed. Please retry.'))}><Download />Clinic reference sheet</Button><Button asChild variant="outline"><Link to="/sample-report"><FileText />Fictional sample report</Link></Button><Button asChild variant="outline"><Link to="/try">Try the pain map</Link></Button></div>
+    <PublicPageFooter />
   </div>;
 }

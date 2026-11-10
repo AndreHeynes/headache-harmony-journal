@@ -23,5 +23,6 @@ export default function SampleReport() {
       <section><h3 className="text-lg font-semibold mb-2">Treatment response & interpretation</h3><p className="text-sm">One partial outcome; one missing outcome excluded. No effectiveness percentage or trigger association can be inferred from this sample.</p><p className="text-sm text-muted-foreground mt-3">Informational only; not medical advice or a diagnosis. Seek urgent medical attention for new severe or concerning symptoms.</p></section>
     </article>
     <div className="flex flex-wrap gap-3 mt-6"><Button asChild><Link to="/try"><ArrowRight />Map my pain</Link></Button><Button asChild variant="outline"><Link to="/signup">Start my own journal</Link></Button></div>
+    <PublicPageFooter />
   </div>;
 }
