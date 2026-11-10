@@ -5,6 +5,7 @@ import { Loader2, ShieldX, Mail, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { APP_CONFIG } from '@/config/appConfig';
 import { Link, useLocation } from 'react-router-dom';
+import { isPublicPath } from '@/lib/publicRoutes';
 
 interface BetaAccessGateProps {
   children: ReactNode;
@@ -20,9 +21,9 @@ export const BetaAccessGate = ({ children }: BetaAccessGateProps) => {
     return <>{children}</>;
   }
 
-  // Allow auth routes through the gate (e.g. /auth?mode=signin for magic link)
-  // /policy must be readable before signup: the signup consent links to it.
-  if (['/', '/try', '/sample-report', '/clinicians', '/auth', '/signin', '/signup', '/policy'].includes(location.pathname)) {
+  // Visitors who are not signed in may open the trial, sample report,
+  // clinician sheet, auth pages and the policies (signup consent links there).
+  if (isPublicPath(location.pathname)) {
     return <>{children}</>;
   }
 

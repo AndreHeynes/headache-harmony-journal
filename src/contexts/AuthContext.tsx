@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { trackCampaignStep } from '@/lib/campaignTracking';
 import { useNavigate } from 'react-router-dom';
 import { readTrialDraft } from '@/lib/publicExperience';
+import { isPostSigninEntryPath } from '@/lib/publicRoutes';
 
 interface BetaUser {
   email: string;
@@ -118,8 +119,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             );
           }, 0);
           
-          // Navigate to dashboard
+          // Navigate to dashboard — but never yank a user away from a page
+          // they opened on purpose (e.g. /policy from the Profile screen).
           setTimeout(() => {
+            if (!isPostSigninEntryPath(window.location.pathname)) return;
             navigate(readTrialDraft() ? '/try' : '/dashboard');
           }, 0);
         } else if (event === 'SIGNED_OUT') {
