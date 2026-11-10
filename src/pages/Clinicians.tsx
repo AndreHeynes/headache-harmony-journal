@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PublicPageHeader } from '@/components/public/PublicPageHeader';
+import { PublicPageFooter } from '@/components/public/PublicPageFooter';
 import { downloadClinicSheet } from '@/lib/clinicianPdf';
 import { toast } from 'sonner';
 

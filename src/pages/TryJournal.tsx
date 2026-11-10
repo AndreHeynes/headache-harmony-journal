@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HeadMapPicker from '@/components/skull-map/HeadMapPicker';
 import { PublicPageHeader } from '@/components/public/PublicPageHeader';
+import { PublicPageFooter } from '@/components/public/PublicPageFooter';
 import { REGION_LABELS } from '@/lib/regionMapping';
 import { GUEST_DRAFT_KEY, newTrialDraft, readTrialDraft, selectedTrialAreas, selectTrialAreas, TRIAL_OUTCOMES, type TrialArea } from '@/lib/publicExperience';
 import { supabase } from '@/integrations/supabase/client';

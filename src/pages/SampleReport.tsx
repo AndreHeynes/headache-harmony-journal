@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Download, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PublicPageHeader } from '@/components/public/PublicPageHeader';
+import { PublicPageFooter } from '@/components/public/PublicPageFooter';
 import { SAMPLE_REPORT, downloadSampleReport } from '@/lib/sampleReport';
 import { toast } from 'sonner';
 
