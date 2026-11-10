@@ -1,0 +1,1 @@
+DELETE FROM public.campaign_events WHERE utm_source = 'qa_check';

@@ -12,3 +12,4 @@
 - Public trial drafts stay in sessionStorage and save only with explicit authenticated consent as active episodes; why: avoid anonymous health-data writes and bypassing required screening.
 - Public sample fixtures are separate from Standard Export, and every sample PDF is labelled fictional; why: keep patient reports real-data-only.
 - PDF QR codes contain only the public clinician reference URL, never health data or report access tokens; why: sharing must not expose patient records.
+- Campaign tracking (`src/lib/campaignTracking.ts`, table `campaign_events`) stores only tag values, page, step and a per-tab random id — never user ids, emails or health data; results visible only to admins at /post-results; why: measure posts without tracking people.

@@ -1,3 +1,4 @@
+import { trackCampaignStep } from '@/lib/campaignTracking';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Download, ArrowRight } from 'lucide-react';
@@ -11,7 +12,7 @@ export default function SampleReport() {
   return <div className="max-w-5xl mx-auto px-4 py-6 pb-20">
     <Helmet><title>Sample doctor report | My Headache Experience Journal</title><meta name="description" content="View a clearly labelled fictional headache report showing pain area order, recorded treatment response and screening information." /></Helmet>
     <PublicPageHeader />
-    <div className="flex flex-wrap justify-between items-start gap-4 mb-8"><div><p className="text-primary text-sm mb-2">Sample only · fictional data</p><h1 className="text-3xl font-semibold">Doctor-ready report sample</h1></div><Button variant="outline" onClick={() => downloadSampleReport().catch(() => toast.error('Sample download failed. Please retry.'))}><Download />Download sample PDF</Button></div>
+    <div className="flex flex-wrap justify-between items-start gap-4 mb-8"><div><p className="text-primary text-sm mb-2">Sample only · fictional data</p><h1 className="text-3xl font-semibold">Doctor-ready report sample</h1></div><Button variant="outline" onClick={() => { void trackCampaignStep('sample_downloaded'); return downloadSampleReport().catch(() => toast.error('Sample download failed. Please retry.')); }}><Download />Download sample PDF</Button></div>
     <article aria-label="Fictional sample report" className="border border-border bg-card p-5 sm:p-8 space-y-7">
       <header className="border-b border-border pb-5"><p className="text-accent font-semibold">SAMPLE ONLY — NOT A PATIENT RECORD</p><h2 className="text-2xl font-semibold mt-3">My Headache Experience Journal</h2><p className="text-muted-foreground mt-2">Patient report · {s.period}</p></header>
       <section><h3 className="text-lg font-semibold mb-2">Demographics & identification</h3><p>{s.patient} · No real personal information</p></section>

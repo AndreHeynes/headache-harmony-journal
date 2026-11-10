@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { trackCampaignStep } from '@/lib/campaignTracking';
 import { useNavigate } from 'react-router-dom';
 import { readTrialDraft } from '@/lib/publicExperience';
 
@@ -186,6 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Trigger email sequence on successful signup (fire-and-forget)
     if (!error) {
       triggerEmailSequence(email, fullName);
+      void trackCampaignStep('signup');
     }
     
     return { error };
