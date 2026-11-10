@@ -89,5 +89,6 @@ export default function TryJournal() {
         </div>
       </section>
     </div>
+    <PublicPageFooter />
   </div>;
 }
