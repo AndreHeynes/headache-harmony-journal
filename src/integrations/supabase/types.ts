@@ -59,6 +59,39 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          page: string | null
+          session_id: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          page?: string | null
+          session_id: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          page?: string | null
+          session_id?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string
+        }
+        Relationships: []
+      }
       episode_locations: {
         Row: {
           created_at: string
