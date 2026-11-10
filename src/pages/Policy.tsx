@@ -71,6 +71,7 @@ export default function Policy() {
                         <li><strong>Personal Information</strong>: Name, email address, age, gender that you provide when creating an account.</li>
                         <li><strong>Health Information</strong>: Details about your headaches including pain intensity, location, symptoms, potential triggers, and medications.</li>
                         <li><strong>Usage Data</strong>: Information about how you interact with our application, including log data, device information, and app usage statistics.</li>
+                        <li><strong>Campaign Tracking</strong>: When you arrive from a link we share on social media, we count the campaign tags in that link, the page you opened, and simple steps such as painting the pain map or creating an account — all without names, email addresses, or health details.</li>
                       </ul>
                     </AccordionContent>
                   </AccordionItem>
@@ -84,6 +85,7 @@ export default function Policy() {
                         <li>To analyze usage patterns and optimize our application</li>
                         <li>To communicate with you about updates, security alerts, and support</li>
                         <li>To detect, prevent, and address technical issues or fraudulent activity</li>
+                        <li>To count which social media posts bring visitors to the app, using campaign tags, pages and tracking steps only — never names, emails or health details</li>
                       </ul>
                     </AccordionContent>
                   </AccordionItem>
