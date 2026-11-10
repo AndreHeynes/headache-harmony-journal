@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, Shield, FileText, Cookie, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/layout/BottomNav";
+import { PublicPageFooter } from "@/components/public/PublicPageFooter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Policy() {
@@ -393,6 +394,9 @@ export default function Policy() {
               </div>
             )}
           </div>
+        </div>
+        <div className="container mx-auto px-4">
+          <PublicPageFooter />
         </div>
       </main>
 
