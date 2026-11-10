@@ -163,7 +163,7 @@ export default function Policy() {
                 </Accordion>
                 
                 <div className="mt-6 text-sm text-muted-foreground">
-                  Last Updated: June 1, 2023
+                  Last Updated: November 10, 2026
                 </div>
               </div>
             )}
@@ -239,7 +239,7 @@ export default function Policy() {
                 </Accordion>
                 
                 <div className="mt-6 text-sm text-muted-foreground">
-                  Last Updated: June 1, 2023
+                  Last Updated: November 10, 2026
                 </div>
               </div>
             )}
@@ -307,7 +307,7 @@ export default function Policy() {
                 </Accordion>
                 
                 <div className="mt-6 text-sm text-muted-foreground">
-                  Last Updated: June 1, 2023
+                  Last Updated: November 10, 2026
                 </div>
               </div>
             )}
@@ -388,7 +388,7 @@ export default function Policy() {
                 </Accordion>
                 
                 <div className="mt-6 text-sm text-muted-foreground">
-                  Last Updated: June 1, 2023
+                  Last Updated: November 10, 2026
                 </div>
               </div>
             )}
