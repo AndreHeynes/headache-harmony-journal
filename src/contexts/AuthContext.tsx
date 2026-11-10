@@ -186,6 +186,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Trigger email sequence on successful signup (fire-and-forget)
     if (!error) {
       triggerEmailSequence(email, fullName);
+      void trackCampaignStep('signup');
     }
     
     return { error };

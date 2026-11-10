@@ -33,6 +33,8 @@ import { BetaModeRedirect } from "./components/auth/BetaModeRedirect";
 import TryJournal from './pages/TryJournal';
 import SampleReport from './pages/SampleReport';
 import Clinicians from './pages/Clinicians';
+import CampaignResults from './pages/CampaignResults';
+import { captureCampaign } from './lib/campaignTracking';
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -62,6 +64,8 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const [showPolicyUpdate, setShowPolicyUpdate] = useState(false);
+
+  useEffect(() => { captureCampaign(); }, []);
 
   useEffect(() => {
     const lastPolicyVersion = localStorage.getItem('last-policy-version');
@@ -139,6 +143,7 @@ const App = () => {
                       <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
                       <Route path="/test-dashboard" element={<ProtectedRoute><TestDashboard /></ProtectedRoute>} />
                       <Route path="/pilot-testing-prep" element={<ProtectedRoute><PilotTestingPrep /></ProtectedRoute>} />
+                      <Route path="/post-results" element={<ProtectedRoute><CampaignResults /></ProtectedRoute>} />
                       <Route path="/data-export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
                       
                       <Route path="*" element={<NotFound />} />

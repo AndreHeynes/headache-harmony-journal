@@ -1,3 +1,4 @@
+import { trackCampaignStep } from '@/lib/campaignTracking';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -65,7 +66,7 @@ export default function TryJournal() {
     <PublicPageHeader />
     <div className="mb-6"><p className="text-primary text-sm mb-2">No account needed</p><h1 className="text-3xl font-semibold">My Headache Experience Journal</h1><p className="text-muted-foreground mt-2">Your pain map</p></div>
     <div className="grid md:grid-cols-2 gap-8">
-      <section aria-label="Trial pain map"><HeadMapPicker selected={areas.map(a => a.id)} labelFor={id => { const a = draft.areas.find(x => x.id === id); return `${a?.order} · ${REGION_LABELS[id]}${a?.order === 1 ? ' (Origin)' : ''}`; }} onChange={next => commit(selectTrialAreas(draft, next))} /></section>
+      <section aria-label="Trial pain map"><HeadMapPicker selected={areas.map(a => a.id)} labelFor={id => { const a = draft.areas.find(x => x.id === id); return `${a?.order} · ${REGION_LABELS[id]}${a?.order === 1 ? ' (Origin)' : ''}`; }} onChange={next => { if (next.length) void trackCampaignStep('map_painted'); commit(selectTrialAreas(draft, next)); }} /></section>
       <section className="space-y-5 min-w-0" aria-label="Trial area details">
         {area ? <>
           <Tabs value={area.id} onValueChange={setActiveId}><TabsList className="h-auto flex flex-wrap justify-start gap-1 bg-transparent">{areas.map(a => <TabsTrigger key={a.id} value={a.id} className="whitespace-normal text-left">{a.order} · {REGION_LABELS[a.id]}{a.order === 1 ? ' · Origin' : ''}</TabsTrigger>)}</TabsList></Tabs>
