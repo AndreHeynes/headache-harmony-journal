@@ -1,0 +1,181 @@
+{
+  "note": "Fictional sample data only. No real users.",
+  "assets": [
+    {
+      "file": "try-front-phone.png",
+      "screen": "/try Front view, 3 areas",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Fictional trial",
+      "text": "Left temple (Origin), Left eye, Top of head"
+    },
+    {
+      "file": "try-front-phone-crop.png",
+      "screen": "/try Front map crop",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "Fictional trial",
+      "text": "Right / Left"
+    },
+    {
+      "file": "try-order-phone.png",
+      "screen": "/try numbered areas with Origin",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Fictional trial",
+      "text": "1 Left temple Origin, 2 Left eye, 3 Top of head"
+    },
+    {
+      "file": "try-back-phone.png",
+      "screen": "/try Back & neck view",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Fictional trial",
+      "text": "Seen from behind \u2014 your left is on the left."
+    },
+    {
+      "file": "try-back-phone-crop.png",
+      "screen": "/try Back map crop",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "Fictional trial",
+      "text": "Left / Right"
+    },
+    {
+      "file": "sample-report-phone.png",
+      "screen": "/sample-report",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "clinicians-phone.png",
+      "screen": "/clinicians",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Public page",
+      "text": "Clinician reference"
+    },
+    {
+      "file": "signup-phone.png",
+      "screen": "/signup",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Public page",
+      "text": "Open beta: 56 days (8 weeks) of Premium, free"
+    },
+    {
+      "file": "sample-report-phone-crop.png",
+      "screen": "/sample-report report crop",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "try-front-desktop.png",
+      "screen": "/try Front view, 3 areas",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Fictional trial",
+      "text": "Left temple (Origin), Left eye, Top of head"
+    },
+    {
+      "file": "try-front-desktop-crop.png",
+      "screen": "/try Front map crop",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "Fictional trial",
+      "text": "Right / Left"
+    },
+    {
+      "file": "try-order-desktop.png",
+      "screen": "/try numbered areas with Origin",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Fictional trial",
+      "text": "1 Left temple Origin, 2 Left eye, 3 Top of head"
+    },
+    {
+      "file": "try-back-desktop.png",
+      "screen": "/try Back & neck view",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Fictional trial",
+      "text": "Seen from behind \u2014 your left is on the left."
+    },
+    {
+      "file": "try-back-desktop-crop.png",
+      "screen": "/try Back map crop",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "Fictional trial",
+      "text": "Left / Right"
+    },
+    {
+      "file": "sample-report-desktop.png",
+      "screen": "/sample-report",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "clinicians-desktop.png",
+      "screen": "/clinicians",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Public page",
+      "text": "Clinician reference"
+    },
+    {
+      "file": "signup-desktop.png",
+      "screen": "/signup",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Public page",
+      "text": "Open beta: 56 days (8 weeks) of Premium, free"
+    },
+    {
+      "file": "sample-report-desktop-crop.png",
+      "screen": "/sample-report report crop",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "headmap-front-clean.png",
+      "screen": "Head map Front (clean)",
+      "device": "image",
+      "size": "2x",
+      "scenario": "None",
+      "text": "Right / Left"
+    },
+    {
+      "file": "headmap-back-clean.png",
+      "screen": "Head map Back & neck (clean)",
+      "device": "image",
+      "size": "2x",
+      "scenario": "None",
+      "text": "Left / Right"
+    },
+    {
+      "file": "rec-pain-map.webm",
+      "screen": "rec-pain-map",
+      "device": "phone",
+      "size": "390x844",
+      "scenario": "Fictional",
+      "text": "screen recording"
+    },
+    {
+      "file": "rec-sample-scroll.webm",
+      "screen": "rec-sample-scroll",
+      "device": "phone",
+      "size": "390x844",
+      "scenario": "Fictional",
+      "text": "screen recording"
+    }
+  ]
+}

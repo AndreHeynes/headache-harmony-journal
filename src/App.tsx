@@ -29,6 +29,8 @@ import { DisclaimerProvider } from "./components/disclaimer";
 import { BetaAccessGate } from "./components/BetaAccessGate";
 import { SharedHeader } from "./components/SharedHeader";
 import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
+import { isCaptureMode } from "./lib/captureMode";
+import PressKit from "./pages/PressKit";
 import { BetaModeRedirect } from "./components/auth/BetaModeRedirect";
 import TryJournal from './pages/TryJournal';
 import SampleReport from './pages/SampleReport';
@@ -64,6 +66,8 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const [showPolicyUpdate, setShowPolicyUpdate] = useState(false);
+  const [capture] = useState(() => isCaptureMode());
+  useEffect(() => { document.documentElement.classList.toggle("capture-mode", capture); }, [capture]);
 
   useEffect(() => { captureCampaign(); }, []);
 
@@ -88,16 +92,16 @@ const App = () => {
           <DisclaimerProvider>
             <div className="min-h-screen flex flex-col">
               <SharedHeader />
-              <div className="fixed bottom-4 right-4 z-50">
+              {!capture && <div className="fixed bottom-4 right-4 z-50">
                 <BetaFeedbackForm />
-              </div>
+              </div>}
               <SecurityHeaders />
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
-                <TestGuideModal />
-                <CookieConsentBanner />
-                {showPolicyUpdate && (
+                {!capture && <TestGuideModal />}
+                {!capture && <CookieConsentBanner />}
+                {showPolicyUpdate && !capture && (
                   <div className="fixed top-16 left-0 right-0 bg-primary/90 text-primary-foreground p-3 z-40 backdrop-blur-sm">
                     <div className="container mx-auto flex items-center justify-between">
                       <p className="text-sm">Our Privacy Policy has been updated. Please review the <a href="/policy" className="underline">updated policy</a>.</p>
@@ -130,6 +134,7 @@ const App = () => {
                       <Route path="/try" element={<TryJournal />} />
                       <Route path="/sample-report" element={<SampleReport />} />
                       <Route path="/clinicians" element={<Clinicians />} />
+                      <Route path="/press-kit" element={<PressKit />} />
                       <Route path="/auth" element={<BetaModeRedirect><Auth /></BetaModeRedirect>} />
                       <Route path="/signin" element={<BetaModeRedirect><SignIn /></BetaModeRedirect>} />
                       <Route path="/signup" element={<BetaModeRedirect><SignUp /></BetaModeRedirect>} />

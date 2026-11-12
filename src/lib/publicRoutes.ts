@@ -13,6 +13,7 @@ export const PUBLIC_PATHS = [
   '/signin',
   '/signup',
   '/policy',
+  '/press-kit',
 ] as const;
 
 // Where a user is standing when it makes sense to send them to the dashboard

@@ -52,3 +52,7 @@
     @apply px-6 py-12 md:px-8 md:py-16 lg:px-12;
   }
 }
+
+/* Screenshot capture mode: keep content clear of the fixed bottom nav */
+.capture-mode body { padding-bottom: 80px; }
+.capture-mode [data-sonner-toaster] { display: none !important; }

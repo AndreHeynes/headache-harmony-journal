@@ -22,6 +22,10 @@ const SignUp = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 rounded-md border border-primary/40 bg-primary/10 p-3 text-sm text-foreground">
+              <p className="font-semibold">Open beta: 56 days (8 weeks) of Premium, free</p>
+              <p className="text-muted-foreground mt-1">After 56 days, logging headaches and the Standard Doctor PDF stay free. Only AI pattern insights need Premium.</p>
+            </div>
             <SignUpForm />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
