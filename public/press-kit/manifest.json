@@ -42,14 +42,6 @@
       "text": "Left / Right"
     },
     {
-      "file": "sample-report-phone.png",
-      "screen": "/sample-report",
-      "device": "phone",
-      "size": "780x1688",
-      "scenario": "Fictional sample",
-      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
-    },
-    {
       "file": "clinicians-phone.png",
       "screen": "/clinicians",
       "device": "phone",
@@ -64,14 +56,6 @@
       "size": "780x1688",
       "scenario": "Public page",
       "text": "Open beta: 56 days (8 weeks) of Premium, free"
-    },
-    {
-      "file": "sample-report-phone-crop.png",
-      "screen": "/sample-report report crop",
-      "device": "phone",
-      "size": "crop",
-      "scenario": "Fictional sample",
-      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
     },
     {
       "file": "try-front-desktop.png",
@@ -114,14 +98,6 @@
       "text": "Left / Right"
     },
     {
-      "file": "sample-report-desktop.png",
-      "screen": "/sample-report",
-      "device": "desktop",
-      "size": "2560x1600",
-      "scenario": "Fictional sample",
-      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
-    },
-    {
       "file": "clinicians-desktop.png",
       "screen": "/clinicians",
       "device": "desktop",
@@ -136,14 +112,6 @@
       "size": "2560x1600",
       "scenario": "Public page",
       "text": "Open beta: 56 days (8 weeks) of Premium, free"
-    },
-    {
-      "file": "sample-report-desktop-crop.png",
-      "screen": "/sample-report report crop",
-      "device": "desktop",
-      "size": "crop",
-      "scenario": "Fictional sample",
-      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
     },
     {
       "file": "headmap-front-clean.png",
@@ -176,6 +144,518 @@
       "size": "390x844",
       "scenario": "Fictional",
       "text": "screen recording"
+    },
+    {
+      "file": "sample-report-phone.png",
+      "screen": "/sample-report",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "sample-report-phone-crop.png",
+      "screen": "/sample-report crop",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "Fictional sample",
+      "text": "Pain medicine at 30 minutes"
+    },
+    {
+      "file": "demo-light-phone.png",
+      "screen": "/demo overview",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "light",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-dashboard-phone.png",
+      "screen": "Dashboard",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-sleep-phone.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-trends-phone.png",
+      "screen": "Episode trend",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-peak-phone.png",
+      "screen": "Peak times",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-spread-phone.png",
+      "screen": "Area order & spread timing",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-neck-phone.png",
+      "screen": "Neck involvement",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-meds-phone.png",
+      "screen": "Medicine-use counter",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-export-phone.png",
+      "screen": "Standard Export",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-profile-phone.png",
+      "screen": "Data Management",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Data Management \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-phone.png",
+      "screen": "/demo overview",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "busy",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-dashboard-phone.png",
+      "screen": "Dashboard",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-sleep-phone.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-trends-phone.png",
+      "screen": "Episode trend",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-peak-phone.png",
+      "screen": "Peak times",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-spread-phone.png",
+      "screen": "Area order & spread timing",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-neck-phone.png",
+      "screen": "Neck involvement",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-meds-phone.png",
+      "screen": "Medicine-use counter",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-export-phone.png",
+      "screen": "Standard Export",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-profile-phone.png",
+      "screen": "Data Management",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Data Management \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-phone.png",
+      "screen": "/demo overview",
+      "device": "phone",
+      "size": "780x1688",
+      "scenario": "party",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-dashboard-phone.png",
+      "screen": "Dashboard",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-sleep-phone.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-trends-phone.png",
+      "screen": "Episode trend",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-peak-phone.png",
+      "screen": "Peak times",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-spread-phone.png",
+      "screen": "Area order & spread timing",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-neck-phone.png",
+      "screen": "Neck involvement",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-meds-phone.png",
+      "screen": "Medicine-use counter",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-export-phone.png",
+      "screen": "Standard Export",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-profile-phone.png",
+      "screen": "Data Management",
+      "device": "phone",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Data Management \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "sample-report-desktop.png",
+      "screen": "/sample-report",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "Fictional sample",
+      "text": "SAMPLE ONLY \u2014 NOT A PATIENT RECORD"
+    },
+    {
+      "file": "sample-report-desktop-crop.png",
+      "screen": "/sample-report crop",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "Fictional sample",
+      "text": "Pain medicine at 30 minutes"
+    },
+    {
+      "file": "demo-light-desktop.png",
+      "screen": "/demo overview",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "light",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-dashboard-desktop.png",
+      "screen": "Dashboard",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-sleep-desktop.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-trends-desktop.png",
+      "screen": "Episode trend",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-peak-desktop.png",
+      "screen": "Peak times",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-spread-desktop.png",
+      "screen": "Area order & spread timing",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-neck-desktop.png",
+      "screen": "Neck involvement",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-meds-desktop.png",
+      "screen": "Medicine-use counter",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-export-desktop.png",
+      "screen": "Standard Export",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-light-profile-desktop.png",
+      "screen": "Data Management",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "light",
+      "text": "Data Management \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-desktop.png",
+      "screen": "/demo overview",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "busy",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-dashboard-desktop.png",
+      "screen": "Dashboard",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-sleep-desktop.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-trends-desktop.png",
+      "screen": "Episode trend",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-peak-desktop.png",
+      "screen": "Peak times",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-spread-desktop.png",
+      "screen": "Area order & spread timing",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-neck-desktop.png",
+      "screen": "Neck involvement",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-meds-desktop.png",
+      "screen": "Medicine-use counter",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-export-desktop.png",
+      "screen": "Standard Export",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-busy-profile-desktop.png",
+      "screen": "Data Management",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "busy",
+      "text": "Data Management \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-desktop.png",
+      "screen": "/demo overview",
+      "device": "desktop",
+      "size": "2560x1600",
+      "scenario": "party",
+      "text": "Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-dashboard-desktop.png",
+      "screen": "Dashboard",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Dashboard \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-sleep-desktop.png",
+      "screen": "Daily Sleep & Wearable Check-in",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Daily Sleep & Wearable Check-in \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-trends-desktop.png",
+      "screen": "Episode trend",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Episode trend \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-peak-desktop.png",
+      "screen": "Peak times",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Peak times \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-spread-desktop.png",
+      "screen": "Area order & spread timing",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Area order & spread timing \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-neck-desktop.png",
+      "screen": "Neck involvement",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Neck involvement \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-meds-desktop.png",
+      "screen": "Medicine-use counter",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Medicine-use counter \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-export-desktop.png",
+      "screen": "Standard Export",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Standard Export \u00b7 Sample only: fictional data"
+    },
+    {
+      "file": "demo-party-profile-desktop.png",
+      "screen": "Data Management",
+      "device": "desktop",
+      "size": "crop",
+      "scenario": "party",
+      "text": "Data Management \u00b7 Sample only: fictional data"
     }
   ]
 }

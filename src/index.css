@@ -56,3 +56,4 @@
 /* Screenshot capture mode: keep content clear of the fixed bottom nav */
 .capture-mode body { padding-bottom: 80px; }
 .capture-mode [data-sonner-toaster] { display: none !important; }
+.capture-mode header.sticky, .capture-mode header.fixed { position: static !important; }

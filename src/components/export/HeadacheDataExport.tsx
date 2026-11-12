@@ -50,7 +50,7 @@ const demoHeadacheData: HeadacheRecord[] = [
     duration: 180,
     symptoms: ["Nausea", "Light sensitivity"],
     triggers: ["Stress", "Weather change"],
-    treatments: ["Ibuprofen", "Dark room"],
+    treatments: ["Pain medicine", "Dark room"],
     notes: "Started after work meeting"
   },
   {

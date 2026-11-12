@@ -31,6 +31,7 @@ import { SharedHeader } from "./components/SharedHeader";
 import { BetaFeedbackForm } from "./components/BetaFeedbackForm";
 import { isCaptureMode } from "./lib/captureMode";
 import PressKit from "./pages/PressKit";
+import Demo from "./pages/Demo";
 import { BetaModeRedirect } from "./components/auth/BetaModeRedirect";
 import TryJournal from './pages/TryJournal';
 import SampleReport from './pages/SampleReport';
@@ -135,6 +136,7 @@ const App = () => {
                       <Route path="/sample-report" element={<SampleReport />} />
                       <Route path="/clinicians" element={<Clinicians />} />
                       <Route path="/press-kit" element={<PressKit />} />
+                      <Route path="/demo" element={<Demo />} />
                       <Route path="/auth" element={<BetaModeRedirect><Auth /></BetaModeRedirect>} />
                       <Route path="/signin" element={<BetaModeRedirect><SignIn /></BetaModeRedirect>} />
                       <Route path="/signup" element={<BetaModeRedirect><SignUp /></BetaModeRedirect>} />

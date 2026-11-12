@@ -14,3 +14,6 @@
 - PDF QR codes contain only the public clinician reference URL, never health data or report access tokens; why: sharing must not expose patient records.
 - Campaign tracking (`src/lib/campaignTracking.ts`, table `campaign_events`) stores only tag values, page, step and a per-tab random id — never user ids, emails or health data; results visible only to admins at /post-results; why: measure posts without tracking people.
 - Pages open to visitors are listed once in `src/lib/publicRoutes.ts` (`PUBLIC_PATHS`, `POST_SIGNIN_ENTRY_PATHS`); the beta gate and the post-signin redirect both read it; why: signup consent links to /policy so it must be readable before an account exists, and a signed-in reader must not be yanked to the dashboard from a page they opened.
+
+- Demo screens (/demo) use in-memory fictional fixtures from `src/lib/demoScenarios.ts` and never read or write the database; why: marketing captures must never touch real user data.
+- `?capture=1` (`src/lib/captureMode.ts`) hides floating UI for screenshots, tab-scoped; why: clean marketing captures without changing normal use.
