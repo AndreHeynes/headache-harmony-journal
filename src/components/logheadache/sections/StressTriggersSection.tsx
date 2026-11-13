@@ -74,7 +74,7 @@ export function StressTriggersSection({ onStressChange, initialStress = [] }: St
   const getHours = (type: string) => selectedStress.find(s => s.type === type)?.hoursBefore || "";
 
   return (
-    <Card className="bg-card border-border">
+    <Card id="stress-triggers" className="bg-card border-border">
       <div className="p-4 space-y-4">
         <h2 className="text-lg font-medium text-foreground">Stress Triggers</h2>
         <div className="space-y-3">

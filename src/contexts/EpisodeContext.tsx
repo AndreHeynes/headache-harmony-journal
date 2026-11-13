@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
 import { HeadacheEpisode, EpisodeContextType } from '@/types/episode';
 import { toast } from 'sonner';
+import { isDemoMode } from '@/lib/demoMode';
 
 const EpisodeContext = createContext<EpisodeContextType | undefined>(undefined);
 
@@ -22,6 +23,20 @@ export const EpisodeProvider = ({ children }: { children: ReactNode }) => {
   const checkForActiveEpisode = useCallback(async () => {
     // Don't check if auth is still loading or no user
     if (authLoading || !user) return;
+
+    // Demo records are local to this tab; never verify or create a real session.
+    if (isDemoMode()) {
+      setLoadingEpisode(true);
+      const { data, error } = await supabase
+        .from('headache_episodes')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      setLoadingEpisode(false);
+      if (!error) setActiveEpisode(data as HeadacheEpisode | null);
+      return;
+    }
 
     // Verify session is actually synchronized before querying
     const { data: sessionData } = await supabase.auth.getSession();

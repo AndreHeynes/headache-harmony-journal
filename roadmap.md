@@ -1,3 +1,12 @@
+# Roadmap: real-screen press kit
+- [x] Reconcile /demo lookalike assets with the missing real-screen capture matrix
+- [ ] Add read-only ?demo=1 fixtures to real signed-in screens without database access
+- [ ] Cover all six log steps, weather/cycle, dashboard, analysis, export, AI Premium Report and profile
+- [ ] Capture phone/desktop PNGs and tight crops, sample-report sections and clinic-sheet PDF
+- [ ] Update /press-kit manifest and noindex previews with exact text and scenario metadata
+- [ ] Open and inspect every asset; verify labels, contrast, fictional data and no medicine brand names
+- [ ] Run tests and verify the central demo/capture flows on phone and desktop
+
 # Roadmap: new skull map
 - [x] Area mapping + checks; region field added and filled for saved areas
 - [x] Draw back-of-head and neck view (left/right/center back of head, neck)

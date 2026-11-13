@@ -305,8 +305,9 @@ export function AiPremiumReport({ isPremium = false }: Props) {
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const id = title === 'Treatment & Management Effectiveness' ? 'ai-treatment-effectiveness' : title === 'Correlation & Association Analysis' ? 'ai-correlation-analysis' : undefined;
   return (
-    <div>
+    <div id={id}>
       <h3 className="text-white font-semibold mb-2">{title}</h3>
       {children}
     </div>

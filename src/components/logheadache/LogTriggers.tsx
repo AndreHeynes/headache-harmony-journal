@@ -37,7 +37,27 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
     const source = hasMultipleLocations && activeLocation
       ? activeLocation.triggers
       : activeEpisode?.triggers;
-    setTriggers(source || []);
+    const existing = source || [];
+    setTriggers(existing);
+    const parseTimed = (prefix: string) => existing
+      .filter(t => t.startsWith(prefix))
+      .map(t => {
+        const match = t.match(new RegExp(`^${prefix}\\s*(.*?)(?:\\s*\\((\\d+(?:\\.\\d+)?)h before\\))?$`));
+        return { value: match?.[1] || '', hours: match?.[2] || '' };
+      });
+    const foods = parseTimed('Food:').map(item => ({ food: item.value, hours: item.hours }));
+    const drinks = parseTimed('Beverage:').map(item => ({ beverage: item.value, hours: item.hours }));
+    setFoodItems(foods.length ? foods : [{ food: '', hours: '' }]);
+    setBeverages(drinks.length ? drinks : [{ beverage: '', hours: '' }]);
+    const savedActivities = existing.filter(t => t.startsWith('Activity:')).map(t => {
+      let text = t.replace(/^Activity:\s*/, '');
+      const duration = text.match(/\s*\[(\d+(?:\.\d+)?) min\]$/)?.[1] || '';
+      text = text.replace(/\s*\[\d+(?:\.\d+)? min\]$/, '');
+      const hoursBefore = text.match(/\s*\((\d+(?:\.\d+)?)h before\)$/)?.[1] || '';
+      text = text.replace(/\s*\(\d+(?:\.\d+)?h before\)$/, '');
+      return { type: text, duration, hoursBefore };
+    });
+    setActivities(savedActivities.length ? savedActivities : [{ type: '', duration: '', hoursBefore: '' }]);
   }, [activeEpisode, activeLocation, activeLocationId, hasMultipleLocations]);
 
   const saveTriggers = async (newTriggers: string[]) => {
@@ -112,7 +132,7 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
       <WeatherSection onWeatherCapture={handleWeatherCapture} />
       <MenstrualCycleSection onCycleDataCapture={handleCycleDataCapture} />
       
-      <Card className="bg-card border-border">
+      <Card id="food-triggers" className="bg-card border-border">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-foreground">
             Food Triggers
@@ -136,7 +156,7 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
         </div>
       </Card>
       
-      <Card className="bg-card border-border">
+      <Card id="fluid-drinks" className="bg-card border-border">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-foreground">Beverages</h2>
           <div className="space-y-3">
@@ -157,7 +177,7 @@ export default function LogTriggers({ episodeId }: LogTriggersProps) {
       
       <StressTriggersSection onStressChange={handleStressChange} initialStress={triggers.filter(t => t.startsWith('Stress:'))} />
       
-      <Card className="bg-card border-border">
+      <Card id="activity-triggers" className="bg-card border-border">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-medium text-foreground">Activities</h2>
           <div className="space-y-3">

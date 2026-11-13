@@ -38,6 +38,8 @@ import SampleReport from './pages/SampleReport';
 import Clinicians from './pages/Clinicians';
 import CampaignResults from './pages/CampaignResults';
 import { captureCampaign } from './lib/campaignTracking';
+import { isDemoMode } from './lib/demoMode';
+import { DemoModeBanner } from './components/demo/DemoModeBanner';
 
 // Initialize React Query with enhanced error logging
 const queryClient = new QueryClient({
@@ -93,6 +95,7 @@ const App = () => {
           <DisclaimerProvider>
             <div className="min-h-screen flex flex-col">
               <SharedHeader />
+              {isDemoMode() && <DemoModeBanner />}
               {!capture && <div className="fixed bottom-4 right-4 z-50">
                 <BetaFeedbackForm />
               </div>}

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { isDemoMode } from "@/lib/demoMode";
 
 export const WEARABLE_TIP =
   "Wear a Fitbit, Apple Watch, or Oura Ring? Use your morning sleep score and HRV to populate your daily check-in. Our AI correlation engine will analyze how sleep architecture affects your episode frequency.";
@@ -23,10 +24,10 @@ const toNum = (v: string) => (v.trim() === "" ? null : Number(v));
 export function WearableCheckIn({ title = "Daily Sleep & Wearable Check-in", compact = false }: Props) {
   const { user } = useAuth();
   const today = format(new Date(), "yyyy-MM-dd");
-  const [hours, setHours] = useState("");
-  const [score, setScore] = useState("");
-  const [rhr, setRhr] = useState("");
-  const [hrv, setHrv] = useState("");
+  const [hours, setHours] = useState(() => isDemoMode() ? "6.5" : "");
+  const [score, setScore] = useState(() => isDemoMode() ? "72" : "");
+  const [rhr, setRhr] = useState(() => isDemoMode() ? "62" : "");
+  const [hrv, setHrv] = useState(() => isDemoMode() ? "48" : "");
   const [saving, setSaving] = useState(false);
   const [savedToday, setSavedToday] = useState(false);
 
@@ -88,7 +89,7 @@ export function WearableCheckIn({ title = "Daily Sleep & Wearable Check-in", com
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card id="wearable-checkin" className="bg-card border-border">
       <CardHeader className={compact ? "pb-2" : undefined}>
         <CardTitle className="text-foreground flex items-center gap-2 text-base">
           <Watch className="h-5 w-5 text-primary" />

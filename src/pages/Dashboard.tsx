@@ -15,6 +15,7 @@ import { formatDistanceToNow, format } from "date-fns";
 import { useEffect } from "react";
 import { WearableCheckIn } from "@/components/wearables/WearableCheckIn";
 import { DoctorSharing } from '@/components/dashboard/DoctorSharing';
+import { HeadacheBreakdown } from '@/components/dashboard/HeadacheBreakdown';
 
 export default function Dashboard() {
   const isPremium = false;
@@ -100,7 +101,7 @@ export default function Dashboard() {
           <WearableCheckIn />
           {/* Active Episode Indicator */}
           {activeEpisode && (
-            <Card className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border-red-700">
+            <Card id="active-episode" className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border-red-700">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Activity className="h-5 w-5 animate-pulse text-red-400" />
@@ -171,8 +172,8 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-7 gap-2">
-                {data.weeklyChartData.map((day) => (
-                  <div key={day.date} className="text-center">
+                {data.weeklyChartData.map((day, index) => (
+                  <div key={`${day.date}-${index}`} className="text-center">
                     <div className="text-xs text-muted-foreground mb-1">{day.date}</div>
                     <div className={`h-12 rounded ${
                       day.count > 0 ? "bg-red-900/50 border border-red-700" : "bg-muted"
@@ -241,8 +242,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          <HeadacheBreakdown />
+
           {/* Quick Insights */}
-          <Card className="bg-card border-border shadow-lg">
+          <Card id="quick-insights" className="bg-card border-border shadow-lg">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center justify-between">
                 <span>Quick Insights</span>

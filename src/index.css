@@ -57,3 +57,6 @@
 .capture-mode body { padding-bottom: 80px; }
 .capture-mode [data-sonner-toaster] { display: none !important; }
 .capture-mode header.sticky, .capture-mode header.fixed { position: static !important; }
+.capture-mode footer.fixed { position: static !important; }
+.capture-mode .fixed.bottom-20 { display: none !important; }
+.capture-mode main, .capture-mode [role="main"] { scroll-padding-bottom: 96px; }

@@ -6,6 +6,9 @@ import './index.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { EpisodeProvider } from './contexts/EpisodeContext';
 import { LocationProvider } from './contexts/LocationContext';
+import { installDemoGateway } from './lib/demoGateway';
+
+installDemoGateway();
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

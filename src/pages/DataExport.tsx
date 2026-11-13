@@ -9,10 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTestContext } from "@/contexts/TestContext";
 import BottomNavWithTest from "@/components/layout/BottomNavWithTest";
 import { useExportData } from "@/hooks/useExportData";
+import { isDemoMode } from "@/lib/demoMode";
 
 export default function DataExport() {
   const navigate = useNavigate();
   const { isTestMode, isPremiumOverride, logTestEvent } = useTestContext();
+  const demoPremiumLocked = isDemoMode() && new URLSearchParams(window.location.search).get('premium') === '0';
+  const premiumAccess = (isPremiumOverride || isDemoMode()) && !demoPremiumLocked;
   const { data: headacheData, redFlags, loading, hasData } = useExportData();
   
   React.useEffect(() => {
@@ -65,11 +68,11 @@ export default function DataExport() {
               <HeadacheDataExport
                 headacheData={hasData ? headacheData : undefined}
                 redFlags={redFlags}
-                isPremium={isPremiumOverride}
+                isPremium={premiumAccess}
               />
             </TabsContent>
             <TabsContent value="ai" className="mt-4">
-              <AiPremiumReport isPremium={isPremiumOverride} />
+              <AiPremiumReport isPremium={premiumAccess} />
             </TabsContent>
           </Tabs>
         )}

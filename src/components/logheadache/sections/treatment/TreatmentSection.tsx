@@ -12,7 +12,7 @@ interface TreatmentSectionProps {
 export function TreatmentSection({ title, children, isLast = false }: TreatmentSectionProps) {
   return (
     <>
-      <div>
+      <div id={title === 'Treatment Timing' ? 'treatment-timing' : title === 'Effectiveness & Outcome' ? 'treatment-outcome' : undefined}>
         <SectionHeading title={title} />
         {children}
       </div>

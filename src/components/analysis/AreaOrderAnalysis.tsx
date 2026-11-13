@@ -27,7 +27,7 @@ export function AreaOrderAnalysis() {
   const { first, ranks, spread } = data;
 
   return (
-    <Card className="bg-card border-border p-4 mb-6 space-y-5">
+    <Card id="area-order-analysis" className="bg-card border-border p-4 mb-6 space-y-5">
       <div className="flex items-center gap-2">
         <ListOrdered className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-medium text-foreground">Area order</h2>

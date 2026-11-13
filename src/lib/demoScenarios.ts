@@ -13,27 +13,27 @@ const ep = (date: string, hour: number, minutes: number, intensity: number, regi
 
 export const DEMO_SCENARIOS: Record<DemoScenarioId, { label: string; period: string; days: number; episodes: DemoEpisode[] }> = {
   light: { label: 'Light month', period: '1–30 November 2026', days: 30, episodes: [
-    ep('2026-11-04', 16, 90, 4, ['l-temple'], ['Stress: Emotional (3h before)'], false, null, 7),
-    ep('2026-11-15', 15, 120, 5, ['l-temple', 'l-eye'], ['Food: Skipped lunch (5h before)'], true, 'effective', 6),
-    ep('2026-11-26', 18, 60, 3, ['forehead'], ['Activity: Screen work (2h before) [180 min]'], false, null, 7.5),
+    ep('2026-11-02', 16, 90, 4, ['l-temple'], ['Stress: Emotional (3h before)'], false, null, 7),
+    ep('2026-11-05', 15, 120, 5, ['l-temple', 'l-eye'], ['Food: Skipped lunch (5h before)'], true, 'effective', 6),
+    ep('2026-11-08', 18, 60, 3, ['forehead'], ['Activity: Screen work (2h before) [180 min]'], false, null, 7.5),
   ] },
-  busy: { label: 'Busy month', period: '1–30 November 2026', days: 30, episodes: [
-    ep('2026-11-02', 8, 240, 7, ['l-occiput', 'neck', 'l-temple'], ['Stress: Physical (6h before)'], true, 'partially_effective', 5.5),
-    ep('2026-11-05', 17, 180, 6, ['l-temple', 'l-eye'], ['Stress: Financial (4h before)'], true, 'effective', 6),
-    ep('2026-11-08', 9, 300, 8, ['neck', 'l-occiput', 'vertex'], ['Activity: Desk work (3h before) [240 min]'], true, 'not_effective', 5),
-    ep('2026-11-11', 16, 120, 5, ['forehead'], ['Food: Skipped breakfast (6h before)'], false, null, 6.5),
-    ep('2026-11-13', 7, 360, 8, ['l-occiput', 'neck', 'l-temple', 'l-eye'], ['Stress: Family (12h before)'], true, 'partially_effective', 4.5),
-    ep('2026-11-16', 18, 150, 6, ['r-temple'], ['Weather: Pressure drop'], true, 'effective', 6),
-    ep('2026-11-19', 8, 240, 7, ['neck', 'l-occiput'], ['Stress: Emotional (8h before)'], true, 'partially_effective', 5),
-    ep('2026-11-22', 15, 90, 4, ['l-temple'], ['Beverage: Coffee (2h before)'], false, null, 7),
-    ep('2026-11-25', 9, 270, 7, ['l-occiput', 'neck', 'vertex'], ['Stress: Physical (5h before)'], true, 'effective', 5.5),
-    ep('2026-11-28', 17, 180, 6, ['l-temple', 'l-eye'], ['Food: Late dinner (10h before)'], true, 'not_effective', 6),
+  busy: { label: 'Busy month', period: '14 October–12 November 2026', days: 30, episodes: [
+    ep('2026-10-14', 8, 240, 7, ['l-occiput', 'neck', 'l-temple'], ['Stress: Physical (6h before)'], true, 'partially_effective', 5.5),
+    ep('2026-10-17', 17, 180, 6, ['l-temple', 'l-eye'], ['Stress: Financial (4h before)'], true, 'effective', 6),
+    ep('2026-10-20', 9, 300, 8, ['neck', 'l-occiput', 'vertex'], ['Activity: Desk work (3h before) [240 min]'], true, 'not_effective', 5),
+    ep('2026-10-23', 16, 120, 5, ['forehead'], ['Food: Skipped breakfast (6h before)'], false, null, 6.5),
+    ep('2026-10-26', 7, 360, 8, ['l-occiput', 'neck', 'l-temple', 'l-eye'], ['Stress: Family (12h before)'], true, 'partially_effective', 4.5),
+    ep('2026-10-29', 18, 150, 6, ['r-temple'], ['Weather: Pressure drop'], true, 'effective', 6),
+    ep('2026-11-01', 8, 240, 7, ['neck', 'l-occiput'], ['Stress: Emotional (8h before)'], true, 'partially_effective', 5),
+    ep('2026-11-04', 15, 90, 4, ['l-temple'], ['Beverage: Coffee (2h before)'], false, null, 7),
+    ep('2026-11-08', 9, 270, 7, ['l-occiput', 'neck', 'vertex'], ['Stress: Physical (5h before)'], true, 'effective', 5.5),
+    ep('2026-11-12', 17, 180, 6, ['l-temple', 'l-eye'], ['Food: Late dinner (10h before)'], true, 'not_effective', 6),
   ] },
-  party: { label: 'Party-season week', period: '22–28 December 2026', days: 7, episodes: [
-    ep('2026-12-22', 10, 180, 6, ['forehead', 'l-temple'], ['Activity: Late night out (12h before) [300 min]', 'Beverage: Wine (14h before)'], true, 'partially_effective', 4.5),
-    ep('2026-12-24', 15, 120, 5, ['l-temple'], ['Food: Skipped lunch (5h before)', 'Stress: Family (6h before)'], true, 'effective', 6),
-    ep('2026-12-26', 9, 240, 7, ['forehead', 'l-temple', 'l-eye'], ['Beverage: Wine (12h before)', 'Activity: Travel (8h before) [240 min]'], true, 'not_effective', 5),
-    ep('2026-12-27', 11, 150, 6, ['neck', 'l-occiput'], ['Stress: Social (10h before)'], false, null, 5.5),
+  party: { label: 'Party-season week', period: '2–8 November 2026', days: 7, episodes: [
+    ep('2026-11-02', 10, 180, 6, ['forehead', 'l-temple'], ['Activity: Late night out (12h before) [300 min]', 'Beverage: Wine (14h before)'], true, 'partially_effective', 4.5),
+    ep('2026-11-04', 15, 120, 5, ['l-temple'], ['Food: Skipped lunch (5h before)', 'Stress: Family (6h before)'], true, 'effective', 6),
+    ep('2026-11-06', 9, 240, 7, ['forehead', 'l-temple', 'l-eye'], ['Beverage: Wine (12h before)', 'Activity: Travel (8h before) [240 min]'], true, 'not_effective', 5),
+    ep('2026-11-07', 11, 150, 6, ['neck', 'l-occiput'], ['Stress: Social (10h before)'], false, null, 5.5),
   ] },
 };
 

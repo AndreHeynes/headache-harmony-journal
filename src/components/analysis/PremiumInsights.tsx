@@ -87,7 +87,7 @@ export function PremiumInsights({ onCardClick }: PremiumInsightsProps) {
   ];
 
   return (
-    <section className="mb-6">
+    <section id="detailed-insights" className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">
           Detailed Insights

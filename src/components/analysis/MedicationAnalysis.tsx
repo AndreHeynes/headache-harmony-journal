@@ -24,7 +24,7 @@ export function MedicationAnalysis() {
 
   if (loading) {
     return (
-      <section className="mb-6">
+      <section id="medication-analysis" className="mb-6">
         <div className="flex items-center justify-center p-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground">Loading medication data...</span>
@@ -35,7 +35,7 @@ export function MedicationAnalysis() {
 
   if (!hasData || medications.length === 0) {
     return (
-      <section className="mb-6">
+      <section id="medication-analysis" className="mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Pill className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Medication Analysis</h2>
@@ -61,7 +61,7 @@ export function MedicationAnalysis() {
   };
 
   return (
-    <section className="mb-6">
+    <section id="medication-analysis" className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Pill className="h-5 w-5 text-primary" />

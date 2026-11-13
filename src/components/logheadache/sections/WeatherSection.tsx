@@ -5,6 +5,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CloudRain, Sun, RefreshCw, ThermometerIcon, MapPin, AlertTriangle, Settings } from "lucide-react";
 import { getCurrentWeather, WeatherData, isPotentialWeatherTrigger, checkLocationPermission, LocationPermissionStatus } from "@/utils/weatherApi";
 import { useTestContext } from "@/contexts/TestContext";
+import { isDemoMode } from "@/lib/demoMode";
+
+const FICTIONAL_WEATHER: WeatherData = {
+  condition: "partly cloudy", temperature: 12, humidity: 68, pressure: 1008,
+  location: "Fictional sample location", timestamp: "2026-11-13T09:00:00.000Z",
+};
 
 interface WeatherSectionProps {
   onWeatherCapture?: (weatherTrigger: string) => void;
@@ -30,12 +36,22 @@ export function WeatherSection({ onWeatherCapture }: WeatherSectionProps) {
         setShowPermissionInfo(true);
       }
     };
+    if (isDemoMode()) {
+      setWeatherData(FICTIONAL_WEATHER);
+      setLocationPermission('granted');
+      return;
+    }
     if (isEnabled) {
       checkPermission();
     }
   }, [isEnabled]);
 
   const fetchWeatherData = async () => {
+    if (isDemoMode()) {
+      setWeatherData(FICTIONAL_WEATHER);
+      setLocationPermission('granted');
+      return;
+    }
     setIsLoading(true);
     setError(null);
     

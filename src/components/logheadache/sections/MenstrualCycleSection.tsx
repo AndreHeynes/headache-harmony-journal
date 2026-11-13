@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { addDays, format, differenceInDays } from "date-fns";
 import { useTestContext } from "@/contexts/TestContext";
+import { isDemoMode } from "@/lib/demoMode";
 
 export interface MenstrualCycleData {
   phase: string;
@@ -19,7 +20,7 @@ interface MenstrualCycleSectionProps {
 }
 
 export function MenstrualCycleSection({ onCycleDataCapture }: MenstrualCycleSectionProps) {
-  const [lastPeriodStartDate, setLastPeriodStartDate] = useState<Date | undefined>(undefined);
+  const [lastPeriodStartDate, setLastPeriodStartDate] = useState<Date | undefined>(() => isDemoMode() ? new Date('2026-10-30T12:00:00.000Z') : undefined);
   const [averageCycleLength, setAverageCycleLength] = useState<number>(28);
   const { premiumFeatures } = useTestContext();
   
@@ -55,7 +56,7 @@ export function MenstrualCycleSection({ onCycleDataCapture }: MenstrualCycleSect
 
   // Notify parent when cycle data changes
   useEffect(() => {
-    if (lastPeriodStartDate && onCycleDataCapture && phase !== "unknown") {
+    if (!isDemoMode() && lastPeriodStartDate && onCycleDataCapture && phase !== "unknown") {
       const cycleTrigger = `Cycle Phase: ${phase} (Day ${dayOfCycle})`;
       onCycleDataCapture(cycleTrigger);
     }

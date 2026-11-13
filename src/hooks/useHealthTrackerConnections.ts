@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { isDemoMode } from "@/lib/demoMode";
 
 export type TrackerProvider = 'fitbit' | 'oura' | 'garmin' | 'withings' | 'apple_health' | 'google_fit';
 
@@ -88,6 +89,11 @@ export function useHealthTrackerConnections() {
   }, []);
 
   const fetchConnections = async () => {
+    if (isDemoMode()) {
+      setConnections([]);
+      setLoading(false);
+      return;
+    }
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

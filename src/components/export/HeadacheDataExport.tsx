@@ -61,8 +61,8 @@ const demoHeadacheData: HeadacheRecord[] = [
     duration: 120,
     symptoms: ["Mild nausea"],
     triggers: ["Lack of sleep"],
-    treatments: ["Acetaminophen"],
-    notes: "Improved after medication"
+    treatments: ["Pain medicine"],
+    notes: "Improved after treatment"
   },
   {
     id: "h3",
@@ -72,8 +72,8 @@ const demoHeadacheData: HeadacheRecord[] = [
     duration: 240,
     symptoms: ["Nausea", "Light sensitivity", "Sound sensitivity"],
     triggers: ["Alcohol", "Missed meal"],
-    treatments: ["Prescription medication", "Sleep"],
-    notes: "Severe migraine - had to leave work early"
+    treatments: ["Pain medicine", "Sleep"],
+    notes: "Severe headache - had to leave work early"
   }
 ];
 

@@ -18,6 +18,7 @@ import { FirstHeadacheCheck } from "@/components/logheadache/FirstHeadacheCheck"
 import { RedFlagScreeningProvider, useScreening } from "@/contexts/RedFlagScreeningContext";
 import { WearableCheckIn } from "@/components/wearables/WearableCheckIn";
 import { RedFlagAlertDialog } from "@/components/logheadache/screening/RedFlagAlertDialog";
+import { DEMO_LOG_EPISODE_ID, isDemoMode } from "@/lib/demoMode";
 
 const steps = [
   { id: 'location', title: 'Pain Location', component: LogPainLocation },
@@ -30,10 +31,13 @@ const steps = [
 ];
 
 function LogHeadacheInner() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [currentEpisodeId, setCurrentEpisodeId] = useState<string | null>(null);
+  const demo = isDemoMode();
+  const requestedStep = Number(new URLSearchParams(window.location.search).get('step') || 1);
+  const initialStep = demo ? Math.min(steps.length - 1, Math.max(0, requestedStep - 1)) : 0;
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [currentEpisodeId, setCurrentEpisodeId] = useState<string | null>(() => demo ? DEMO_LOG_EPISODE_ID : null);
   const [showEpisodeModal, setShowEpisodeModal] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(() => new Set(demo ? steps.slice(0, initialStep).map(step => step.id) : []));
   const [showRedFlagAlert, setShowRedFlagAlert] = useState(false);
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();

@@ -5,6 +5,26 @@ import { trackCampaignStep } from '@/lib/campaignTracking';
 import { useNavigate } from 'react-router-dom';
 import { readTrialDraft } from '@/lib/publicExperience';
 import { isPostSigninEntryPath } from '@/lib/publicRoutes';
+import { DEMO_USER_ID, disableDemoMode, isDemoMode } from '@/lib/demoMode';
+
+const createDemoUser = () => ({
+  id: DEMO_USER_ID,
+  aud: 'authenticated',
+  role: 'authenticated',
+  email: 'sample@example.invalid',
+  email_confirmed_at: '2026-11-01T09:00:00.000Z',
+  app_metadata: {},
+  user_metadata: { full_name: 'Sample User' },
+  identities: [],
+  created_at: '2026-11-01T09:00:00.000Z',
+  updated_at: '2026-11-13T09:00:00.000Z',
+} as User);
+
+const createDemoSession = (user: User) => ({
+  access_token: 'fictional-demo-not-a-credential',
+  refresh_token: 'fictional-demo-not-a-credential',
+  token_type: 'bearer', expires_in: 3600, expires_at: 4102444800, user,
+} as Session);
 
 interface BetaUser {
   email: string;
@@ -79,14 +99,19 @@ const verifyAndCreateProfile = async (userId: string, email: string, fullName?: 
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const demo = isDemoMode();
+  const [user, setUser] = useState<User | null>(() => demo ? createDemoUser() : null);
+  const [session, setSession] = useState<Session | null>(() => demo ? createDemoSession(createDemoUser()) : null);
+  const [loading, setLoading] = useState(!demo);
   const [betaUser, setBetaUser] = useState<BetaUser | null>(null);
   const [justAuthenticated, setJustAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (isDemoMode()) {
+      setLoading(false);
+      return;
+    }
     // Load beta user from localStorage
     const storedBetaUser = localStorage.getItem('beta_user');
     if (storedBetaUser) {
@@ -229,6 +254,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    if (isDemoMode()) {
+      disableDemoMode();
+      window.location.assign('/');
+      return;
+    }
     await supabase.auth.signOut();
     localStorage.removeItem('beta_token');
     localStorage.removeItem('beta_user');

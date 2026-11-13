@@ -18,6 +18,7 @@ import { NeckPainInsights } from "@/components/analysis/NeckPainInsights";
 import { DetailedInsight } from "@/components/analysis/DetailedInsight";
 import { AreaOrderAnalysis } from "@/components/analysis/AreaOrderAnalysis";
 import { RedFlagHistory } from "@/components/analysis/RedFlagHistory";
+import { PeakTimeAnalysis } from "@/components/analysis/PeakTimeAnalysis";
 import BottomNav from "@/components/layout/BottomNav";
 import { useTestContext } from "@/contexts/TestContext";
 
@@ -121,6 +122,7 @@ export default function Analysis() {
       ) : (
         <>
           <OverviewStats daysRange={30} />
+          <PeakTimeAnalysis />
           
           <RedFlagHistory />
           

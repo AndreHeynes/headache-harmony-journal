@@ -10,7 +10,7 @@ export function NeckPainInsights() {
 
   if (loading) {
     return (
-      <section className="mb-6">
+      <section id="neck-pain-insights" className="mb-6">
         <div className="flex items-center justify-center p-6">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground text-sm">Loading neck pain data...</span>
@@ -21,7 +21,7 @@ export function NeckPainInsights() {
 
   if (!hasData) {
     return (
-      <section className="mb-6">
+      <section id="neck-pain-insights" className="mb-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Neck Pain Insights</h2>
         <Card className="bg-card/50 border-border">
           <CardContent className="p-4">
@@ -36,7 +36,7 @@ export function NeckPainInsights() {
   }
 
   return (
-    <section className="mb-6">
+    <section id="neck-pain-insights" className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Neck Pain Insights</h2>
         <Button variant="ghost" size="icon" className="text-primary">

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { isDemoMode } from '@/lib/demoMode';
 
 export type PriorityLevel = 'high' | 'medium' | 'low';
 
@@ -195,7 +196,13 @@ const PRIORITY_MESSAGES = {
 
 export const useRedFlagScreening = (): UseRedFlagScreeningReturn => {
   const { user } = useAuth();
-  const [responses, setResponses] = useState<ScreeningResponses>({});
+  const [responses, setResponses] = useState<ScreeningResponses>(() => isDemoMode() ? {
+    suddenOnset: false, maxIntensityTime: null, firstEver: false, firstAfter50: null,
+    hasNeuroSymptoms: false, neuroSymptoms: [], hasSystemicSymptoms: false, systemicSymptoms: [],
+    hasCancer: false, isImmunosuppressed: false, immunosuppressionType: null,
+    hasPatternChange: false, isWorsening: false, hasPositionalChange: false, worseWithValsalva: false,
+    eyeRedness: false, isPregnantOrPostpartum: false,
+  } : {});
 
   const updateResponse = useCallback((key: keyof ScreeningResponses, value: boolean) => {
     setResponses(prev => ({ ...prev, [key]: value }));

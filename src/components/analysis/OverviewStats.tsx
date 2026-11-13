@@ -45,7 +45,7 @@ export function OverviewStats({ daysRange = 30 }: OverviewStatsProps) {
   }
 
   return (
-    <section className="mb-6">
+    <section id="analysis-overview" className="mb-6">
       {!hasData && (
         <p className="text-sm text-muted-foreground mb-3">
           No data in the last {daysRange} days. Stats will appear as you log episodes.

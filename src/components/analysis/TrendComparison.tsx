@@ -40,7 +40,7 @@ export function TrendComparison({ monthsToAnalyze = 6 }: TrendComparisonProps) {
 
   if (loading) {
     return (
-      <section className="mb-6">
+      <section id="trend-comparison" className="mb-6">
         <div className="flex items-center justify-center p-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground">Loading trend data...</span>
@@ -51,7 +51,7 @@ export function TrendComparison({ monthsToAnalyze = 6 }: TrendComparisonProps) {
 
   if (!hasData) {
     return (
-      <section className="mb-6">
+      <section id="trend-comparison" className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Trend Comparison</h2>
         </div>
@@ -103,7 +103,7 @@ export function TrendComparison({ monthsToAnalyze = 6 }: TrendComparisonProps) {
   const overallLabel = getOverallTrendLabel();
 
   return (
-    <section className="mb-6">
+    <section id="trend-comparison" className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Activity className="h-5 w-5 text-primary" />

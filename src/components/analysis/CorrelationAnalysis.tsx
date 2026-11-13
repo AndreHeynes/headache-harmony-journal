@@ -52,7 +52,7 @@ export function CorrelationAnalysis() {
 
   if (loading) {
     return (
-      <section className="mb-6">
+      <section id="correlation-analysis" className="mb-6">
         <div className="flex items-center justify-center p-8">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span className="ml-2 text-muted-foreground">Loading correlation data...</span>
@@ -63,7 +63,7 @@ export function CorrelationAnalysis() {
 
   if (!hasData) {
     return (
-      <section className="mb-6">
+      <section id="correlation-analysis" className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Correlation Analysis</h2>
         </div>
@@ -84,7 +84,7 @@ export function CorrelationAnalysis() {
   const displayTreatmentData = durationTreatmentHeatmap.length > 0 ? durationTreatmentHeatmap : [];
 
   return (
-    <section className="mb-6">
+    <section id="correlation-analysis" className="mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Correlation Analysis</h2>
         <Button variant="ghost" size="icon" className="text-primary">
