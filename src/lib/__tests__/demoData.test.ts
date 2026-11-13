@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDemoAiReport, createDemoDatabase } from '../demoData';
 import { DEMO_SCENARIOS } from '../demoScenarios';
+import { SAMPLE_REPORT } from '../sampleReport';
 
 const serialized = (value: unknown) => JSON.stringify(value).toLowerCase();
 
@@ -11,6 +12,7 @@ describe('real-screen fictional demo fixtures', () => {
       const text = serialized(db);
       expect(text).toContain('sample@example.invalid');
       expect(text).not.toMatch(/ibuprofen|acetaminophen|paracetamol|sumatriptan|rizatriptan|aspirin|naproxen/);
+      expect(serialized(SAMPLE_REPORT)).not.toMatch(/ibuprofen|acetaminophen|paracetamol|sumatriptan|rizatriptan|aspirin|naproxen/);
       expect(db.headache_episodes.every(e => e.notes?.includes('Fictional'))).toBe(true);
     }
   });
