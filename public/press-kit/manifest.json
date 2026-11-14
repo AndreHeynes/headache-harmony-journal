@@ -1,841 +1,733 @@
 {
   "assets": [
     {
-      "file": "busy-ai-correlation-desktop.png",
-      "screen": "busy ai correlation desktop",
-      "device": "desktop",
-      "size": "1358x213",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5a456eeb5c72544fdec207c16f01a83a47c68ba8731304c54f845d0cbde68324"
-    },
-    {
-      "file": "busy-ai-premium-gating-desktop.png",
-      "screen": "busy ai premium gating desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "170f3cf5736bdc933eb4b1bc0350537df07054b6be13a0a0341f9de60ff13091"
-    },
-    {
-      "file": "busy-ai-report-desktop.png",
-      "screen": "busy ai report desktop",
-      "device": "desktop",
-      "size": "1440x1706",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "cbb9627461e8e472a5b99a8973e20451024eadfc943a2845037f8f7d5f621042"
-    },
-    {
-      "file": "busy-ai-report-phone.png",
-      "screen": "busy ai report phone",
-      "device": "phone",
-      "size": "390x2769",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "abd0fbad82c4e72b74a9254997f7e7af23ceb6414835f2904a7cee952e6068ac"
-    },
-    {
-      "file": "busy-ai-signup-desktop.png",
-      "screen": "busy ai signup desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "752e9129e1d05945e2ff767e01ff89fa90197896b5ce640b361e37eda88ff0a7"
-    },
-    {
-      "file": "busy-ai-treatment-desktop.png",
-      "screen": "busy ai treatment desktop",
-      "device": "desktop",
-      "size": "1358x215",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5df47603bcaabc61b3d164d0eaee291fc9bae7052b86c05664c8f1598bf87349"
-    },
-    {
-      "file": "busy-analysis-overview-phone.png",
-      "screen": "busy analysis overview phone",
-      "device": "phone",
-      "size": "390x5453",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "d05bfbf271b4ca28a4d8fded638f2bd92a1c0d0aec317ad13db97af329069baf"
-    },
-    {
-      "file": "busy-breakdown-insights-desktop.png",
-      "screen": "busy breakdown insights desktop",
-      "device": "desktop",
-      "size": "1420x601",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "19497f8d28fabcb287e61e1cae1b7ba6a399126c74c92f2a34415beb982763b9"
-    },
-    {
-      "file": "busy-correlation-phone.png",
-      "screen": "busy correlation phone",
-      "device": "phone",
-      "size": "358x769",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "168031e592cb7a2bdb36816c84f1d206b7c1af6177a6ea0d7f8a587f4496ed41"
-    },
-    {
       "file": "busy-dashboard-desktop.png",
-      "screen": "busy dashboard desktop",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
       "device": "desktop",
-      "size": "1440x2848",
+      "size": "2560x5696",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "93d85e5b6b41a8670de047a84ac60a8dfda852d390b69dcbe85adec1d0ef3f89"
+      "text": "My Headache Experience Journal; Daily sleep check-in; Busy month; fictional completed and active episode labels.",
+      "sha256": "46ef54fe6a99882ec4c76ba17a81d454b4461dc506efc11bf087ab15ff1b3adc"
     },
     {
-      "file": "busy-dashboard-phone.png",
-      "screen": "busy dashboard phone",
-      "device": "phone",
-      "size": "390x3256",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "3a9346a0f16dcb2876b11aaf6545d40917027401012fd5c048b03578fc3bb9bd"
-    },
-    {
-      "file": "busy-detailed-insights-desktop.png",
-      "screen": "busy detailed insights desktop",
+      "file": "busy-headache-breakdown-desktop.png",
+      "screen": "Headache breakdown by area",
       "device": "desktop",
-      "size": "1408x235",
+      "size": "2496x580",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a8d74c489e1bdbd98f75ea172e60d8e82d42c15c657000a67ac89996f8e7f1c7"
+      "text": "Busy month; completed episodes only; multi-area episodes contribute once per selected area.",
+      "sha256": "a0a3dcb7c2ead2460f334797a3b218bd39c1483e0187ba1219c1fdbad5dd1482"
     },
     {
-      "file": "busy-log-activities-desktop.png",
-      "screen": "busy log activities desktop",
+      "file": "busy-quick-insights-desktop.png",
+      "screen": "Quick insights",
       "device": "desktop",
-      "size": "1408x218",
+      "size": "2496x588",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "ff5c273b8ee25c3c4274a60d080be66af260b0eae89a71c276075376d72a2159"
+      "text": "Busy month; average intensity, common reported trigger and average duration; completed episodes only.",
+      "sha256": "e8399be244909245f0742d91805e79127c318d752ce9b1f4c0fd78c56455a002"
     },
     {
-      "file": "busy-log-associated-symptoms-phone.png",
-      "screen": "busy log associated symptoms phone",
-      "device": "phone",
-      "size": "390x2684",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "dabcb05e47fa5cdd7687863eb9a74f9b219a3122fa7385b1474a0a83dae74fa3"
-    },
-    {
-      "file": "busy-log-fluid-stress-phone.png",
-      "screen": "busy log fluid stress phone",
-      "device": "phone",
-      "size": "370x644",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "64072ca04c84852503988e6dd34d6ef909c55b19dba0b319e861458684414a43"
-    },
-    {
-      "file": "busy-log-pain-duration-phone.png",
-      "screen": "busy log pain duration phone",
-      "device": "phone",
-      "size": "390x1172",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "3a8d281add85b369dcbe2cd8853da7915c59d25d6934b4153e99a261e90fe339"
-    },
-    {
-      "file": "busy-log-pain-intensity-phone.png",
-      "screen": "busy log pain intensity phone",
-      "device": "phone",
-      "size": "390x1556",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7c3a67739aab75b81c389e17c8b315dbcfb8b0fe423fcb7fbe1c689695697be3"
-    },
-    {
-      "file": "busy-log-pain-location-phone.png",
-      "screen": "busy log pain location phone",
-      "device": "phone",
-      "size": "390x2031",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "224f808533688799b6521b2c30c61ae3622814015f558a387fe700b6f37b66dc"
-    },
-    {
-      "file": "busy-log-treatment-timing-desktop.png",
-      "screen": "busy log treatment timing desktop",
+      "file": "detailed-insights-desktop.png",
+      "screen": "Detailed insight categories",
       "device": "desktop",
-      "size": "1386x843",
+      "size": "2496x364",
+      "scenario": "shared",
+      "text": "Pain area, intensity, duration, symptoms, triggers and treatment categories.",
+      "sha256": "e9163de71a936bc7fbf4589f1204240fca6dd425042ec11ed2018aaa3bcfaf47"
+    },
+    {
+      "file": "busy-area-order-desktop.png",
+      "screen": "Area order and spread timing",
+      "device": "desktop",
+      "size": "2496x1040",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "00b0a30675d19662167aaf9c007ad9ee73ce97d9e5d7d0714bc8d705f3da0952"
+      "text": "First-area counts, selection-rank summaries and selection timing; timestamps are not verified biological spread.",
+      "sha256": "fb8ad09a22beb2668867fea641c126e699498ba9fe879b1a6c94d68a97d1f78c"
+    },
+    {
+      "file": "busy-peak-time-desktop.png",
+      "screen": "Peak headache times",
+      "device": "desktop",
+      "size": "2496x392",
+      "scenario": "busy",
+      "text": "Busy month; completed episodes grouped by time of day.",
+      "sha256": "2786119ff58612736ffeaeddedc68548625038cac59b6a7d5d3fb4ed3bb1919a"
+    },
+    {
+      "file": "busy-neck-insights-desktop.png",
+      "screen": "Neck involvement insights",
+      "device": "desktop",
+      "size": "2496x584",
+      "scenario": "busy",
+      "text": "Busy month; neck and back-of-head involvement; fictional data.",
+      "sha256": "76b6522c6f46e58acef18b591cee41c7a6a613e64c8998a802fa4126cb916d54"
     },
     {
       "file": "busy-medication-analysis-desktop.png",
-      "screen": "busy medication analysis desktop",
+      "screen": "Medication analysis and other management",
       "device": "desktop",
-      "size": "1408x335",
+      "size": "2496x924",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "92f5b1331a2ce118df327799c627dc0da3ee8c3dbdd537d386fa519bcf7e4593"
-    },
-    {
-      "file": "busy-neck-peak-desktop.png",
-      "screen": "busy neck peak desktop",
-      "device": "desktop",
-      "size": "1408x505",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "1573289eb7083c802b83f39ed4ce6e7910ea216b163ed61e0b9f76742633eae3"
-    },
-    {
-      "file": "busy-profile-desktop.png",
-      "screen": "busy profile desktop",
-      "device": "desktop",
-      "size": "1440x4505",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "e123ff4d3e8de9d126591d22e9ec2045250cad35c1a57eff836720ad2cad2e6a"
-    },
-    {
-      "file": "busy-profile-phone.png",
-      "screen": "busy profile phone",
-      "device": "phone",
-      "size": "390x5253",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "2c6b7d2a3cd9f5776c91227e6c6d4dacb720ea271b4c06a5cc5539bd51f3c302"
-    },
-    {
-      "file": "busy-sample-example-episode-desktop.png",
-      "screen": "busy sample example episode desktop",
-      "device": "desktop",
-      "size": "926x415",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "623c42d5b98cd86ce040c60811a054eac9c1f5dc6ba5b086e1fd6ad6f1063ee1"
-    },
-    {
-      "file": "busy-sample-report-desktop.png",
-      "screen": "busy sample report desktop",
-      "device": "desktop",
-      "size": "1440x2314",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "04412817dd123a35c29d41689fcc24fbd3d2ce42940f18a593609659f9709b65"
-    },
-    {
-      "file": "busy-sample-report-phone.png",
-      "screen": "busy sample report phone",
-      "device": "phone",
-      "size": "390x3867",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "03413f65620223c45584b7a677263f99e0db65407dd6ab1c73e50cfe5e54457f"
+      "text": "Medication Days 8/30 days; Pain medicine 30d uses 8; 30d days 8; Rest under Other management; full non-diagnosis disclaimer.",
+      "sha256": "59285a35f807924786031915b65225a852d8c8b7455497167866773082f0a71b"
     },
     {
       "file": "busy-standard-export-desktop.png",
-      "screen": "busy standard export desktop",
+      "screen": "Standard doctor report export",
       "device": "desktop",
-      "size": "1440x1502",
+      "size": "2560x3964",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5d9210fd51c5814cc85fa1c1595a0fcae928589f4d1440678fbefe6e57df78f4"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "a542f7d791f8656d92ee68d28d216926caed87671e0819fced986ba1e60afae6"
+    },
+    {
+      "file": "busy-ai-report-desktop.png",
+      "screen": "AI Premium Report",
+      "device": "desktop",
+      "size": "2560x3964",
+      "scenario": "busy",
+      "text": "AI Pattern Analysis; Weak; n=10; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "41901dd24f3451e2a5dbbc3b53ba5884586c1f5bc7a6c00f1fb78e05c3354bbb"
+    },
+    {
+      "file": "busy-ai-correlation-desktop.png",
+      "screen": "AI correlation findings",
+      "device": "desktop",
+      "size": "2396x426",
+      "scenario": "busy",
+      "text": "AI Pattern Analysis; Weak; n=10; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "a5de36dc55898fa999d9516bc86b4aaf2ea30f6a58abff40a94a1d5355fc1288"
+    },
+    {
+      "file": "busy-ai-treatment-desktop.png",
+      "screen": "AI treatment and management effectiveness",
+      "device": "desktop",
+      "size": "2396x430",
+      "scenario": "busy",
+      "text": "Pain medicine used 8 times; recorded outcomes only; 8 fictional medicine-use days.",
+      "sha256": "115e9fa09d5bf09c4e312c054347ea1f7395602004efa96dfb48aa3488cda182"
+    },
+    {
+      "file": "busy-dashboard-phone.png",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
+      "device": "phone",
+      "size": "1170x9696",
+      "scenario": "busy",
+      "text": "My Headache Experience Journal; Daily sleep check-in; Busy month; fictional completed and active episode labels.",
+      "sha256": "ab3cd830e440f22f2f86b7da7353befecc2b1ebf87e200074282b609df848d3b"
+    },
+    {
+      "file": "daily-sleep-check-in-phone.png",
+      "screen": "Daily sleep check-in",
+      "device": "phone",
+      "size": "1074x1332",
+      "scenario": "shared",
+      "text": "Sleep 6.5 hours; sleep score 72/100; resting heart rate 62; HRV 48 ms; manual entry; no device or AI claims.",
+      "sha256": "b99a2aa4fb30ad10128667961aadb28204ca289ff8780478efa1f524412d87fb"
+    },
+    {
+      "file": "busy-analysis-overview-phone.png",
+      "screen": "Complete analysis screen",
+      "device": "phone",
+      "size": "1170x16665",
+      "scenario": "busy",
+      "text": "Busy month; overview, peak time, area order, associations, medicine use and other management; fictional data.",
+      "sha256": "f3fed45bc6efcee230ee04f69ec66ca312365fdd9667b78f779fadeb2c7740b1"
+    },
+    {
+      "file": "busy-correlation-phone.png",
+      "screen": "Correlation analysis",
+      "device": "phone",
+      "size": "1074x2304",
+      "scenario": "busy",
+      "text": "Busy month; self-reported associations; correlation does not imply causation.",
+      "sha256": "f738a531d090c59e59d7cb1a6d97bf5e7155b93fe7a600fe40aea4fa591aa8fd"
     },
     {
       "file": "busy-standard-export-phone.png",
-      "screen": "busy standard export phone",
+      "screen": "Standard doctor report export",
       "device": "phone",
-      "size": "390x1921",
+      "size": "1170x5763",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7fdc269e017ed2ffd5234db1fa2abefa46b35ec5d8f8c6bd3c9567955e8fdb5a"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "2951aef37ffcc97eb1e295902fa813afe8ff57496cc12b6e17351893a8c7088c"
     },
     {
-      "file": "busy-wearable-active-phone.png",
-      "screen": "busy wearable active phone",
+      "file": "busy-ai-report-phone.png",
+      "screen": "AI Premium Report",
       "device": "phone",
-      "size": "370x734",
+      "size": "1170x8310",
       "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "d345ca00aa51462f6927b01c131c2eb3f1b7f240c65b338c4b5e6a7ce0d06995"
-    },
-    {
-      "file": "headmap-back-clean.png",
-      "screen": "headmap back clean",
-      "device": "desktop",
-      "size": "360x468",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "488ca6c36889a2e0943ee77bfe3543098cbbbc523dfcf7984d49e7883cd2a120"
-    },
-    {
-      "file": "headmap-front-clean.png",
-      "screen": "headmap front clean",
-      "device": "desktop",
-      "size": "360x450",
-      "scenario": "busy",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7d87811cb5366a898f2b5da85bbccbe4c0dfbff51686e66994b0e9b374f41646"
-    },
-    {
-      "file": "light-ai-correlation-desktop.png",
-      "screen": "light ai correlation desktop",
-      "device": "desktop",
-      "size": "1358x213",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7bbabc1ad7f498a3c19a5b3d4a8d9a0c0b761b4c2afe059d6ee971ff155508b0"
-    },
-    {
-      "file": "light-ai-premium-gating-desktop.png",
-      "screen": "light ai premium gating desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "458c0793cee05c13dc43f6d728db5fcbf20270f7bb6a618f4a451a244f685775"
-    },
-    {
-      "file": "light-ai-report-desktop.png",
-      "screen": "light ai report desktop",
-      "device": "desktop",
-      "size": "1440x1706",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "d7ae2a55e5ea6d7a8fa1ea9e792f4e9e78337ddc60ade91ee06644c5aae41a07"
-    },
-    {
-      "file": "light-ai-report-phone.png",
-      "screen": "light ai report phone",
-      "device": "phone",
-      "size": "390x2757",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "dc3379d22080292b61b22e736dc9f0ed332eb8fbedc253f909b491dd261b0c74"
-    },
-    {
-      "file": "light-ai-signup-desktop.png",
-      "screen": "light ai signup desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "9c47a71d946438990732668d1852a6971bca84e341103e147f4aaf07a1eae174"
-    },
-    {
-      "file": "light-ai-treatment-desktop.png",
-      "screen": "light ai treatment desktop",
-      "device": "desktop",
-      "size": "1358x215",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "90b45eca731fa35dc14c65de6edddfee913b8c59d7b7cb576df18fe49a629306"
-    },
-    {
-      "file": "light-analysis-overview-phone.png",
-      "screen": "light analysis overview phone",
-      "device": "phone",
-      "size": "390x5241",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "773ac16b95582a56708ace9c0c2f2c836fa47c6009ffbd562645b107c564db08"
-    },
-    {
-      "file": "light-breakdown-insights-desktop.png",
-      "screen": "light breakdown insights desktop",
-      "device": "desktop",
-      "size": "1420x536",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "cfc83fa35ae40e5ad63979ffcac181e44f30a2511088375ab3ea00220fabd219"
-    },
-    {
-      "file": "light-correlation-phone.png",
-      "screen": "light correlation phone",
-      "device": "phone",
-      "size": "358x769",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "396c341bfb25c89ac881cf2ed37fbc750c25cb4506ee95e6177e5f95b6254d33"
+      "text": "AI Pattern Analysis; Weak; n=10; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "ee573e8daac3ab8a1224983d95bd062cb981901c5e6200842b2574760a8c3688"
     },
     {
       "file": "light-dashboard-desktop.png",
-      "screen": "light dashboard desktop",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
       "device": "desktop",
-      "size": "1440x2674",
+      "size": "2560x5348",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5722a29af18ca372541941a1d0f3255eb7b31eee22b7d895d727770fb2128a8e"
+      "text": "My Headache Experience Journal; Daily sleep check-in; Light month; fictional completed and active episode labels.",
+      "sha256": "b16d20d2c385a44e66976c9604c69b60f93e8bae894e2fc699dc9f5e364e4508"
     },
     {
-      "file": "light-dashboard-phone.png",
-      "screen": "light dashboard phone",
-      "device": "phone",
-      "size": "390x3034",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "2e1535a33a7877c4d4e1995d5f506afc7e2df584f8d2b522650d9120ad561b61"
-    },
-    {
-      "file": "light-detailed-insights-desktop.png",
-      "screen": "light detailed insights desktop",
+      "file": "light-headache-breakdown-desktop.png",
+      "screen": "Headache breakdown by area",
       "device": "desktop",
-      "size": "1408x235",
+      "size": "2496x412",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a8d74c489e1bdbd98f75ea172e60d8e82d42c15c657000a67ac89996f8e7f1c7"
+      "text": "Light month; completed episodes only; multi-area episodes contribute once per selected area.",
+      "sha256": "2e220a2fce28ecbf7a7ad397f4ca04afb93b4ce0126dc5773eab813692e3b2bd"
     },
     {
-      "file": "light-log-activities-desktop.png",
-      "screen": "light log activities desktop",
+      "file": "light-quick-insights-desktop.png",
+      "screen": "Quick insights",
       "device": "desktop",
-      "size": "1408x218",
+      "size": "2496x588",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "ff5c273b8ee25c3c4274a60d080be66af260b0eae89a71c276075376d72a2159"
+      "text": "Light month; average intensity, common reported trigger and average duration; completed episodes only.",
+      "sha256": "7884ba7c9a6b4e4c0d7846fa4e9e79d4042b5695b3c3bc4ad7642c7889a69d35"
     },
     {
-      "file": "light-log-associated-symptoms-phone.png",
-      "screen": "light log associated symptoms phone",
-      "device": "phone",
-      "size": "390x2684",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "c8aa2eff19eab88374efcab19b2ea6960d65b30272110eb0eedbcdeddb1ad3b3"
-    },
-    {
-      "file": "light-log-fluid-stress-phone.png",
-      "screen": "light log fluid stress phone",
-      "device": "phone",
-      "size": "370x644",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "64072ca04c84852503988e6dd34d6ef909c55b19dba0b319e861458684414a43"
-    },
-    {
-      "file": "light-log-pain-duration-phone.png",
-      "screen": "light log pain duration phone",
-      "device": "phone",
-      "size": "390x1172",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "d7bead0c2900ce9710c199f3d24c05574059f49a11822273b2142eb65c2c0a86"
-    },
-    {
-      "file": "light-log-pain-intensity-phone.png",
-      "screen": "light log pain intensity phone",
-      "device": "phone",
-      "size": "390x1556",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "04d3f4e4f8bff50a1cc838bacc5093871dc038d9daf2471eb6cbc35caf8dea6c"
-    },
-    {
-      "file": "light-log-pain-location-phone.png",
-      "screen": "light log pain location phone",
-      "device": "phone",
-      "size": "390x2031",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "f981cd75d67f409aa037d80b5b821d502dae905ccc30076689ab84d2f01feb9e"
-    },
-    {
-      "file": "light-log-treatment-timing-desktop.png",
-      "screen": "light log treatment timing desktop",
+      "file": "light-area-order-desktop.png",
+      "screen": "Area order and spread timing",
       "device": "desktop",
-      "size": "1386x843",
+      "size": "2496x936",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "00b0a30675d19662167aaf9c007ad9ee73ce97d9e5d7d0714bc8d705f3da0952"
+      "text": "First-area counts, selection-rank summaries and selection timing; timestamps are not verified biological spread.",
+      "sha256": "1bf278f24b74a3b9990ae270aa3ae78bc29d9e2243eb9815e6d432b2baeaa669"
+    },
+    {
+      "file": "light-peak-time-desktop.png",
+      "screen": "Peak headache times",
+      "device": "desktop",
+      "size": "2496x392",
+      "scenario": "light",
+      "text": "Light month; completed episodes grouped by time of day.",
+      "sha256": "c9728a6a56893c994d1f07802609d22152a1d62a8dd03a06dce23bdfebe6013a"
+    },
+    {
+      "file": "light-neck-insights-desktop.png",
+      "screen": "Neck involvement insights",
+      "device": "desktop",
+      "size": "2496x584",
+      "scenario": "light",
+      "text": "Light month; neck and back-of-head involvement; fictional data.",
+      "sha256": "532bf55e65d343d23e61c7bc3fa1218145e7c8f1f4d8d3276e32f58488f1eaaa"
     },
     {
       "file": "light-medication-analysis-desktop.png",
-      "screen": "light medication analysis desktop",
+      "screen": "Medication analysis and other management",
       "device": "desktop",
-      "size": "1408x335",
+      "size": "2496x924",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "9a5a33653e647e6dd99a06aa01b50060dcbf775ad7eb067598e858caa6d2b5d5"
-    },
-    {
-      "file": "light-neck-peak-desktop.png",
-      "screen": "light neck peak desktop",
-      "device": "desktop",
-      "size": "1408x505",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "456624e2cd4ec15750664d10c3549902a6eb4821f8a9d15b790a1ce49d17620c"
-    },
-    {
-      "file": "light-profile-desktop.png",
-      "screen": "light profile desktop",
-      "device": "desktop",
-      "size": "1440x4505",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "460bab21469c393c10dd22bf30ac7991c768b3db597202784bf5cd75b3755e83"
-    },
-    {
-      "file": "light-profile-phone.png",
-      "screen": "light profile phone",
-      "device": "phone",
-      "size": "390x5253",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "dd65d19283700a2dc9d3aa962388a4bb714fb9e73383c69484dc18b768bc64ee"
-    },
-    {
-      "file": "light-sample-example-episode-desktop.png",
-      "screen": "light sample example episode desktop",
-      "device": "desktop",
-      "size": "926x415",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "623c42d5b98cd86ce040c60811a054eac9c1f5dc6ba5b086e1fd6ad6f1063ee1"
-    },
-    {
-      "file": "light-sample-report-desktop.png",
-      "screen": "light sample report desktop",
-      "device": "desktop",
-      "size": "1440x2314",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a38db13e1bea428e83a083620d7c9d86d7b935169eb549aa39c6b16743fb6f5b"
-    },
-    {
-      "file": "light-sample-report-phone.png",
-      "screen": "light sample report phone",
-      "device": "phone",
-      "size": "390x3867",
-      "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "66082580ab498ae9d1da6868c895036c6888dfe784b62b9f696392be20b34da5"
+      "text": "Light month; medicine-use counter and other management; missing relief times are not inferred.",
+      "sha256": "c343dd7f80fd6eda7baf83ce0415715608e2ab60d4c62fdf23e59cb39a3d0dab"
     },
     {
       "file": "light-standard-export-desktop.png",
-      "screen": "light standard export desktop",
+      "screen": "Standard doctor report export",
       "device": "desktop",
-      "size": "1440x1340",
+      "size": "2560x3964",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "4713648890cba26482fe5e883eefbc5c880f2101b3aefd17a97eb22b687bb2f1"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "720a5226d5b07dc7d4d65014fad34d375df21638b007e04ce4b147d95ad6ba6e"
+    },
+    {
+      "file": "light-ai-report-desktop.png",
+      "screen": "AI Premium Report",
+      "device": "desktop",
+      "size": "2560x3964",
+      "scenario": "light",
+      "text": "AI Pattern Analysis; Insufficient data; n=3; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "da972a1982e196fb9d3855adcfaaaba1bae99a8749cc8da2faa924dddba987e9"
+    },
+    {
+      "file": "ai-insufficient-data-desktop.png",
+      "screen": "AI report with insufficient data",
+      "device": "desktop",
+      "size": "2396x426",
+      "scenario": "light",
+      "text": "Insufficient data; n=3; at least 5 episodes required before an association is described.",
+      "sha256": "e512278785de17311653ea2f989845bd992da0ef603b43cb18ee7f2911bc46d4"
+    },
+    {
+      "file": "light-ai-treatment-desktop.png",
+      "screen": "AI treatment and management effectiveness",
+      "device": "desktop",
+      "size": "2396x430",
+      "scenario": "light",
+      "text": "AI Pattern Analysis; Insufficient data; n=3; correlation does not imply causation; fictional data; missing outcomes excluded. Treatment timing and missing outcomes are stated without guessing.",
+      "sha256": "70c0a0aea243460c204d516264841699a175da418ca7942d9fe29fedb1966d69"
+    },
+    {
+      "file": "light-dashboard-phone.png",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
+      "device": "phone",
+      "size": "1170x9030",
+      "scenario": "light",
+      "text": "My Headache Experience Journal; Daily sleep check-in; Light month; fictional completed and active episode labels.",
+      "sha256": "c8636e1293856d23db65c02dea2e99e40b821f47b3dc7448c58a0f231bd84d4f"
+    },
+    {
+      "file": "light-analysis-overview-phone.png",
+      "screen": "Complete analysis screen",
+      "device": "phone",
+      "size": "1170x16029",
+      "scenario": "light",
+      "text": "Light month; overview, peak time, area order, associations, medicine use and other management; fictional data.",
+      "sha256": "8878be7f274018510837ed796f73c23d70aedf10d25cfe25f0dd2bdc0253d6ba"
+    },
+    {
+      "file": "light-correlation-phone.png",
+      "screen": "Correlation analysis",
+      "device": "phone",
+      "size": "1074x2304",
+      "scenario": "light",
+      "text": "Light month; self-reported associations; correlation does not imply causation.",
+      "sha256": "9752b04f0d02db3bdd92539ab0af4ba1d0233200beea834635e74682cc393f40"
     },
     {
       "file": "light-standard-export-phone.png",
-      "screen": "light standard export phone",
+      "screen": "Standard doctor report export",
       "device": "phone",
-      "size": "390x1819",
+      "size": "1170x5457",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "2081d2b32b31c96e0983c90edb5da97b8d36a3c25b6694b916189939b1bbcc09"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "af69f986237a818a8f29d0aa34b498297240dc557ab360b590b06eb8c4a0f6a6"
     },
     {
-      "file": "light-wearable-active-phone.png",
-      "screen": "light wearable active phone",
+      "file": "light-ai-report-phone.png",
+      "screen": "AI Premium Report",
       "device": "phone",
-      "size": "370x734",
+      "size": "1170x8274",
       "scenario": "light",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7f94fa7b6b109c2a6b191d67ab26a0c8734cca1ff0e378cbd2b6fcc16b581795"
-    },
-    {
-      "file": "party-ai-correlation-desktop.png",
-      "screen": "party ai correlation desktop",
-      "device": "desktop",
-      "size": "1358x213",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "9ae1e8c71b1e3de709573d235bf0f9d09cc3452dba8ec29a1b18c41d969aa2ea"
-    },
-    {
-      "file": "party-ai-premium-gating-desktop.png",
-      "screen": "party ai premium gating desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5371f3494f24a1d0977038696de3ad3e5950e47b240963c1a97e17bc2de69e8c"
-    },
-    {
-      "file": "party-ai-report-desktop.png",
-      "screen": "party ai report desktop",
-      "device": "desktop",
-      "size": "1440x1706",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "3c293a8275d28a022121228c0b3cfe134fdfe7f7fd284d5c769fcfa5ddf868a7"
-    },
-    {
-      "file": "party-ai-report-phone.png",
-      "screen": "party ai report phone",
-      "device": "phone",
-      "size": "390x2757",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "b107e8e91e5ec25ea84cb006513ee13f157acad59fcca44df695429259aa93e1"
-    },
-    {
-      "file": "party-ai-signup-desktop.png",
-      "screen": "party ai signup desktop",
-      "device": "desktop",
-      "size": "1440x900",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "dbf81bd837d40b749872284792716021d4fa18c73c5894d5c49c5ea7178b8977"
-    },
-    {
-      "file": "party-ai-treatment-desktop.png",
-      "screen": "party ai treatment desktop",
-      "device": "desktop",
-      "size": "1358x215",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "d02605092e524ce311198aa98ba42eae2aa89122ea62ae0835632651a2a08683"
-    },
-    {
-      "file": "party-analysis-overview-phone.png",
-      "screen": "party analysis overview phone",
-      "device": "phone",
-      "size": "390x5413",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "238f871941871b1b7a9fc2dc5e05cea9f879f561b1249f68ad088713c0498e50"
-    },
-    {
-      "file": "party-breakdown-insights-desktop.png",
-      "screen": "party breakdown insights desktop",
-      "device": "desktop",
-      "size": "1420x587",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a75ea49d5e9ea521f942b01735cd348373dd6be919ce132a5aa1349800255881"
-    },
-    {
-      "file": "party-correlation-phone.png",
-      "screen": "party correlation phone",
-      "device": "phone",
-      "size": "358x769",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "1595b6e8239a5c769e576bba534ed7b174d7efc23842644994b023fecd6239ff"
+      "text": "AI Pattern Analysis; Insufficient data; n=3; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "c36c5d6540e860d8b38e727638b0c66a70e140fe72b8c6a56f18a1737030d66d"
     },
     {
       "file": "party-dashboard-desktop.png",
-      "screen": "party dashboard desktop",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
       "device": "desktop",
-      "size": "1440x2820",
+      "size": "2560x5640",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7b2446dd832db2942da632659aa8373c2b263409010afdf0b0bf1c30c6876e37"
+      "text": "My Headache Experience Journal; Daily sleep check-in; Party-season week; fictional completed and active episode labels.",
+      "sha256": "19bb5cfa0d4cbdb33e7ca1d188016aa5a57541bf66761f106b5234bc391da833"
     },
     {
-      "file": "party-dashboard-phone.png",
-      "screen": "party dashboard phone",
-      "device": "phone",
-      "size": "390x3204",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "5457f906020e3215b12e8c652f9c393d6e4a364f693ac13f4c0bb02ea72d583d"
-    },
-    {
-      "file": "party-detailed-insights-desktop.png",
-      "screen": "party detailed insights desktop",
+      "file": "party-headache-breakdown-desktop.png",
+      "screen": "Headache breakdown by area",
       "device": "desktop",
-      "size": "1408x235",
+      "size": "2496x524",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a8d74c489e1bdbd98f75ea172e60d8e82d42c15c657000a67ac89996f8e7f1c7"
+      "text": "Party-season week; completed episodes only; multi-area episodes contribute once per selected area.",
+      "sha256": "7c87018154ece730904e1a058bc5ad979b168898248d720ecc884069366a3adf"
     },
     {
-      "file": "party-log-activities-desktop.png",
-      "screen": "party log activities desktop",
+      "file": "party-quick-insights-desktop.png",
+      "screen": "Quick insights",
       "device": "desktop",
-      "size": "1408x218",
+      "size": "2496x588",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "ff5c273b8ee25c3c4274a60d080be66af260b0eae89a71c276075376d72a2159"
+      "text": "Party-season week; average intensity, common reported trigger and average duration; completed episodes only.",
+      "sha256": "adb340dd9f7ecb5d47adc181d3410b5711078992f97406b987077536c4bb261e"
     },
     {
-      "file": "party-log-associated-symptoms-phone.png",
-      "screen": "party log associated symptoms phone",
-      "device": "phone",
-      "size": "390x2684",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "8137d32c6ea6b37e1b245bcc32f421def6d9b657490b50fccdaf3bf2a0b9cc99"
-    },
-    {
-      "file": "party-log-fluid-stress-phone.png",
-      "screen": "party log fluid stress phone",
-      "device": "phone",
-      "size": "370x644",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "64072ca04c84852503988e6dd34d6ef909c55b19dba0b319e861458684414a43"
-    },
-    {
-      "file": "party-log-pain-duration-phone.png",
-      "screen": "party log pain duration phone",
-      "device": "phone",
-      "size": "390x1172",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "2c0e72cb3e522fd6c6d75ec6d204e6f4ac127d86bc13c598ecf6da84445f0d68"
-    },
-    {
-      "file": "party-log-pain-intensity-phone.png",
-      "screen": "party log pain intensity phone",
-      "device": "phone",
-      "size": "390x1556",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "6e2a04a6bec1f7126c3c3f27c552933fc4e263405a815ea11a74e25db1d09851"
-    },
-    {
-      "file": "party-log-pain-location-phone.png",
-      "screen": "party log pain location phone",
-      "device": "phone",
-      "size": "390x2031",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "cd273c97d3954c4607859cefa07cb393bacadb79718567e1a81b2bd6b0ff1874"
-    },
-    {
-      "file": "party-log-treatment-timing-desktop.png",
-      "screen": "party log treatment timing desktop",
+      "file": "party-area-order-desktop.png",
+      "screen": "Area order and spread timing",
       "device": "desktop",
-      "size": "1386x843",
+      "size": "2496x984",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "00b0a30675d19662167aaf9c007ad9ee73ce97d9e5d7d0714bc8d705f3da0952"
+      "text": "First-area counts, selection-rank summaries and selection timing; timestamps are not verified biological spread.",
+      "sha256": "0561a9fd1ab6e82d027a1154536b681dc530281d4c27f987cf5e669ce63a979c"
+    },
+    {
+      "file": "party-peak-time-desktop.png",
+      "screen": "Peak headache times",
+      "device": "desktop",
+      "size": "2496x392",
+      "scenario": "party",
+      "text": "Party-season week; completed episodes grouped by time of day.",
+      "sha256": "e3dd7a02b450e121549d5ecb05bf52a9d18a3215b339421322a543727a50c0c0"
+    },
+    {
+      "file": "party-neck-insights-desktop.png",
+      "screen": "Neck involvement insights",
+      "device": "desktop",
+      "size": "2496x584",
+      "scenario": "party",
+      "text": "Party-season week; neck and back-of-head involvement; fictional data.",
+      "sha256": "a71367d5861e5076a3cfe4c976d45cc1a5067581fb5fcb87d16bae7e0be07ce6"
     },
     {
       "file": "party-medication-analysis-desktop.png",
-      "screen": "party medication analysis desktop",
+      "screen": "Medication analysis and other management",
       "device": "desktop",
-      "size": "1408x335",
+      "size": "2496x924",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "27f8191b9ff4ce0f22a845d55eaa080eafdb564394e524642c80329ec8cc8d73"
-    },
-    {
-      "file": "party-neck-peak-desktop.png",
-      "screen": "party neck peak desktop",
-      "device": "desktop",
-      "size": "1408x505",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a253e42942b91111dba9f00e8ccffb2b36fc8142fd2ccad8764c1e91d8f4da9a"
-    },
-    {
-      "file": "party-profile-desktop.png",
-      "screen": "party profile desktop",
-      "device": "desktop",
-      "size": "1440x4505",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "a0c5f994dafa81084a2934936af86f4469c2a2cb7f9852423b6279855e909784"
-    },
-    {
-      "file": "party-profile-phone.png",
-      "screen": "party profile phone",
-      "device": "phone",
-      "size": "390x5253",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "cf76ae4b4f10425fb21338b5fc3304e082d051f29cf4b63c147bcbfd9444edc4"
-    },
-    {
-      "file": "party-sample-example-episode-desktop.png",
-      "screen": "party sample example episode desktop",
-      "device": "desktop",
-      "size": "926x415",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "623c42d5b98cd86ce040c60811a054eac9c1f5dc6ba5b086e1fd6ad6f1063ee1"
-    },
-    {
-      "file": "party-sample-report-desktop.png",
-      "screen": "party sample report desktop",
-      "device": "desktop",
-      "size": "1440x2314",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "df46ee62577eab1513928f50db7c2c2867fb19104bd7e7fdaf90613e92b60ba2"
-    },
-    {
-      "file": "party-sample-report-phone.png",
-      "screen": "party sample report phone",
-      "device": "phone",
-      "size": "390x3867",
-      "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "7539aa64267f928b14c1a35cdcfc656e5766420945dba16a4ccf87c107f3b522"
+      "text": "Party-season week; medicine-use counter and other management; missing relief times are not inferred.",
+      "sha256": "0b5c531d612ea149008e28a070fe014451d8238a5edbede1dac05353a0f3b441"
     },
     {
       "file": "party-standard-export-desktop.png",
-      "screen": "party standard export desktop",
+      "screen": "Standard doctor report export",
       "device": "desktop",
-      "size": "1440x1393",
+      "size": "2560x3964",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "2e281fabc695924668d4021be9cc1bd4a90cb504ab355eacebafbffc61d747dc"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "494f94095b3d63939102915097d8570210a9e8399ac36c3aba5bae2b19989941"
+    },
+    {
+      "file": "party-ai-report-desktop.png",
+      "screen": "AI Premium Report",
+      "device": "desktop",
+      "size": "2560x3964",
+      "scenario": "party",
+      "text": "AI Pattern Analysis; Weak; n=5; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "7132b3e6b7f272394b3f2a052033d65909758c2734344e5d5c6fefe8294e7d39"
+    },
+    {
+      "file": "party-ai-correlation-desktop.png",
+      "screen": "AI correlation findings",
+      "device": "desktop",
+      "size": "2396x426",
+      "scenario": "party",
+      "text": "AI Pattern Analysis; Weak; n=5; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "3bafc39371aefc66401284db91e213ba489dd45568b18210af804ce14a6cc0c2"
+    },
+    {
+      "file": "party-ai-treatment-desktop.png",
+      "screen": "AI treatment and management effectiveness",
+      "device": "desktop",
+      "size": "2396x430",
+      "scenario": "party",
+      "text": "AI Pattern Analysis; Weak; n=5; correlation does not imply causation; fictional data; missing outcomes excluded. Treatment timing and missing outcomes are stated without guessing.",
+      "sha256": "d5e672760fdf1a46e5f3763d16ca440942e69475f2fd1cfe6b382e2d40fb4908"
+    },
+    {
+      "file": "party-dashboard-phone.png",
+      "screen": "Dashboard with daily sleep check-in and episode summary",
+      "device": "phone",
+      "size": "1170x9540",
+      "scenario": "party",
+      "text": "My Headache Experience Journal; Daily sleep check-in; Party-season week; fictional completed and active episode labels.",
+      "sha256": "2c482c0cc628f8a1f348dadb24a9ccf43b03da6ad02cb5a377787669b9054614"
+    },
+    {
+      "file": "party-analysis-overview-phone.png",
+      "screen": "Complete analysis screen",
+      "device": "phone",
+      "size": "1170x16485",
+      "scenario": "party",
+      "text": "Party-season week; overview, peak time, area order, associations, medicine use and other management; fictional data.",
+      "sha256": "e277020a659729c611a7dab4c513a10ce5450c423bf197d40b4034b742aa3ed9"
+    },
+    {
+      "file": "party-correlation-phone.png",
+      "screen": "Correlation analysis",
+      "device": "phone",
+      "size": "1074x2304",
+      "scenario": "party",
+      "text": "Party-season week; self-reported associations; correlation does not imply causation.",
+      "sha256": "fbea28e542080a62b845f49773c59c65c52d190115528f6cca38c21bda69f1d6"
     },
     {
       "file": "party-standard-export-phone.png",
-      "screen": "party standard export phone",
+      "screen": "Standard doctor report export",
       "device": "phone",
-      "size": "390x1921",
+      "size": "1170x5763",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "fe8dd16e78d0c777747df5bd25ad8bff8ba627e37635433a9c7a86c9e945199b"
+      "text": "Standard PDF and CSV; completed episodes only; fictional demo; real exports require real completed data.",
+      "sha256": "2beb3117c8d88ccc82a7884024946d24f5efa54d3bf8b7224c7c0d97c7ffb988"
     },
     {
-      "file": "party-wearable-active-phone.png",
-      "screen": "party wearable active phone",
+      "file": "party-ai-report-phone.png",
+      "screen": "AI Premium Report",
       "device": "phone",
-      "size": "370x734",
+      "size": "1170x8310",
       "scenario": "party",
-      "text": "Real-screen capture using clearly labelled fictional data.",
-      "sha256": "1cdc8df8f0f82624763d64618bb02000ce4fc9dd482efed26b8321a5966031b8"
+      "text": "AI Pattern Analysis; Weak; n=5; correlation does not imply causation; fictional data; missing outcomes excluded.",
+      "sha256": "4779a29d6a83b5c6ccfd3fab1bbd1d8737bf6c7f71687f34d352cbc81937c201"
     },
     {
-      "file": "clinic-reference-sheet.pdf",
-      "screen": "Clinician reference sheet",
+      "file": "ai-premium-gating-desktop.png",
+      "screen": "AI Premium Report access state",
       "device": "desktop",
-      "size": "A4 PDF",
-      "scenario": "none",
-      "text": "Public reference only; QR opens the public clinician page and contains no health details.",
-      "sha256": "de45bdefb6a939b42551b375ee20d722be896c9ecdc362374e9eb1825364fff8"
+      "size": "2560x3964",
+      "scenario": "shared",
+      "text": "Premium access explanation; beta phase unlock statement; fictional demo.",
+      "sha256": "293b3659367c90bc3ff1092bf6849ee6e840e8ef9d06cd055d967ad04c94437d"
+    },
+    {
+      "file": "profile-secure-data-desktop.png",
+      "screen": "Secure Data Management only",
+      "device": "desktop",
+      "size": "2496x584",
+      "scenario": "shared",
+      "text": "Export My Data, View Data Summary, Delete All Data; no profile identity, notification, tracker or testing controls.",
+      "sha256": "c67338ce9a2106b3d4f5adfda8b5cd9fe32a15ce6e5d38231b550ffd9ab9ef6e"
+    },
+    {
+      "file": "log-activities-desktop.png",
+      "screen": "Log step 5: Triggers",
+      "device": "desktop",
+      "size": "2560x5076",
+      "scenario": "shared",
+      "text": "Step 5 of 6: Triggers; fictional active log; per-area values restored from the fixture.",
+      "sha256": "6ac5c8a39d04976bbc41179d81f47bf60cd06b20a26523259ef3ad5a2b5da57c"
+    },
+    {
+      "file": "log-treatment-timing-desktop.png",
+      "screen": "Log step 6: Treatment Log",
+      "device": "desktop",
+      "size": "2560x4658",
+      "scenario": "shared",
+      "text": "Step 6 of 6: Treatment Log; fictional active log; per-area values restored from the fixture.",
+      "sha256": "061b454f0f74c1e1c5059a040b7b41308aa31b79821d30d28eeb555915a7d3c2"
+    },
+    {
+      "file": "signup-desktop.png",
+      "screen": "Open beta signup",
+      "device": "desktop",
+      "size": "2560x3890",
+      "scenario": "public",
+      "text": "My Headache Experience Journal; Open beta: 56 days (8 weeks) of Premium, free; age dialog dismissed; no form submission.",
+      "sha256": "b130faddc1de5f40e799aae4a92cf8f47b5426b185b1968985373b4a9c5f84ba"
+    },
+    {
+      "file": "sample-report-desktop.png",
+      "screen": "Fictional sample doctor report",
+      "device": "desktop",
+      "size": "1984x3356",
+      "scenario": "public",
+      "text": "Sample only; My Headache Experience Journal; Pain medicine; six-criterion SNOOP audit; clinician QR contains only the public reference URL.",
+      "sha256": "f2747f6f1c092b80c47df18abe2cb9949ad90f9e1e791fea9305a5873d1db3f8"
+    },
+    {
+      "file": "sample-example-episode-desktop.png",
+      "screen": "Sample episode area order",
+      "device": "desktop",
+      "size": "1852x830",
+      "scenario": "public",
+      "text": "1 Left temple Origin; 2 Left back of head; Pain medicine and Rest; missing outcome excluded.",
+      "sha256": "70812b613b70676af4cfadcf0379db8b8d9c26a1b6dcc5166bc459f5b8cbab61"
+    },
+    {
+      "file": "sample-medication-counter-desktop.png",
+      "screen": "Sample medicine-use counter",
+      "device": "desktop",
+      "size": "1852x296",
+      "scenario": "public",
+      "text": "Pain medicine 3 recorded days; full self-reported non-diagnosis disclaimer visible.",
+      "sha256": "dd253f0c256630a24bee11d50935aefb5d4d9ec7335adabb47b488ce3d3c1211"
+    },
+    {
+      "file": "clinicians-desktop.png",
+      "screen": "Clinician reference page",
+      "device": "desktop",
+      "size": "2560x3760",
+      "scenario": "public",
+      "text": "Episode and area records, reports, interpretation limits, safety and privacy; public clinician reference.",
+      "sha256": "26daa20161624843f64040492b2991db60fdc2d2d1b9efcd78aa6250d0df4243"
+    },
+    {
+      "file": "try-front-desktop.png",
+      "screen": "Interactive front pain map with numbered chips",
+      "device": "desktop",
+      "size": "2560x3760",
+      "scenario": "public",
+      "text": "1 Left temple (Origin); 2 Left eye; 3 Top of head; authentic SVG vectors; trial draft stays in this tab.",
+      "sha256": "7ea081950611ebf80fed1e61654a986d1a64d8d3a2aef72c20c5c0f498be89a5"
+    },
+    {
+      "file": "try-back-neck-desktop.png",
+      "screen": "Interactive back-of-head and neck map with numbered chips",
+      "device": "desktop",
+      "size": "2560x3760",
+      "scenario": "public",
+      "text": "Front selections retained; Left back of head and Neck / base of skull added in selection order; bright Left and Right labels.",
+      "sha256": "756349e47ac69784d88d584500de40ce554f2b7c36fb61c62f29762bc3160643"
+    },
+    {
+      "file": "headmap-back-clean.png",
+      "screen": "Clean back-of-head and neck SVG map",
+      "device": "desktop",
+      "size": "720x936",
+      "scenario": "shared",
+      "text": "Unselected anatomical SVG with bright Left and Right orientation labels.",
+      "sha256": "17494b37c810007bb648292595a6ea7e8604ef8c3cd47f80e2adb14f18d442fb"
+    },
+    {
+      "file": "headmap-front-clean.png",
+      "screen": "Clean front SVG map",
+      "device": "desktop",
+      "size": "720x900",
+      "scenario": "shared",
+      "text": "Unselected anatomical SVG with bright patient-side orientation labels.",
+      "sha256": "034e33fceb9ff3320ee2308c2e4589a9e80d4645f832fddff3cf9dd7fda0b896"
+    },
+    {
+      "file": "profile-secure-data-phone.png",
+      "screen": "Secure Data Management only",
+      "device": "phone",
+      "size": "1074x984",
+      "scenario": "shared",
+      "text": "Export My Data, View Data Summary, Delete All Data; no profile identity, notification, tracker or testing controls.",
+      "sha256": "5ca905417bae66b8905137fdc8996412f9b4497d1bebd243bb47d33d1dccbfa4"
+    },
+    {
+      "file": "log-pain-location-phone.png",
+      "screen": "Log step 1: Pain Location",
+      "device": "phone",
+      "size": "1170x5355",
+      "scenario": "shared",
+      "text": "Step 1 of 6: Pain Location; fictional active log; per-area values restored from the fixture.",
+      "sha256": "36b9a3854a26f9904667004d0d4122724b205f6fc8a496894f026af636f529c9"
+    },
+    {
+      "file": "log-pain-intensity-phone.png",
+      "screen": "Log step 2: Pain Intensity",
+      "device": "phone",
+      "size": "1170x4062",
+      "scenario": "shared",
+      "text": "Step 2 of 6: Pain Intensity; fictional active log; per-area values restored from the fixture. Pain characteristics: Sharp, Stabbing, Dull, Throbbing, Band of pressure, Tooth ache-like.",
+      "sha256": "d15bcd8cdbbb5bfa1afe928a2a3ef85b12f9ab640282a476d0363d98709bd8ad"
+    },
+    {
+      "file": "log-pain-duration-phone.png",
+      "screen": "Log step 3: Pain Duration",
+      "device": "phone",
+      "size": "1170x2910",
+      "scenario": "shared",
+      "text": "Step 3 of 6: Pain Duration; fictional active log; per-area values restored from the fixture.",
+      "sha256": "a499b6dd930e4c257aabd211bf6aa326acc1ffab906ee014481b888bcbb3576e"
+    },
+    {
+      "file": "log-associated-symptoms-phone.png",
+      "screen": "Log step 4: Associated Symptoms",
+      "device": "phone",
+      "size": "1170x7446",
+      "scenario": "shared",
+      "text": "Step 4 of 6: Associated Symptoms; fictional active log; per-area values restored from the fixture.",
+      "sha256": "95033c2c5499211b23f697a78427eaceac6bcf1ada63ea4956e3c142a9687fa6"
+    },
+    {
+      "file": "log-triggers-phone.png",
+      "screen": "Log step 5: Triggers",
+      "device": "phone",
+      "size": "1170x8298",
+      "scenario": "shared",
+      "text": "Step 5 of 6: Triggers; fictional active log; per-area values restored from the fixture.",
+      "sha256": "ede807c1500a3d75ec569307a8ad0a0b139897dbf18c87e43f51867ca3b5c68a"
+    },
+    {
+      "file": "log-fluid-drinks-phone.png",
+      "screen": "Beverage trigger entry",
+      "device": "phone",
+      "size": "1074x510",
+      "scenario": "shared",
+      "text": "Beverage and hours-before fields; current step remains visible in the full Triggers capture.",
+      "sha256": "905d70ff6fa9a36d4a51f268fb759cb8945c52038587281e30e634d359d3f188"
+    },
+    {
+      "file": "log-treatment-phone.png",
+      "screen": "Log step 6: Treatment Log",
+      "device": "phone",
+      "size": "1170x7215",
+      "scenario": "shared",
+      "text": "Step 6 of 6: Treatment Log; fictional active log; per-area values restored from the fixture.",
+      "sha256": "9aad162c2adada0154f54e7c188982d9aab11d633c931cfbbcf468d2815a4ecb"
+    },
+    {
+      "file": "signup-phone.png",
+      "screen": "Open beta signup",
+      "device": "phone",
+      "size": "1170x3918",
+      "scenario": "public",
+      "text": "My Headache Experience Journal; Open beta: 56 days (8 weeks) of Premium, free; age dialog dismissed; no form submission.",
+      "sha256": "f89f51d25c152ff8a75dcf771fd51d0c6cb2695c79de0a8c991948b749a201d4"
+    },
+    {
+      "file": "sample-report-phone.png",
+      "screen": "Fictional sample doctor report",
+      "device": "phone",
+      "size": "1074x8013",
+      "scenario": "public",
+      "text": "Sample only; My Headache Experience Journal; Pain medicine; six-criterion SNOOP audit; clinician QR contains only the public reference URL.",
+      "sha256": "70b8e6a6a02f5912b3101028feb2d238530edff9cd5f4e1934c01142ddfedb4b"
+    },
+    {
+      "file": "sample-snoop-audit-phone.png",
+      "screen": "Mobile SNOOP screening audit",
+      "device": "phone",
+      "size": "948x3084",
+      "scenario": "public",
+      "text": "All six criteria in wrapped mobile cards; Screened, not detected; no horizontal table scrolling.",
+      "sha256": "338e4999957d12b76acd823628a7676d3cb8888a49eb0d13a56c607530ff08e2"
+    },
+    {
+      "file": "clinicians-phone.png",
+      "screen": "Clinician reference page",
+      "device": "phone",
+      "size": "1170x5220",
+      "scenario": "public",
+      "text": "Episode and area records, reports, interpretation limits, safety and privacy; public clinician reference.",
+      "sha256": "9efb06ce0aa30f83ee79a9245f9ae1898d281f5f58b36bb6c4cecccdd3ecb73d"
+    },
+    {
+      "file": "try-front-phone.png",
+      "screen": "Interactive front pain map with numbered chips",
+      "device": "phone",
+      "size": "1170x8340",
+      "scenario": "public",
+      "text": "1 Left temple (Origin); 2 Left eye; 3 Top of head; authentic SVG vectors; trial draft stays in this tab.",
+      "sha256": "7c9b6742b202c0d7f92c2920daa8256c9199eb389128e25138f3992e4e4dd13a"
+    },
+    {
+      "file": "try-back-neck-phone.png",
+      "screen": "Interactive back-of-head and neck map with numbered chips",
+      "device": "phone",
+      "size": "1170x8550",
+      "scenario": "public",
+      "text": "Front selections retained; Left back of head and Neck / base of skull added in selection order; bright Left and Right labels.",
+      "sha256": "4a5f0be229f29c271e9885a7defd5eacbd83ce6e40a0f86801346807d47c1725"
     },
     {
       "file": "sample-doctor-report.pdf",
       "screen": "Fictional sample doctor report PDF",
-      "device": "desktop",
-      "size": "A4 PDF",
-      "scenario": "sample",
-      "text": "Sample only: fictional data; includes ordered areas, SNOOP summary and public clinician QR footer.",
-      "sha256": "3e449368d846230da9e601df1db2a068e846b4f77c0df78809d6b9ec168ccd95"
+      "device": "document",
+      "size": "A4",
+      "scenario": "public",
+      "text": "Sample only; full product name; generic Pain medicine; six SNOOP criteria; interpretation limits; public clinician QR footer.",
+      "sha256": "78f6473fd17ce353b17e8b7d08ba52bd1decfa9117268f58f443086305d0857b"
     },
     {
-      "file": "rec-pain-map.webm",
-      "screen": "Pain-map selection recording",
-      "device": "phone",
-      "size": "390x844 WebM",
-      "scenario": "trial",
-      "text": "Selects three front areas, switches to Back & neck and retains a tab-only fictional draft.",
-      "sha256": "4efd8da6d43a69a266c4865fdcb0c0a08d7652fe08d99005eab7ca453c82746c"
+      "file": "clinic-reference-sheet.pdf",
+      "screen": "Clinician reference sheet PDF",
+      "device": "document",
+      "size": "A4",
+      "scenario": "public",
+      "text": "Public clinical reference and report limitations; no patient health data.",
+      "sha256": "0e12fb5b7f8f69cdaec2317103a0453429dcc5980cd17063116fd268d9605b8c"
+    },
+    {
+      "file": "rec-map-select.webm",
+      "screen": "Interactive pain-map selection recording",
+      "device": "phone recording",
+      "size": "390x1400; 7.8s",
+      "scenario": "public",
+      "text": "Left temple, Left eye and Top of head selected in order; numbered chips remain visible; no account or saved health data.",
+      "sha256": "44f802c0daac9f8a524d44eec6a257508d546c158fc8d637fc3e8c0054229311"
     },
     {
       "file": "rec-sample-scroll.webm",
-      "screen": "Sample report scroll and PDF download",
-      "device": "phone",
-      "size": "390x844 WebM",
-      "scenario": "sample",
-      "text": "Scrolls the fictional example episode and SNOOP audit, then downloads the labelled sample PDF.",
-      "sha256": "0094da684e64b4367aa34c4d4dd4ab516751a9c27462c9d01f05fbd9cf99e2c4"
+      "screen": "Sample doctor report scrolling recording",
+      "device": "phone recording",
+      "size": "390x1000; 7.5s",
+      "scenario": "public",
+      "text": "Fictional sample report; frequency, episode order, SNOOP audit and public clinician reference.",
+      "sha256": "e5cf7fed796f3d2757e3c9c88324124508730f2e6df9070ddde63022cbfd2010"
     }
   ]
 }

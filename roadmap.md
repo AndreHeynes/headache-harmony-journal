@@ -1,9 +1,9 @@
 # Roadmap: press-kit review corrections
-- [ ] Correct daily sleep copy, product naming, fictional triggers and Busy medicine-use consistency
-- [ ] Separate medicine from other management and retain the full medicine-counter disclaimer in captures
-- [ ] Re-capture high-resolution screens, focused crops, signup, public maps, clinician page and recordings
-- [ ] Remove duplicate assets, update manifest descriptions/counts, inspect every output and rebuild the ZIP
-- [ ] Run focused tests and verify the corrected press-kit flow
+- [x] Correct daily sleep copy, product naming, fictional triggers and Busy medicine-use consistency
+- [x] Separate medicine from other management and retain the full medicine-counter disclaimer in captures
+- [x] Re-capture high-resolution screens, focused crops, signup, public maps, clinician page and recordings
+- [x] Remove duplicate assets, update manifest descriptions/counts, inspect every output and rebuild the ZIP
+- [x] Run focused tests and verify the corrected press-kit flow
 
 # Roadmap: real-screen press kit
 - [x] Reconcile /demo lookalike assets with the missing real-screen capture matrix
