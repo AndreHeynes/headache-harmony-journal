@@ -78,7 +78,7 @@ const SignIn = () => {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">My Headache Experience Journal!™</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">My Headache Experience Journal</h1>
           <p className="text-muted-foreground">Participate, understand, and recognize your headaches.</p>
         </div>
 

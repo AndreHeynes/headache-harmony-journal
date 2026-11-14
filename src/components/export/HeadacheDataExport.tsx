@@ -178,7 +178,7 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
     
     // Add title
     doc.setFontSize(20);
-    doc.text("Headache Experience Journal: Patient Report", 20, 25);
+    doc.text("My Headache Experience Journal: Patient Report", 20, 25);
     
     // Add patient identification & demographics section
     doc.setFontSize(12);
@@ -494,7 +494,7 @@ export function HeadacheDataExport({ headacheData, redFlags = [], isPremium = fa
       : 'No data recorded';
     
     // Create CSV content with patient identification header
-    let csvContent = `# Headache Experience Journal Export\n`;
+    let csvContent = `# My Headache Experience Journal Export\n`;
     csvContent += `# ========================================\n`;
     csvContent += `# PATIENT DEMOGRAPHICS & IDENTIFICATION\n`;
     csvContent += `# Patient Name: ${patientName}\n`;

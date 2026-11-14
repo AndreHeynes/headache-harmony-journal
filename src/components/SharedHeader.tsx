@@ -43,7 +43,7 @@ export const SharedHeader = () => {
             className="h-8 w-8 rounded-full"
           />
           <span className="font-semibold text-lg hidden sm:inline">
-            My Headache Experience Journal!™
+            My Headache Experience Journal
           </span>
           {isLoggedIn && beta.expiresAt && !beta.expired ? (
             <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full whitespace-nowrap">

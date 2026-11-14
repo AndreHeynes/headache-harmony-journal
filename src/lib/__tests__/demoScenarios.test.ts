@@ -16,4 +16,10 @@ describe('demo scenarios', () => {
     expect(s.episodes).toBe(10);
     expect(s.medDays).toBe(8);
   });
+  it('party season has five episodes and uses coffee rather than wine', () => {
+    const s = summarizeDemo('party');
+    expect(s.episodes).toBe(5);
+    expect(JSON.stringify(DEMO_SCENARIOS.party)).toContain('Beverage: Coffee');
+    expect(JSON.stringify(DEMO_SCENARIOS.party)).not.toContain('Beverage: Wine');
+  });
 });

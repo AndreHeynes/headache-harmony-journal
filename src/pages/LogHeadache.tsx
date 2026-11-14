@@ -245,7 +245,7 @@ function LogHeadacheInner() {
 
           {currentStep === 0 && (
             <div className="mt-6">
-              <WearableCheckIn title="Last night's sleep & wearable data" compact />
+              <WearableCheckIn compact />
             </div>
           )}
         </main>

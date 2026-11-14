@@ -19,7 +19,7 @@ describe('real-screen fictional demo fixtures', () => {
 
   it('keeps small samples explicitly insufficient in the AI report', () => {
     expect(createDemoAiReport('light').narrative.correlation_findings[0].strength).toBe('Insufficient data');
-    expect(createDemoAiReport('party').narrative.correlation_findings[0].strength).toBe('Insufficient data');
+    expect(createDemoAiReport('party').narrative.correlation_findings[0].strength).toBe('Weak');
     expect(createDemoAiReport('busy').narrative.correlation_findings[0].sample_size).toBe(10);
   });
 

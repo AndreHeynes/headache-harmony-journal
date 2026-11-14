@@ -155,7 +155,7 @@ export function DataManagementCard() {
   };
 
   return (
-    <Card className="bg-gray-800/50 border-gray-700 p-4 mb-4">
+    <Card id="secure-data-management" className="bg-gray-800/50 border-gray-700 p-4 mb-4">
       <div className="flex items-center space-x-2 mb-2">
         <Download className="h-5 w-5 text-teal-400" />
         <h3 className="font-medium text-white">Secure Data Management</h3>

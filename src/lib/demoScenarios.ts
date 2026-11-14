@@ -30,12 +30,19 @@ export const DEMO_SCENARIOS: Record<DemoScenarioId, { label: string; period: str
     ep('2026-11-12', 17, 180, 6, ['l-temple', 'l-eye'], ['Food: Late dinner (10h before)'], true, 'not_effective', 6),
   ] },
   party: { label: 'Party-season week', period: '2–8 November 2026', days: 7, episodes: [
-    ep('2026-11-02', 10, 180, 6, ['forehead', 'l-temple'], ['Activity: Late night out (12h before) [300 min]', 'Beverage: Wine (14h before)'], true, 'partially_effective', 4.5),
+    ep('2026-11-02', 10, 180, 6, ['forehead', 'l-temple'], ['Activity: Late night out (12h before) [300 min]', 'Beverage: Coffee (14h before)'], true, 'partially_effective', 4.5),
     ep('2026-11-04', 15, 120, 5, ['l-temple'], ['Food: Skipped lunch (5h before)', 'Stress: Family (6h before)'], true, 'effective', 6),
-    ep('2026-11-06', 9, 240, 7, ['forehead', 'l-temple', 'l-eye'], ['Beverage: Wine (12h before)', 'Activity: Travel (8h before) [240 min]'], true, 'not_effective', 5),
+    ep('2026-11-06', 9, 240, 7, ['forehead', 'l-temple', 'l-eye'], ['Beverage: Coffee (12h before)', 'Activity: Travel (8h before) [240 min]'], true, 'not_effective', 5),
     ep('2026-11-07', 11, 150, 6, ['neck', 'l-occiput'], ['Stress: Social (10h before)'], false, null, 5.5),
+    ep('2026-11-08', 13, 90, 4, ['forehead'], ['Beverage: Coffee (3h before)'], false, null, 7),
   ] },
 };
+
+/** Fixed scenario end date keeps demo reporting windows independent of the live clock. */
+export function getDemoAnalysisDate(id: DemoScenarioId): Date {
+  const lastDate = DEMO_SCENARIOS[id].episodes.reduce((latest, episode) => episode.date > latest ? episode.date : latest, '2026-11-01');
+  return new Date(`${lastDate}T23:59:59.999Z`);
+}
 
 const NECK = new Set(['neck', 'l-occiput', 'r-occiput', 'occiput']);
 const round1 = (n: number) => Math.round(n * 10) / 10;

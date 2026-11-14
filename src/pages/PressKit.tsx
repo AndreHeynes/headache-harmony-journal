@@ -10,6 +10,9 @@ type Asset = { file: string; screen: string; device: string; size: string; scena
 export default function PressKit() {
   const [assets, setAssets] = useState<Asset[] | null>(null);
   useEffect(() => { fetch('/press-kit/manifest.json').then(r => r.json()).then(m => setAssets(m.assets || [])).catch(() => setAssets([])); }, []);
+  const images = (assets || []).filter(a => a.file.endsWith('.png')).length;
+  const pdfs = (assets || []).filter(a => a.file.endsWith('.pdf')).length;
+  const videos = (assets || []).filter(a => a.file.endsWith('.webm')).length;
   return <div className="max-w-6xl mx-auto px-4 py-6 pb-20">
     <Helmet><title>Press kit | My Headache Experience Journal</title><meta name="robots" content="noindex, nofollow" /></Helmet>
     <PublicPageHeader />
@@ -18,7 +21,7 @@ export default function PressKit() {
     <div className="mb-8 flex flex-col items-start gap-4 rounded-lg border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h2 className="font-medium">Complete press kit</h2>
-        <p className="text-sm text-muted-foreground">All 93 assets — 89 images, 2 PDFs and 2 video clips — plus the manifest.</p>
+        <p className="text-sm text-muted-foreground">{assets === null ? 'Loading asset catalog…' : `All ${assets.length} assets — ${images} images, ${pdfs} PDFs and ${videos} video clips — plus the manifest.`}</p>
       </div>
       <Button asChild className="shrink-0">
         <a href={pressKitArchive.url} download="headache-journal-press-kit.zip"><Download />Download all as ZIP</a>

@@ -51,12 +51,12 @@ export default function Dashboard() {
     return (
       <>
         <Helmet>
-          <title>Dashboard - Headache Journal™</title>
+          <title>Dashboard - My Headache Experience Journal</title>
         </Helmet>
         <div className="min-h-screen bg-background text-foreground">
           <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-sm border-b border-border p-4">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold text-foreground">Headache Journal™</h1>
+              <h1 className="text-xl font-bold text-foreground">My Headache Experience Journal</h1>
               <Link to="/profile">
                 <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
                   <AvatarFallback className="bg-primary text-primary-foreground">
@@ -80,12 +80,12 @@ export default function Dashboard() {
   return (
     <>
       <Helmet>
-        <title>Dashboard - Headache Journal™</title>
+        <title>Dashboard - My Headache Experience Journal</title>
       </Helmet>
       <div className="min-h-screen bg-background text-foreground">
         <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-sm border-b border-border p-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-foreground">Headache Journal™</h1>
+            <h1 className="text-xl font-bold text-foreground">My Headache Experience Journal</h1>
             <Link to="/profile">
               <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
                 <AvatarFallback className="bg-primary text-primary-foreground">

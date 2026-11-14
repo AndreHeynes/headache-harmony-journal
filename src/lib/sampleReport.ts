@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import { addClinicianFooter } from './clinicianPdf';
 import type { ExportArea } from './exportFormat';
+import { SNOOP_CRITERIA } from '@/utils/snoopCriteria';
 
 /** Fictional, fixed marketing fixture; never passed to Standard Export. */
 export const SAMPLE_REPORT = {
@@ -17,7 +18,7 @@ export async function downloadSampleReport() {
   const doc = new jsPDF();
   const write = (text: string, y: number, size = 11) => { doc.setFontSize(size); doc.text(doc.splitTextToSize(text, 165), 22, y); };
   write('SAMPLE ONLY — FICTIONAL DATA', 20, 13);
-  write('Headache Journal: Patient Report', 32, 19);
+  write('My Headache Experience Journal: Patient Report', 32, 19);
   write('Demographics: Fictional patient A. No real personal information.', 46);
   write('Reporting period: 1–30 October 2026. Completed episodes only.', 56);
   write('Frequency: 6 completed episodes on 5 days; 18 hours total; average intensity 6.2/10.', 70);
@@ -33,11 +34,27 @@ export async function downloadSampleReport() {
   doc.addPage();
   write('SAMPLE ONLY — FICTIONAL DATA', 20, 13);
   write('Screening and interpretation', 34, 18);
-  write('SNOOP example: systemic symptoms, neurological symptoms, sudden onset, first-ever headache after 50, pattern change and positional features: no positive responses in this fictional example.', 50);
-  write('This illustrative sample is not a complete screening audit or a real patient report. Real reports include the full recorded screening history.', 78);
-  write('Treatment response: one partial outcome shown; one missing outcome excluded. No effectiveness percentage or statistical association is inferred from this example.', 101);
-  write('First-selection timestamps reflect when areas were logged; they are not proof of the biological spread of pain.', 126);
-  write('Informational only. Not medical advice or a diagnosis. Seek urgent medical attention for new severe or concerning symptoms.', 148);
+  let screeningY = 50;
+  SNOOP_CRITERIA.forEach(criterion => {
+    if (screeningY > 735) {
+      doc.addPage();
+      screeningY = 30;
+    }
+    const titleLines = doc.splitTextToSize(`${criterion.letter} — ${criterion.name}: screened, not detected.`, 165);
+    doc.setFontSize(11);
+    doc.text(titleLines, 22, screeningY);
+    screeningY += titleLines.length * 13;
+    const detailLines = doc.splitTextToSize(criterion.description, 165);
+    doc.setFontSize(9);
+    doc.text(detailLines, 22, screeningY);
+    screeningY += detailLines.length * 11 + 9;
+  });
+  write('All six criteria are shown, including criteria screened but not detected. This fictional audit is not a diagnosis.', Math.max(180, screeningY + 8), 10);
+  doc.addPage();
+  write('Treatment response & interpretation', 30, 18);
+  write('Treatment response: one partial outcome shown; one missing outcome excluded. No effectiveness percentage or statistical association is inferred from this example.', 58);
+  write('First-selection timestamps reflect when areas were logged; they are not proof of the biological spread of pain.', 96);
+  write('Informational only. Not medical advice or a diagnosis. Seek urgent medical attention for new severe or concerning symptoms.', 134);
   await addClinicianFooter(doc);
   doc.save('headache-journal-SAMPLE-fictional-report.pdf');
 }

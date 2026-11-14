@@ -30,8 +30,8 @@ export default function Demo() {
     <Card id="demo-dashboard"><CardHeader><SampleTag /><CardTitle>Dashboard · last {sc.days} days</CardTitle></CardHeader>
       <CardContent className="grid grid-cols-2 sm:grid-cols-4 gap-4"><Stat v={s.episodes} l="Completed episodes" /><Stat v={s.headacheDays} l="Headache days" /><Stat v={s.hours} l="Hours total" /><Stat v={s.meanIntensity} l="Mean intensity /10" /></CardContent></Card>
 
-    <Card id="demo-sleep"><CardHeader><SampleTag /><CardTitle className="flex items-center gap-2"><Moon className="h-5 w-5 text-primary" />Daily Sleep & Wearable Check-in</CardTitle><CardDescription>Entered by hand. No device sync.</CardDescription></CardHeader>
-      <CardContent className="grid grid-cols-2 sm:grid-cols-4 gap-4"><Stat v={s.avgSleep} l="Avg sleep hours" /><Stat v="3/5" l="Sleep quality" /><Stat v="62" l="Resting HR (bpm)" /><Stat v="48" l="HRV (ms)" /></CardContent></Card>
+    <Card id="demo-sleep"><CardHeader><SampleTag /><CardTitle className="flex items-center gap-2"><Moon className="h-5 w-5 text-primary" />Daily sleep check-in</CardTitle><CardDescription>Enter last night's sleep and, if you track them, your resting heart rate and HRV.</CardDescription></CardHeader>
+      <CardContent className="grid grid-cols-2 sm:grid-cols-4 gap-4"><Stat v={s.avgSleep} l="Avg sleep hours" /><Stat v="72/100" l="Sleep score" /><Stat v="62" l="Resting HR (bpm)" /><Stat v="48" l="HRV (ms)" /></CardContent></Card>
 
     <div className="grid md:grid-cols-2 gap-6">
       <Card id="demo-trends"><CardHeader><SampleTag /><CardTitle>Episode trend</CardTitle></CardHeader><CardContent>

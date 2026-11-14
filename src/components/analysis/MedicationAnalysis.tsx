@@ -1,25 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Pill, 
-  AlertTriangle, 
-  Loader2, 
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  TrendingUp
-} from "lucide-react";
+import { Pill, AlertTriangle, Loader2, AlertCircle, CheckCircle, Clock, Leaf } from "lucide-react";
 import { useMedicationAnalysis } from "@/hooks/useMedicationAnalysis";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function MedicationAnalysis() {
-  const { 
+  const {
     medications,
+    otherTreatments,
     totalMedicationDays,
     medicationOveruseRisk,
     overuseAlertCount,
     mostEffectiveMedication,
     loading,
-    hasData
+    hasData,
   } = useMedicationAnalysis();
 
   if (loading) {
@@ -33,7 +26,7 @@ export function MedicationAnalysis() {
     );
   }
 
-  if (!hasData || medications.length === 0) {
+  if (!hasData) {
     return (
       <section id="medication-analysis" className="mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -44,7 +37,7 @@ export function MedicationAnalysis() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3 text-muted-foreground">
               <AlertCircle className="h-5 w-5" />
-              <p>No medication data recorded yet. Log treatments to see medication analysis.</p>
+              <p>No completed episodes recorded yet. Log treatments to see medication analysis.</p>
             </div>
           </CardContent>
         </Card>
@@ -67,27 +60,20 @@ export function MedicationAnalysis() {
           <Pill className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-foreground">Medication Analysis</h2>
         </div>
-        {medicationOveruseRisk && (
-          <span className="text-xs px-2 py-1 rounded bg-destructive/20 text-destructive">
-            Overuse Risk
-          </span>
-        )}
+        {medicationOveruseRisk && <span className="text-xs px-2 py-1 rounded bg-destructive/20 text-destructive">Overuse Risk</span>}
       </div>
 
-      {/* Overuse Alert */}
       {overuseAlertCount > 0 && (
         <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Medication Overuse Alert</AlertTitle>
           <AlertDescription>
-            {overuseAlertCount} medication(s) may be overused. Frequent use of pain medications can lead to 
-            medication overuse headaches. Consult your healthcare provider.
+            {overuseAlertCount} medication(s) exceed a use-day counter threshold. Frequent use of pain medicines can be associated with medication overuse headache. Consult your healthcare provider.
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-3 mb-2">
         <Card className="bg-card/50 border-border">
           <CardContent className="p-3">
             <div className="flex items-center gap-2 mb-1">
@@ -98,12 +84,9 @@ export function MedicationAnalysis() {
               <span className="text-xl font-bold text-foreground">{totalMedicationDays}</span>
               <span className="text-xs text-muted-foreground">/30 days</span>
             </div>
-            {totalMedicationDays >= 15 && (
-              <span className="text-xs text-destructive">High frequency</span>
-            )}
+            {totalMedicationDays >= 15 && <span className="text-xs text-destructive">High frequency</span>}
           </CardContent>
         </Card>
-        
         {mostEffectiveMedication && (
           <Card className="bg-card/50 border-border">
             <CardContent className="p-3">
@@ -116,10 +99,10 @@ export function MedicationAnalysis() {
           </Card>
         )}
       </div>
+      <p id="medication-counter-disclaimer" className="text-xs text-muted-foreground mb-4">Self-reported use; this counter is not a diagnosis of medication overuse headache.</p>
 
-      {/* Medication List */}
       <div className="space-y-3">
-        {medications.slice(0, 5).map((med) => (
+        {medications.slice(0, 5).map(med => (
           <Card key={med.medication} className="bg-card/50 border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
@@ -127,72 +110,41 @@ export function MedicationAnalysis() {
                   <Pill className="h-4 w-4 text-primary" />
                   <span className="font-medium text-foreground">{med.medication}</span>
                 </div>
-                {med.overuseAlert && (
-                  <AlertTriangle className="h-4 w-4 text-destructive" />
-                )}
+                {med.overuseAlert && <AlertTriangle className="h-4 w-4 text-destructive" />}
               </div>
-
-              {/* Usage Stats */}
               <div className="grid grid-cols-3 gap-2 text-xs mb-3">
-                <div>
-                  <span className="text-muted-foreground">30d uses:</span>
-                  <span className={`ml-1 font-medium ${med.overuseAlert ? 'text-destructive' : 'text-foreground'}`}>
-                    {med.usesLast30Days}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">7d uses:</span>
-                  <span className="ml-1 font-medium text-foreground">{med.usesLast7Days}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Avg relief:</span>
-                  <span className="ml-1 font-medium text-foreground">{med.avgReliefTimeMinutes}m</span>
-                </div>
+                <div><span className="text-muted-foreground">30d uses:</span><span className={`ml-1 font-medium ${med.overuseAlert ? 'text-destructive' : 'text-foreground'}`}>{med.usesLast30Days}</span></div>
+                <div><span className="text-muted-foreground">30d days:</span><span className="ml-1 font-medium text-foreground">{med.daysLast30Days}</span></div>
+                <div><span className="text-muted-foreground">7d uses:</span><span className="ml-1 font-medium text-foreground">{med.usesLast7Days}</span></div>
               </div>
-
-              {/* Effectiveness Bar */}
+              <p className="text-xs text-muted-foreground mb-3">Avg recorded relief: <span className="text-foreground">{med.avgReliefTimeMinutes == null ? 'Not recorded' : `${med.avgReliefTimeMinutes}m`}</span></p>
               {med.avgEffectiveness > 0 && (
                 <div className="mb-3">
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Effectiveness</span>
-                    <span className="text-foreground">{med.avgEffectiveness}/10</span>
-                  </div>
-                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary rounded-full transition-all" 
-                      style={{ width: `${(med.avgEffectiveness / 10) * 100}%` }}
-                    />
-                  </div>
+                  <div className="flex items-center justify-between text-xs mb-1"><span className="text-muted-foreground">Effectiveness</span><span className="text-foreground">{med.avgEffectiveness}/10</span></div>
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(med.avgEffectiveness / 10) * 100}%` }} /></div>
                 </div>
               )}
-
-              {/* Side Effects */}
               {med.sideEffects.length > 0 && (
                 <div>
                   <span className="text-xs text-muted-foreground mb-2 block">Side Effects:</span>
-                  <div className="flex flex-wrap gap-1">
-                    {med.sideEffects.slice(0, 4).map((effect) => (
-                      <span 
-                        key={effect.effect}
-                        className={`text-xs px-2 py-0.5 rounded ${getSeverityColor(effect.severity)}`}
-                      >
-                        {effect.effect} ({effect.percentageOfUses}%)
-                      </span>
-                    ))}
-                  </div>
+                  <div className="flex flex-wrap gap-1">{med.sideEffects.slice(0, 4).map(effect => <span key={effect.effect} className={`text-xs px-2 py-0.5 rounded ${getSeverityColor(effect.severity)}`}>{effect.effect} ({effect.percentageOfUses}%)</span>)}</div>
                 </div>
               )}
-
-              {/* Overuse Warning */}
-              {med.overuseMessage && (
-                <div className="mt-3 p-2 bg-destructive/10 rounded text-xs text-destructive">
-                  {med.overuseMessage}
-                </div>
-              )}
+              {med.overuseMessage && <div className="mt-3 p-2 bg-destructive/10 rounded text-xs text-destructive">{med.overuseMessage}</div>}
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {otherTreatments.length > 0 && (
+        <Card className="bg-card/50 border-border mt-5">
+          <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Leaf className="h-4 w-4 text-primary" />Other management</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {otherTreatments.map(item => <div key={item.treatment} className="flex items-center justify-between text-sm"><span>{item.treatment}</span><span className="text-muted-foreground">{item.usesLast30Days} uses / 30 days</span></div>)}
+            <p className="text-xs text-muted-foreground pt-2">Self-care entries are shown separately and do not count towards medication-use days.</p>
+          </CardContent>
+        </Card>
+      )}
     </section>
   );
 }

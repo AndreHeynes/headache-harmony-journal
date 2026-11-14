@@ -1,6 +1,7 @@
 
 import { PlusCircle, BarChart2, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { isCaptureMode } from "@/lib/captureMode";
 
 const navItems = [
   { icon: "logo", label: "Home", href: "/dashboard" },
@@ -11,6 +12,7 @@ const navItems = [
 
 export default function BottomNav() {
   const location = useLocation();
+  if (isCaptureMode()) return null;
 
   return (
     <nav className="fixed bottom-0 w-full bg-card/90 backdrop-blur-sm border-t border-border">

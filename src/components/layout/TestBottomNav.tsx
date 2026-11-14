@@ -2,10 +2,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Activity, Plus, BarChart2, User, Beaker } from "lucide-react";
 import { useTestContext } from "@/contexts/TestContext";
+import { isCaptureMode } from "@/lib/captureMode";
 
 export default function TestBottomNav() {
   const { isTestMode } = useTestContext();
   const location = useLocation();
+  if (isCaptureMode()) return null;
 
   const isActive = (path: string) => location.pathname === path;
 

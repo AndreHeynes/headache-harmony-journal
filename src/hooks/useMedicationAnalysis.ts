@@ -1,17 +1,24 @@
 import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { HeadacheEpisode } from '@/types/episode';
-import { fetchAnalysisData, AnalysisUnit, extractTreatmentNames } from '@/lib/analysis';
-import { subDays, differenceInDays, startOfDay, format } from 'date-fns';
+import {
+  fetchAnalysisData,
+  AnalysisUnit,
+  extractMedicationNames,
+  extractOtherTreatmentNames,
+} from '@/lib/analysis';
+import { subDays, startOfDay, endOfDay, format } from 'date-fns';
+import { getDemoScenario, isDemoMode } from '@/lib/demoMode';
+import { getDemoAnalysisDate } from '@/lib/demoScenarios';
 
 interface MedicationUsage {
   medication: string;
   totalUses: number;
   usesLast30Days: number;
   usesLast7Days: number;
+  daysLast30Days: number;
   avgEffectiveness: number;
-  avgReliefTimeMinutes: number;
+  avgReliefTimeMinutes: number | null;
   overuseAlert: boolean;
   overuseMessage: string | null;
   sideEffects: SideEffectSummary[];
@@ -24,8 +31,14 @@ interface SideEffectSummary {
   percentageOfUses: number;
 }
 
+interface OtherTreatmentUsage {
+  treatment: string;
+  usesLast30Days: number;
+}
+
 interface MedicationAnalysisData {
   medications: MedicationUsage[];
+  otherTreatments: OtherTreatmentUsage[];
   totalMedicationDays: number;
   medicationOveruseRisk: boolean;
   overuseAlertCount: number;
@@ -33,22 +46,179 @@ interface MedicationAnalysisData {
   leastSideEffectsMedication: string | null;
 }
 
-// Common side effects to track
 const COMMON_SIDE_EFFECTS = ['nausea', 'dizziness', 'fatigue', 'drowsiness', 'stomach upset', 'dry mouth'];
 
-// Overuse thresholds (per month) - based on medical guidelines
 const OVERUSE_THRESHOLDS: Record<string, number> = {
-  'default': 15, // Generic threshold - 15 days/month
-  'triptans': 10, // Triptans - 10 days/month
-  'opioids': 10, // Opioids - 10 days/month
-  'ibuprofen': 15,
-  'acetaminophen': 15,
-  'aspirin': 15,
-  'naproxen': 15,
-  'sumatriptan': 10,
-  'rizatriptan': 10,
-  'ergotamine': 10,
+  default: 15,
+  triptans: 10,
+  opioids: 10,
+  ibuprofen: 15,
+  acetaminophen: 15,
+  aspirin: 15,
+  naproxen: 15,
+  sumatriptan: 10,
+  rizatriptan: 10,
+  ergotamine: 10,
 };
+
+type TreatmentUse = {
+  date: Date;
+  day: string;
+  effectiveness?: number;
+  reliefMinutes?: number;
+  sideEffects?: string[];
+};
+
+const emptyAnalysis = (): MedicationAnalysisData => ({
+  medications: [],
+  otherTreatments: [],
+  totalMedicationDays: 0,
+  medicationOveruseRisk: false,
+  overuseAlertCount: 0,
+  mostEffectiveMedication: null,
+  leastSideEffectsMedication: null,
+});
+
+/** Pure 30-day calculation. Demo callers pass the fixed scenario end date instead of the live clock. */
+export function calculateMedicationAnalysis(
+  episodes: HeadacheEpisode[],
+  units: AnalysisUnit[],
+  referenceDate: Date,
+): MedicationAnalysisData {
+  if (episodes.length === 0) return emptyAnalysis();
+
+  const periodEnd = endOfDay(referenceDate);
+  const thirtyDaysStart = startOfDay(subDays(referenceDate, 29));
+  const sevenDaysStart = startOfDay(subDays(referenceDate, 6));
+  const inLast30Days = (date: Date) => date >= thirtyDaysStart && date <= periodEnd;
+  const medicationDays = new Set<string>();
+  const medicationMap = new Map<string, { uses: TreatmentUse[] }>();
+  const otherMap = new Map<string, { uses: TreatmentUse[] }>();
+  const seenMedications = new Set<string>();
+  const seenOther = new Set<string>();
+
+  units.forEach(unit => {
+    const treatment = unit.treatment as any;
+    if (!treatment) return;
+    const date = new Date(unit.start_time);
+    const day = format(date, 'yyyy-MM-dd');
+    const effectiveness = Number(treatment.effectiveness) > 0 ? Number(treatment.effectiveness) : undefined;
+    const recordedRelief = Number(treatment.relief_time_minutes ?? treatment.reliefMinutes);
+    const reliefMinutes = Number.isFinite(recordedRelief) && recordedRelief >= 0 ? recordedRelief : undefined;
+    const sideEffects: string[] = treatment.sideEffects
+      ? (Array.isArray(treatment.sideEffects) ? treatment.sideEffects : [treatment.sideEffects])
+      : [];
+    const use = { date, day, effectiveness, reliefMinutes, sideEffects };
+
+    const medicationNames = extractMedicationNames(treatment);
+    medicationNames.forEach(name => {
+      const key = name.toLowerCase().trim();
+      const dedupe = `${unit.episodeId}|${key}`;
+      if (!key || seenMedications.has(dedupe)) return;
+      seenMedications.add(dedupe);
+      const existing = medicationMap.get(key) || { uses: [] };
+      existing.uses.push(use);
+      medicationMap.set(key, existing);
+      if (inLast30Days(date)) medicationDays.add(day);
+    });
+
+    extractOtherTreatmentNames(treatment).forEach(name => {
+      const key = name.toLowerCase().trim();
+      const dedupe = `${unit.episodeId}|${key}`;
+      if (!key || seenOther.has(dedupe)) return;
+      seenOther.add(dedupe);
+      const existing = otherMap.get(key) || { uses: [] };
+      existing.uses.push(use);
+      otherMap.set(key, existing);
+    });
+  });
+
+  const medications: MedicationUsage[] = Array.from(medicationMap.entries()).map(([medication, data]) => {
+    const usesLast30 = data.uses.filter(use => inLast30Days(use.date));
+    const usesLast30Days = usesLast30.length;
+    const usesLast7Days = usesLast30.filter(use => use.date >= sevenDaysStart).length;
+    const daysLast30Days = new Set(usesLast30.map(use => use.day)).size;
+    const usesWithEffectiveness = data.uses.filter(use => use.effectiveness !== undefined);
+    const avgEffectiveness = usesWithEffectiveness.length > 0
+      ? Math.round((usesWithEffectiveness.reduce((sum, use) => sum + (use.effectiveness || 0), 0) / usesWithEffectiveness.length) * 10) / 10
+      : 0;
+    const usesWithRelief = data.uses.filter(use => use.reliefMinutes !== undefined);
+    const avgReliefTimeMinutes = usesWithRelief.length > 0
+      ? Math.round(usesWithRelief.reduce((sum, use) => sum + (use.reliefMinutes || 0), 0) / usesWithRelief.length)
+      : null;
+    const threshold = OVERUSE_THRESHOLDS[medication] || OVERUSE_THRESHOLDS.default;
+    const overuseAlert = daysLast30Days >= threshold;
+    const overuseMessage = overuseAlert
+      ? `Used on ${daysLast30Days} days in the last 30 days (counter threshold: ${threshold} days). Discuss this with a healthcare provider.`
+      : null;
+
+    const sideEffectCounts = new Map<string, { count: number; severities: string[] }>();
+    data.uses.forEach(use => {
+      (use.sideEffects || []).forEach(effect => {
+        const effectLower = effect.toLowerCase();
+        const existing = sideEffectCounts.get(effectLower) || { count: 0, severities: [] };
+        existing.count++;
+        if (COMMON_SIDE_EFFECTS.some(common => effectLower.includes(common))) {
+          if (effectLower.includes('severe')) existing.severities.push('severe');
+          else if (effectLower.includes('moderate')) existing.severities.push('moderate');
+          else existing.severities.push('mild');
+        } else {
+          existing.severities.push('mild');
+        }
+        sideEffectCounts.set(effectLower, existing);
+      });
+    });
+
+    const sideEffects = Array.from(sideEffectCounts.entries()).map(([effect, details]) => {
+      const severityCounts = details.severities.reduce((counts, severity) => {
+        counts[severity] = (counts[severity] || 0) + 1;
+        return counts;
+      }, {} as Record<string, number>);
+      const mostCommonSeverity = Object.entries(severityCounts).sort((a, b) => b[1] - a[1])[0]?.[0] as SideEffectSummary['severity'] || 'mild';
+      return {
+        effect: effect.replace(/mild|moderate|severe/gi, '').trim() || effect,
+        severity: mostCommonSeverity,
+        occurrences: details.count,
+        percentageOfUses: Math.round((details.count / data.uses.length) * 100),
+      };
+    }).sort((a, b) => b.occurrences - a.occurrences);
+
+    return {
+      medication: medication.charAt(0).toUpperCase() + medication.slice(1),
+      totalUses: data.uses.length,
+      usesLast30Days,
+      usesLast7Days,
+      daysLast30Days,
+      avgEffectiveness,
+      avgReliefTimeMinutes,
+      overuseAlert,
+      overuseMessage,
+      sideEffects,
+    };
+  }).sort((a, b) => b.usesLast30Days - a.usesLast30Days);
+
+  const otherTreatments = Array.from(otherMap.entries()).map(([treatment, data]) => ({
+    treatment: treatment.charAt(0).toUpperCase() + treatment.slice(1),
+    usesLast30Days: data.uses.filter(use => inLast30Days(use.date)).length,
+  })).filter(item => item.usesLast30Days > 0).sort((a, b) => b.usesLast30Days - a.usesLast30Days);
+
+  const overuseAlertCount = medications.filter(medication => medication.overuseAlert).length;
+  const effectiveMeds = medications.filter(medication => medication.avgEffectiveness > 0);
+
+  return {
+    medications,
+    otherTreatments,
+    totalMedicationDays: medicationDays.size,
+    medicationOveruseRisk: overuseAlertCount > 0 || medicationDays.size >= 15,
+    overuseAlertCount,
+    mostEffectiveMedication: effectiveMeds.length > 0
+      ? [...effectiveMeds].sort((a, b) => b.avgEffectiveness - a.avgEffectiveness)[0].medication
+      : null,
+    leastSideEffectsMedication: medications.length > 0
+      ? [...medications].sort((a, b) => a.sideEffects.length - b.sideEffects.length)[0].medication
+      : null,
+  };
+}
 
 export const useMedicationAnalysis = () => {
   const { user } = useAuth();
@@ -56,21 +226,21 @@ export const useMedicationAnalysis = () => {
   const [units, setUnits] = useState<AnalysisUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const referenceTime = useMemo(
+    () => (isDemoMode() ? getDemoAnalysisDate(getDemoScenario()) : new Date()).getTime(),
+    [user?.id],
+  );
 
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
-
     const fetchEpisodes = async () => {
       try {
-        // Fetch last 90 days for comprehensive analysis
-        const startDate = subDays(new Date(), 90);
-
-        const r = await fetchAnalysisData(user.id, { from: startDate });
-        setEpisodes(r.episodes);
-        setUnits(r.units);
+        const result = await fetchAnalysisData(user.id, { from: subDays(new Date(referenceTime), 90) });
+        setEpisodes(result.episodes);
+        setUnits(result.units);
       } catch (err) {
         console.error('Error fetching medication data:', err);
         setError('Failed to load medication data');
@@ -78,158 +248,13 @@ export const useMedicationAnalysis = () => {
         setLoading(false);
       }
     };
-
     fetchEpisodes();
-  }, [user]);
+  }, [user, referenceTime]);
 
-  const analysisData = useMemo<MedicationAnalysisData>(() => {
-    const emptyResult: MedicationAnalysisData = {
-      medications: [],
-      totalMedicationDays: 0,
-      medicationOveruseRisk: false,
-      overuseAlertCount: 0,
-      mostEffectiveMedication: null,
-      leastSideEffectsMedication: null,
-    };
+  const analysisData = useMemo(
+    () => calculateMedicationAnalysis(episodes, units, new Date(referenceTime)),
+    [episodes, units, referenceTime],
+  );
 
-    if (episodes.length === 0) return emptyResult;
-
-    const thirtyDaysAgo = subDays(new Date(), 30);
-    const sevenDaysAgo = subDays(new Date(), 7);
-
-    // Extract medications from treatment data
-    const medicationMap = new Map<string, {
-      uses: Array<{ date: Date; duration: number; effectiveness?: number; sideEffects?: string[] }>;
-    }>();
-
-    // Read each area's treatment; a medication counts once per episode (overuse is counted in days).
-    const seen = new Set<string>();
-    units.forEach(u => {
-      const treatment = u.treatment as any;
-      if (!treatment) return;
-      const epDate = new Date(u.start_time);
-      const duration = u.duration_minutes || 0;
-      const effectiveness = typeof treatment === 'object' && treatment.effectiveness !== undefined && Number(treatment.effectiveness) > 0
-        ? Number(treatment.effectiveness) : undefined;
-      const sideEffects: string[] = typeof treatment === 'object' && treatment.sideEffects
-        ? (Array.isArray(treatment.sideEffects) ? treatment.sideEffects : [treatment.sideEffects]) : [];
-
-      extractTreatmentNames(treatment).forEach(med => {
-        const medLower = med.toLowerCase().trim();
-        if (!medLower) return;
-        const dedupe = `${u.episodeId}|${medLower}`;
-        if (seen.has(dedupe)) return;
-        seen.add(dedupe);
-        const existing = medicationMap.get(medLower) || { uses: [] };
-        existing.uses.push({ date: epDate, duration, effectiveness, sideEffects });
-        medicationMap.set(medLower, existing);
-      });
-    });
-
-    // Calculate medication statistics
-    const medications: MedicationUsage[] = Array.from(medicationMap.entries()).map(([medication, data]) => {
-      const totalUses = data.uses.length;
-      const usesLast30Days = data.uses.filter(u => u.date >= thirtyDaysAgo).length;
-      const usesLast7Days = data.uses.filter(u => u.date >= sevenDaysAgo).length;
-
-      // Average effectiveness (assuming shorter duration = more effective)
-      const usesWithEffectiveness = data.uses.filter(u => u.effectiveness !== undefined);
-      const avgEffectiveness = usesWithEffectiveness.length > 0
-        ? Math.round((usesWithEffectiveness.reduce((sum, u) => sum + (u.effectiveness || 0), 0) / usesWithEffectiveness.length) * 10) / 10
-        : 0;
-
-      // Average relief time
-      const avgReliefTimeMinutes = totalUses > 0
-        ? Math.round(data.uses.reduce((sum, u) => sum + u.duration, 0) / totalUses)
-        : 0;
-
-      // Check for overuse
-      const threshold = OVERUSE_THRESHOLDS[medication] || OVERUSE_THRESHOLDS['default'];
-      const overuseAlert = usesLast30Days >= threshold;
-      const overuseMessage = overuseAlert
-        ? `Used ${usesLast30Days} days in last 30 days (threshold: ${threshold} days). Risk of medication overuse headache.`
-        : null;
-
-      // Side effects analysis
-      const sideEffectCounts = new Map<string, { count: number; severities: string[] }>();
-      data.uses.forEach(use => {
-        (use.sideEffects || []).forEach(effect => {
-          const effectLower = effect.toLowerCase();
-          const existing = sideEffectCounts.get(effectLower) || { count: 0, severities: [] };
-          existing.count++;
-          // Try to extract severity from effect string (e.g., "mild nausea")
-          if (effectLower.includes('severe')) existing.severities.push('severe');
-          else if (effectLower.includes('moderate')) existing.severities.push('moderate');
-          else existing.severities.push('mild');
-          sideEffectCounts.set(effectLower, existing);
-        });
-      });
-
-      const sideEffects: SideEffectSummary[] = Array.from(sideEffectCounts.entries()).map(([effect, data]) => {
-        // Determine most common severity
-        const severityCounts = data.severities.reduce((acc, s) => {
-          acc[s] = (acc[s] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-        const mostCommonSeverity = Object.entries(severityCounts)
-          .sort((a, b) => b[1] - a[1])[0]?.[0] as 'mild' | 'moderate' | 'severe' || 'mild';
-
-        return {
-          effect: effect.replace(/mild|moderate|severe/gi, '').trim() || effect,
-          severity: mostCommonSeverity,
-          occurrences: data.count,
-          percentageOfUses: Math.round((data.count / totalUses) * 100),
-        };
-      }).sort((a, b) => b.occurrences - a.occurrences);
-
-      return {
-        medication: medication.charAt(0).toUpperCase() + medication.slice(1),
-        totalUses,
-        usesLast30Days,
-        usesLast7Days,
-        avgEffectiveness,
-        avgReliefTimeMinutes,
-        overuseAlert,
-        overuseMessage,
-        sideEffects,
-      };
-    }).sort((a, b) => b.usesLast30Days - a.usesLast30Days);
-
-    // Calculate overall statistics
-    const uniqueMedicationDays = new Set(
-      units
-        .filter(u => extractTreatmentNames(u.treatment).length > 0)
-        .map(u => format(new Date(u.start_time), 'yyyy-MM-dd'))
-    ).size;
-
-    const overuseAlertCount = medications.filter(m => m.overuseAlert).length;
-    const medicationOveruseRisk = overuseAlertCount > 0 || uniqueMedicationDays >= 15;
-
-    // Find most effective medication
-    const effectiveMeds = medications.filter(m => m.avgEffectiveness > 0);
-    const mostEffectiveMedication = effectiveMeds.length > 0
-      ? effectiveMeds.sort((a, b) => b.avgEffectiveness - a.avgEffectiveness)[0].medication
-      : null;
-
-    // Find medication with least side effects
-    const leastSideEffectsMedication = medications.length > 0
-      ? medications.sort((a, b) => a.sideEffects.length - b.sideEffects.length)[0].medication
-      : null;
-
-    return {
-      medications,
-      totalMedicationDays: uniqueMedicationDays,
-      medicationOveruseRisk,
-      overuseAlertCount,
-      mostEffectiveMedication,
-      leastSideEffectsMedication,
-    };
-  }, [episodes, units]);
-
-  return {
-    ...analysisData,
-    loading,
-    error,
-    hasData: episodes.length > 0,
-  };
+  return { ...analysisData, loading, error, hasData: episodes.length > 0 };
 };

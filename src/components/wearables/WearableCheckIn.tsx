@@ -11,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { isDemoMode } from "@/lib/demoMode";
 
 export const WEARABLE_TIP =
-  "Wear a Fitbit, Apple Watch, or Oura Ring? Use your morning sleep score and HRV to populate your daily check-in. Our AI correlation engine will analyze how sleep architecture affects your episode frequency.";
+  "Enter last night's sleep and, if you track them, your resting heart rate and HRV.";
 
 interface Props {
   title?: string;
@@ -21,7 +21,7 @@ interface Props {
 const toNum = (v: string) => (v.trim() === "" ? null : Number(v));
 
 /** Manual sleep & wearable check-in for today. Saves one manual row per day. */
-export function WearableCheckIn({ title = "Daily Sleep & Wearable Check-in", compact = false }: Props) {
+export function WearableCheckIn({ title = "Daily sleep check-in", compact = false }: Props) {
   const { user } = useAuth();
   const today = format(new Date(), "yyyy-MM-dd");
   const [hours, setHours] = useState(() => isDemoMode() ? "6.5" : "");
@@ -116,7 +116,7 @@ export function WearableCheckIn({ title = "Daily Sleep & Wearable Check-in", com
             <Input id="wc-hrv" type="number" inputMode="numeric" value={hrv} onChange={(e) => setHrv(e.target.value)} />
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">From your smartwatch or tracker.</p>
+        <p className="text-xs text-muted-foreground">Sleep score uses a 1–100 scale. Heart rate and HRV are optional.</p>
         <Button onClick={save} disabled={saving} className="w-full">
           {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {savedToday ? "Update today's check-in" : "Save check-in"}

@@ -120,6 +120,40 @@ export function extractTreatmentNames(t: any): string[] {
   return Array.from(new Set(names.map(n => n.trim()).filter(Boolean)));
 }
 
+const NON_MEDICATION_NAMES = new Set([
+  'rest', 'meditation', 'ice pack', 'cold compress', 'heat', 'heating pad', 'hydration',
+  'water', 'sleep', 'dark room', 'breathing', 'exercise', 'stretching', 'massage',
+]);
+
+const isNonMedication = (name: string) => NON_MEDICATION_NAMES.has(name.trim().toLowerCase());
+
+/** Explicit medication entries, with a legacy type fallback that excludes self-care labels. */
+export function extractMedicationNames(t: any): string[] {
+  if (!t || typeof t !== 'object') return [];
+  const names: string[] = [];
+  if (t.medications) {
+    const meds = Array.isArray(t.medications) ? t.medications : [t.medications];
+    meds.forEach((m: any) => {
+      const name = typeof m === 'string' ? m : m?.name;
+      if (name) names.push(name);
+    });
+  }
+  if (names.length === 0 && typeof t.type === 'string' && t.type && !isNonMedication(t.type) && t.type.toLowerCase() !== 'other') {
+    names.push(t.type);
+  }
+  return Array.from(new Set(names.map(n => n.trim()).filter(Boolean)));
+}
+
+/** Non-drug management is reported separately and never counted towards medication-use days. */
+export function extractOtherTreatmentNames(t: any): string[] {
+  if (!t || typeof t !== 'object') return [];
+  const names = Array.isArray(t.otherTreatments)
+    ? t.otherTreatments.filter((name: any): name is string => typeof name === 'string')
+    : [];
+  if (typeof t.type === 'string' && isNonMedication(t.type)) names.push(t.type);
+  return Array.from(new Set(names.map(name => name.trim()).filter(Boolean)));
+}
+
 export interface OutcomeCounts { effective: number; partial: number; notEffective: number }
 
 export function addOutcome(c: OutcomeCounts, outcome: string | null | undefined) {
