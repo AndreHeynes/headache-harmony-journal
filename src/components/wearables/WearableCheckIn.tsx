@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Watch, Loader2 } from "lucide-react";
+import { Moon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,7 +92,7 @@ export function WearableCheckIn({ title = "Daily sleep check-in", compact = fals
     <Card id="wearable-checkin" className="bg-card border-border">
       <CardHeader className={compact ? "pb-2" : undefined}>
         <CardTitle className="text-foreground flex items-center gap-2 text-base">
-          <Watch className="h-5 w-5 text-primary" />
+          <Moon className="h-5 w-5 text-primary" />
           {title}
         </CardTitle>
         <CardDescription>{WEARABLE_TIP}</CardDescription>
